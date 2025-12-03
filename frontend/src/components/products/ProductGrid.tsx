@@ -21,7 +21,7 @@ const ProductGrid = ({ products }: ProductGridProps) => {
 					</div>
 					<h3 className="text-sm px-4 mb-2">{product.name}</h3>
 					<p className="text-gray-500 px-4 font-medium text-sm tracking-tighter">
-						$ {product.price}
+						IDR {product.price.toLocaleString()}
 					</p>
 				</Link>
 			))}

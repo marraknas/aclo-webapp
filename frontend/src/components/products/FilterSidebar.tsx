@@ -9,6 +9,7 @@ type FilterState = {
 	material: string[];
 	minPrice: number;
 	maxPrice: number;
+	[key: string]: any;
 };
 
 const FilterSidebar = () => {
@@ -25,20 +26,9 @@ const FilterSidebar = () => {
 	const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
 	const materials = ["Birch plywood", "Oak plywood"];
 
-	// const params = Object.fromEntries([...searchParams]);
-	// const filter: FilterState = {
-	// 	category: params.category || "",
-	// 	color: params.color || "",
-	// 	material: params.material ? params.material.split(",") : [],
-	// 	minPrice: params.minPrice ? Number(params.minPrice) : 0,
-	// 	maxPrice: params.maxPrice ? Number(params.maxPrice) : 1000000,
-	// };
-	// const priceRange: [number, number] = [filter.minPrice, filter.maxPrice];
 	useEffect(() => {
 		const params = Object.fromEntries([...searchParams]);
 		// you get this {category: "Learning Tower", maxPrice: 10000} and you access like this params.category
-		// const maxPrice = params.maxPrice ? Number(params.maxPrice) : 1000000;
-		// const minPrice = params.minPrice ? Number(params.minPrice) : 0;
 		setFilters({
 			category: params.category || "",
 			color: params.color || "",
@@ -47,20 +37,22 @@ const FilterSidebar = () => {
 			maxPrice: params.maxPrice ? Number(params.maxPrice) : 1000000,
 		});
 		// setPriceRange([minPrice, maxPrice]);
-		setPriceRange([0, Number(params.maxPrice) || 1000000])
+		setPriceRange([0, Number(params.maxPrice) || 1000000]);
 	}, [searchParams]);
 	const handleFilterChange = (
 		e: ChangeEvent<HTMLInputElement> | MouseEvent<HTMLButtonElement>
 	) => {
 		const target = e.target as HTMLInputElement;
-		const {name, value, checked, type} = target;
-		let newFilters: FilterState = {...filters};
+		const { name, value, checked, type } = target;
+		const newFilters: FilterState = { ...filters };
 
 		if (type === "checkbox") {
-			if(checked) {
+			if (checked) {
 				newFilters[name] = [...(newFilters[name] || []), value];
 			} else {
-				newFilters[name] = newFilters[name].filter((item) => item !== value);
+				newFilters[name] = newFilters[name].filter(
+					(item: string) => item !== value
+				);
 			}
 		} else {
 			newFilters[name] = value;
@@ -68,39 +60,8 @@ const FilterSidebar = () => {
 		setFilters(newFilters);
 		console.log(newFilters);
 		updateURLParams(newFilters);
-		// const params = new URLSearchParams(searchParams);
-		// const { name, value } = e.target;
-
-		// if ("checked" in e.target && e.target.type === "checkbox") {
-		// 	const materials = params.get(name)?.split(",") ?? [];
-
-		// 	if (e.target.checked) {
-		// 		materials.push(value);
-		// 	} else {
-		// 		const updated = materials.filter((m) => m !== value);
-		// 		if (updated.length === 0) params.delete(name);
-		// 		else params.set(name, updated.join(","));
-		// 	}
-		// } else {
-		// 	// Handles <select>, <input type="text">, etc.
-		// 	if (value === "" || value === "all") params.delete(name);
-		// 	else params.set(name, value);
-		// }
-
-		// setSearchParams(params);
 	};
 
-	// const handleFilterClick = (name: string, value: string) => {
-	// 	const params = new URLSearchParams(searchParams);
-
-	// 	if (params.get(name) === value) {
-	// 		params.delete(name);
-	// 	} else {
-	// 		params.set(name, value);
-	// 	}
-
-	// 	setSearchParams(params);
-	// };
 	const updateURLParams = (newFilters: FilterState) => {
 		const params = new URLSearchParams();
 		Object.keys(newFilters).forEach((key) => {
@@ -108,11 +69,18 @@ const FilterSidebar = () => {
 				params.append(key, newFilters[key].join(","));
 			} else if (newFilters[key]) {
 				params.set(key, newFilters[key]);
-				
 			}
 		});
 		setSearchParams(params);
 		navigate(`?${params.toString()}`);
+	};
+
+	const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const newPrice = Number(e.target.value);
+		setPriceRange([0, newPrice]);
+		const newFilters = { ...filters, minPrice: 0, maxPrice: newPrice };
+		setFilters(newFilters);
+		updateURLParams(newFilters);
 	};
 
 	return (
@@ -128,6 +96,7 @@ const FilterSidebar = () => {
 							name="category"
 							value={category}
 							onChange={handleFilterChange}
+							checked={filters.category === category}
 							className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 cursor-pointer"
 						/>
 						<span className="text-gray-700">{category}</span>
@@ -143,9 +112,10 @@ const FilterSidebar = () => {
 							key={color}
 							name="color"
 							value={color}
-							// onClick={() => handleFilterClick("color", color)}
 							onClick={handleFilterChange}
-							className="w-6 h-6 rounded-full border border-gray-300 cursor-pointer transition hover:scale-105"
+							className={`w-6 h-6 rounded-full border border-gray-300 cursor-pointer transition hover:scale-105 ${
+								filters.color === color ? "ring-2 ring-blue-500" : ""
+							}`}
 							style={{ backgroundColor: COLOR_MAP[color] }}
 						/>
 					))}
@@ -161,6 +131,7 @@ const FilterSidebar = () => {
 							name="material"
 							value={material}
 							onChange={handleFilterChange}
+							checked={filters.material.includes(material)}
 							className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
 						/>
 						<span className="text-gray-700">{material}</span>
@@ -178,6 +149,8 @@ const FilterSidebar = () => {
 					name="priceRange"
 					min={0}
 					max={1000000}
+					value={priceRange[1]}
+					onChange={handlePriceChange}
 					className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
 				/>
 				<div className="flex justify-between text-gray-600 mt-2">
