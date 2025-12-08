@@ -34,6 +34,9 @@ Packages needed for BACKEND:
 - bcryptjs - for hashing passwords stored in the website,
 - cors - to connect FE and BE because FE and BE are hosted on diff domains,
 - nodemon - dev tool that restarts server whenever we save changes instead of manually restarting everytime
+- multer - handling file uploads and stores them in memory
+- cloudinary - help communicate with cloudinary API
+- streamifier - convert chunks of data into streams 
 
 To run FE, cd into the frontend folder and run `npm run dev`
 To run BE, cd into the backend folder and run `npm run dev`
@@ -41,5 +44,3 @@ To run BE, cd into the backend folder and run `npm run dev`
 BACKEND note:
 We are allowing users to create a cart even if they're not logged in (i.e. guest users). But guest users aren't allowed to checkout.
 If they login, it will be converted into a User Cart, hence the merge cart functionality in the api
-
-CartItemSchema: productId, name, image, price, category, options, quantity

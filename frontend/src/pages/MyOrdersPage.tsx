@@ -9,6 +9,7 @@ type OrderItem = {
 type ShippingAddress = {
 	city: string;
 	address: string;
+	postalCode: string;
 };
 
 type Order = {
@@ -34,6 +35,7 @@ const MyOrdersPage = () => {
 					shippingAddress: {
 						city: "Jakarta",
 						address: "Jalan Permata Indah 2 Blok H5/23",
+						postalCode: "12345",
 					},
 					orderItems: [
 						{
@@ -50,6 +52,7 @@ const MyOrdersPage = () => {
 					shippingAddress: {
 						city: "Medan",
 						address: "Jalan Permata Jelek 4 Blok H3/12",
+						postalCode: "67890",
 					},
 					orderItems: [
 						{
@@ -109,7 +112,7 @@ const MyOrdersPage = () => {
 									</td>
 									<td className="py-2 px-2 sm:py-4 sm:px-4">
 										{order.shippingAddress
-											? `${order.shippingAddress.city}, ${order.shippingAddress.address}`
+											? `${order.shippingAddress.city}, ${order.shippingAddress.address}, ${order.shippingAddress.postalCode}`
 											: "N/A"}
 									</td>
 									<td className="py-2 px-2 sm:py-4 sm:px-4">
