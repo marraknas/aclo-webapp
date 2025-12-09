@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
 // pre is a hook that gets executed before the save operation
 userSchema.pre("save", async function () {
 	// next param ensures that the next middleware/other operations run aft this code
-	if (!this.isModified("password")) return next();
+	if (!this.isModified("password")) return;
 
 	// salt is a random extra data added to password before hashing
 	const salt = await bcrypt.genSalt(10); // higher number, more accurate it is but slower

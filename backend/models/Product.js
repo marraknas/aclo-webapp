@@ -70,7 +70,8 @@ const productSchema = new mongoose.Schema(
 			type: Number,
 			default: 0,
 		},
-		createdBy: {
+		user: {
+			// the admin user that created the product
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: true,

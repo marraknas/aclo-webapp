@@ -42,7 +42,7 @@ router.post("/", protect, admin, async (req, res) => {
 			isPublished,
 			dimensions,
 			weight,
-			createdBy: req.user._id, // reference to admin user who created product
+			user: req.user._id, // reference to admin user who created product
 		});
 
 		const createdProduct = await product.save();
