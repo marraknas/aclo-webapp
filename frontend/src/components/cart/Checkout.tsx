@@ -1,21 +1,30 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalButton from "./PayPalButton";
+import type { Cart } from "../../types/cart";
 
-const cart = {
+// mock cart
+const cart: Cart = {
 	products: [
 		{
+			productId: "1",
 			name: "T-shirt",
-			size: "M",
-			color: "Red",
+			options: {
+				size: "M",
+				color: "Red",
+			},
 			quantity: 1,
 			price: 15000,
 			image: "https://picsum.photos/200?random=1",
 		},
 		{
+			productId: "2",
 			name: "Jeans",
-			size: "L",
-			color: "Blue",
+			options: {
+
+				size: "L",
+				color: "Blue",
+			},
 			quantity: 1,
 			price: 15000,
 			image: "https://picsum.photos/200?random=2",
@@ -180,8 +189,8 @@ const Checkout = () => {
 								/>
 								<div>
 									<h3 className="text-md">{product.name}</h3>
-									<p className="text-gray-500">Size: {product.size}</p>
-									<p className="text-gray-500">Color: {product.color}</p>
+									<p className="text-gray-500">Size: {product.options?.size}</p>
+									<p className="text-gray-500">Color: {product.options?.color}</p>
 								</div>
 							</div>
 							<p className="text-xl">IDR {product.price?.toLocaleString()}</p>

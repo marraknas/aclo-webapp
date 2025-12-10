@@ -1,7 +1,15 @@
+import type { User } from "../../types/user";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
+interface NewUserFormData {
+  name: string;
+  email: string;
+  password: string;
+  role: User["role"]; // reuses role type from User
+}
+
 const UserManagement = () => {
-	const users = [
+	const users: User[] = [
 		{
 			_id: "someid",
 			name: "John Doe",
@@ -9,11 +17,11 @@ const UserManagement = () => {
 			role: "admin",
 		},
 	];
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<NewUserFormData>({
 		name: "",
 		email: "",
 		password: "",
-		role: "customer", // Default role
+		role: "customer",
 	});
 
 	const handleChange = (
@@ -35,7 +43,7 @@ const UserManagement = () => {
 			role: "customer",
 		});
 	};
-	const handleRoleChange = (userId: string, newRole: string) => {
+	const handleRoleChange = (userId: string, newRole: User["role"]) => {
 		console.log({ id: userId, role: newRole });
 	};
 	const handleDeleteUser = (userId: string) => {
@@ -121,7 +129,7 @@ const UserManagement = () => {
 								<td className="p-4">
 									<select
 										value={user.role}
-										onChange={(e) => handleRoleChange(user._id, e.target.value)}
+										onChange={(e) => handleRoleChange(user._id, e.target.value as User["role"])}
 										className="p-2 border rounded"
 									>
 										<option value="customer">Customer</option>

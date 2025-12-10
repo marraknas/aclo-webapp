@@ -1,21 +1,26 @@
 import { RiDeleteBinLine } from "react-icons/ri";
+import type { CartItem } from "../../types/cart";
 
 const CartContents = () => {
-	const cartProducts = [
+	const cartProducts: CartItem[] = [
 		{
-			productId: 1,
+			productId: "1",
 			name: "T-shirt",
-			size: "M",
-			color: "Red",
+			options: {
+				size: "M",
+				color: "Red",
+			},
 			quantity: 1,
 			price: 15000,
 			image: "https://picsum.photos/200?random=1",
 		},
 		{
-			productId: 2,
+			productId: "2",
 			name: "Jeans",
-			size: "L",
-			color: "Blue",
+			options: {
+				size: "L",
+				color: "Blue",
+			},
 			quantity: 1,
 			price: 15000,
 			image: "https://picsum.photos/200?random=2",
@@ -37,7 +42,7 @@ const CartContents = () => {
 						<div>
 							<h3>{product.name}</h3>
 							<p className="text-sm text-gray-500">
-								size: {product.size} | color: {product.color}{" "}
+								size: {product.options?.size} | color: {product.options?.color}{" "}
 							</p>
 							<div className="flex items-center mt-2">
 								<button className="border rounded px-2 py-0.5 text-xl font-medium">

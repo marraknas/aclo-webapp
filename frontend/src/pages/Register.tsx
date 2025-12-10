@@ -1,18 +1,31 @@
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import registerImg from "../assets/register1.jpg";
 import { registerUser } from "../redux/slices/authSlice";
 import { useAppDispatch } from "../redux/hooks";
+import type { RegisterPayload } from "../types/auth";
 
 const Register = () => {
-	const [name, setName] = useState<string>("");
-	const [email, setEmail] = useState<string>("");
-	const [password, setPassword] = useState<string>("");
+	const [formData, setFormData] = useState<RegisterPayload>({
+		name: "",
+		email: "",
+		password: "",
+	});
+
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setFormData({
+			...formData,
+			[e.target.name]: e.target.value,
+		});
+	};
+
 	const dispatch = useAppDispatch();
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		dispatch(registerUser({ name, email, password }));
+		dispatch(registerUser(formData));
+		// reset form after submit
+		setFormData({ name: "", email: "", password: "" });
 	};
 
 	return (
@@ -33,8 +46,9 @@ const Register = () => {
 						<label className="block text-sm font-semibold mb-2">Name</label>
 						<input
 							type="text"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+							name="name"
+							value={formData.name}
+							onChange={handleChange}
 							className="w-full p-2 border rounded"
 							placeholder="Enter your name"
 						/>
@@ -43,8 +57,9 @@ const Register = () => {
 						<label className="block text-sm font-semibold mb-2">Email</label>
 						<input
 							type="email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
+							name="email"
+							value={formData.email}
+							onChange={handleChange}
 							className="w-full p-2 border rounded"
 							placeholder="Enter your email address"
 						/>
@@ -53,8 +68,9 @@ const Register = () => {
 						<label className="block text-sm font-semibold mb-2">Password</label>
 						<input
 							type="password"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
+							name="password"
+							value={formData.password}
+							onChange={handleChange}
 							className="w-full p-2 border rounded"
 							placeholder="Enter your password"
 						/>

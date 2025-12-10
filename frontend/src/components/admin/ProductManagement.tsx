@@ -1,12 +1,24 @@
 import { Link } from "react-router-dom";
+import type { Product } from "../../types/products";
 
 const ProductManagement = () => {
-	const products = [
+	const products: Product[] = [
 		{
 			_id: "id123",
 			name: "Shirt",
+			description: "A nice shirt",
 			price: 115000,
+			countInStock: 10,
 			sku: "1235431562", // stock-keeping unit
+			category: "Accessories",
+			images: [
+				{url: "https://picsum.photos/50?random=1"}
+			],
+			isFeatured: false,
+            isPublished: true,
+            rating: 4.5,
+            numReviews: 10,
+            user: "user123",
 		},
 	];
 	const handleDelete = (productId: string) => {

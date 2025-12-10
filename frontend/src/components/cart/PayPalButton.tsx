@@ -1,4 +1,4 @@
-// IGNORE THIS FILE BECAUSE WE WON'T BE USING PAYPAL
+// IGNORE ERRORS/WARNINGS IN THIS FILE BECAUSE WE WON'T BE USING PAYPAL
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 type PayPalButtonProps = {

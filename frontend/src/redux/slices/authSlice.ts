@@ -1,28 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-
-// === Types ===
-export interface User {
-	_id: string;
-	name: string;
-	email: string;
-	role: "customer" | "admin";
-}
-
-interface AuthError {
-	message: string;
-}
-
-interface LoginPayload {
-	email: string;
-	password: string;
-}
-
-interface RegisterPayload {
-	name: string;
-	email: string;
-	password: string;
-}
+import type { User } from "../../types/user";
+import type { LoginPayload, RegisterPayload } from "../../types/auth";
+import type { AppError } from "../../types/error";
 
 interface AuthState {
 	user: User | null;
@@ -59,7 +39,7 @@ const initialState: AuthState = {
 export const loginUser = createAsyncThunk<
 	User,
 	LoginPayload,
-	{ rejectValue: AuthError }
+	{ rejectValue: AppError }
 >("auth/loginUser", async (userData, { rejectWithValue }) => {
 	try {
 		const response = await axios.post(
@@ -72,7 +52,7 @@ export const loginUser = createAsyncThunk<
 		// return user obj from response
 		return response.data.user as User;
 	} catch (err) {
-		const error = err as AxiosError<AuthError>;
+		const error = err as AxiosError<AppError>;
 		if (error.response && error.response.data) {
 			return rejectWithValue(error.response.data);
 		}
@@ -84,7 +64,7 @@ export const loginUser = createAsyncThunk<
 export const registerUser = createAsyncThunk<
 	User,
 	RegisterPayload,
-	{ rejectValue: AuthError }
+	{ rejectValue: AppError }
 >("auth/registerUser", async (userData, { rejectWithValue }) => {
 	try {
 		const response = await axios.post(
@@ -97,7 +77,7 @@ export const registerUser = createAsyncThunk<
 		// return user obj from response
 		return response.data.user as User;
 	} catch (err) {
-		const error = err as AxiosError<AuthError>;
+		const error = err as AxiosError<AppError>;
 		if (error.response && error.response.data) {
 			return rejectWithValue(error.response.data);
 		}
