@@ -16,7 +16,7 @@ router.get("/my-orders", protect, async (req, res) => {
 		res.json(orders);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -37,7 +37,7 @@ router.get("/:id", protect, async (req, res) => {
 		res.json(order);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 

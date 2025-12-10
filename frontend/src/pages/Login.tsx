@@ -1,14 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import loginImg from "../assets/login1.jpg";
+import { loginUser } from "../redux/slices/authSlice";
+import { useAppDispatch } from "../redux/hooks";
 
 const Login = () => {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
+	const dispatch = useAppDispatch();
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log("User Login: ", { email, password });
+		dispatch(loginUser({ email, password }));
 	};
 
 	return (

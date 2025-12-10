@@ -49,7 +49,7 @@ router.post("/", protect, admin, async (req, res) => {
 		res.status(201).json(createdProduct);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -105,7 +105,7 @@ router.put("/:id", protect, admin, async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -127,7 +127,7 @@ router.delete("/:id", protect, admin, async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -136,7 +136,7 @@ router.delete("/:id", protect, admin, async (req, res) => {
 // @access Public
 router.get("/", async (req, res) => {
 	try {
-		// note that filters may not even be used due to the small number of products we have
+		// note that filters are not used due to the small number of products we have
 		// const { category, color, material, minPrice, maxPrice, sortBy, search } =
 		// 	req.query;
 
@@ -187,7 +187,7 @@ router.get("/", async (req, res) => {
 		res.json(products);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -204,7 +204,7 @@ router.get("/best-seller", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -218,7 +218,7 @@ router.get("/new-arrivals", async (req, res) => {
 		res.json(newArrivals);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -235,7 +235,7 @@ router.get("/:id", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -259,7 +259,7 @@ router.get("/similar/:id", async (req, res) => {
 		res.json(similarProducts);
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 

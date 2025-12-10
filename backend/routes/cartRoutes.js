@@ -87,7 +87,7 @@ router.post("/", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({message: "Server Error"});
 	}
 });
 
@@ -123,7 +123,7 @@ router.put("/", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({message: "Server Error"});
 	}
 });
 
@@ -155,7 +155,7 @@ router.delete("/", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({message: "Server Error"});
 	}
 });
 
@@ -174,7 +174,7 @@ router.get("/", async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({message: "Server Error"});
 	}
 });
 
@@ -239,7 +239,7 @@ router.post("/merge", protect, async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({message: "Server Error"});
 	}
 });
 

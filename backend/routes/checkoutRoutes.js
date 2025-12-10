@@ -32,7 +32,7 @@ router.post("/", protect, async (req, res) => {
 		res.status(201).json(newCheckout);
 	} catch (error) {
 		console.error("Error creating checkout session: ", error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -63,7 +63,7 @@ router.put("/:id/pay", protect, async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
@@ -107,7 +107,7 @@ router.post("/:id/finalize", protect, async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 

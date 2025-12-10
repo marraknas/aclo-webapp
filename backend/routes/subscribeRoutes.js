@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
 		res.status(201).json({ message: "Successfully Subscribed to Newsletter" });
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Server Error");
+		res.status(500).json({ message: "Server Error" });
 	}
 });
 
