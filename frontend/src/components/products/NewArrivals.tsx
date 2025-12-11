@@ -1,9 +1,9 @@
-import kidsToysImg from "../../assets/toys1.jpg";
-import yellowLearningTowerImg from "../../assets/lt-yellow1.jpg";
-import foldableStoolImg from "../../assets/stool-folded1.jpg";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import axios from "axios";
+import { API_URL } from "../../constants/api";
+import type { Product } from "../../types/products";
 
 const NewArrivals = () => {
 	const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -12,63 +12,21 @@ const NewArrivals = () => {
 	const [scrollLeft, setScrollLeft] = useState<number>(0);
 	const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
 	const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
-	const newArrivals = [
-		{
-			_id: "1",
-			name: "Kids' Toys",
-			price: 7000,
-			images: [
-				{
-					url: kidsToysImg,
-					altText: "Kids' Toys",
-				},
-			],
-		},
-		{
-			_id: "2",
-			name: "Random Object",
-			price: 20000,
-			images: [
-				{
-					url: "https://picsum.photos/500/700?random=1",
-					altText: "Random Object",
-				},
-			],
-		},
-		{
-			_id: "3",
-			name: "Blue Learning Tower",
-			price: 50000,
-			images: [
-				{
-					url: "/lt-blue2.jpg",
-					altText: "Blue Learning Tower",
-				},
-			],
-		},
-		{
-			_id: "4",
-			name: "Yellow Learning Tower",
-			price: 50000,
-			images: [
-				{
-					url: yellowLearningTowerImg,
-					altText: "Yellow Learning Tower",
-				},
-			],
-		},
-		{
-			_id: "5",
-			name: "Foldable Stool",
-			price: 30000,
-			images: [
-				{
-					url: foldableStoolImg,
-					altText: "Foldable Stool",
-				},
-			],
-		},
-	];
+	const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+
+	useEffect(() => {
+		const fetchNewArrivals = async () => {
+			try {
+				const response = await axios.get<Product[]>(
+					`${API_URL}/api/products/new-arrivals`
+				);
+				setNewArrivals(response.data);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		fetchNewArrivals();
+	}, []);
 
 	const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
 		const container = scrollRef.current;
@@ -122,7 +80,7 @@ const NewArrivals = () => {
 		return () => {
 			container.removeEventListener("scroll", updateScrollButtons);
 		};
-	}, []);
+	}, [newArrivals]);
 	return (
 		<section className="py-16 px-4 lg:px-0">
 			<div className="container mx-auto text-center mb-10 relative">

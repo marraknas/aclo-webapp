@@ -1,27 +1,27 @@
 export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: "customer" | "admin";
-  createdAt?: string; // backend currently doesn't return these, but maybe for future improvements
-  updatedAt?: string;
+	_id: string;
+	name: string;
+	email: string;
+	role: "customer" | "admin";
+	createdAt?: string; // backend currently doesn't return these, but maybe for future improvements
+	updatedAt?: string;
 }
 
 // ==== Types for Admin actions =====
 export interface AddUserPayload {
-  name: string;
-  email: string;
-  password: string;
-  role?: "customer" | "admin";
+	name: string;
+	email: string;
+	password: string;
+	role?: "customer" | "admin";
 }
 
 export interface UpdateUserPayload {
-  id: string;
-  name?: string;
-  email?: string;
-  role?: "customer" | "admin";
+	id: string;
+	name?: string;
+	email?: string;
+	role?: "customer" | "admin";
 }
 
 export interface DeleteUserPayload {
-  id: string;
+	id: string;
 }

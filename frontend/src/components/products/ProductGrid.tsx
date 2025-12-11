@@ -3,9 +3,18 @@ import type { Product } from "../../types/products";
 
 type ProductGridProps = {
 	products: Product[];
+	loading: boolean;
+	error: string | null;
 };
 
-const ProductGrid = ({ products }: ProductGridProps) => {
+const ProductGrid = ({ products, loading, error }: ProductGridProps) => {
+	if (loading) {
+		return <p>Loading...</p>;
+	}
+
+	if (error) {
+		return <p>Error: {error}</p>;
+	}
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 space-y-4">
 			{products.map((product, index) => (

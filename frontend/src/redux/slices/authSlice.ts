@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import type { User } from "../../types/user";
 import type { LoginPayload, RegisterPayload } from "../../types/auth";
 import type { AppError } from "../../types/error";
+import { API_URL } from "../../constants/api";
 
 interface AuthState {
 	user: User | null;
@@ -43,7 +44,7 @@ export const loginUser = createAsyncThunk<
 >("auth/loginUser", async (userData, { rejectWithValue }) => {
 	try {
 		const response = await axios.post(
-			`${import.meta.env.VITE_BACKEND_URL as string}/api/users/login`,
+			`${API_URL as string}/api/users/login`,
 			userData
 		);
 		localStorage.setItem("userInfo", JSON.stringify(response.data.user));
@@ -68,7 +69,7 @@ export const registerUser = createAsyncThunk<
 >("auth/registerUser", async (userData, { rejectWithValue }) => {
 	try {
 		const response = await axios.post(
-			`${import.meta.env.VITE_BACKEND_URL as string}/api/users/register`,
+			`${API_URL as string}/api/users/register`,
 			userData
 		);
 		localStorage.setItem("userInfo", JSON.stringify(response.data.user));
