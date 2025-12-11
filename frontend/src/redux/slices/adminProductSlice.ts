@@ -184,7 +184,7 @@ const adminProductSlice = createSlice({
 				(state, action: PayloadAction<string>) => {
 					const deletedId = action.payload;
 					state.products = state.products.filter(
-						(product) => product._id === deletedId
+						(product) => product._id !== deletedId
 					);
 
 					state.loading = false;

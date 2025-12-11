@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, role }: ProtectedRouteProps) => {
 	const { user } = useAppSelector((state) => state.auth);
 	if (!user || (role && user.role !== role)) {
-		return <Navigate to="/" replace />;
+		return <Navigate to="/login" replace />;
 	}
 	return <>{children}</>;
 };

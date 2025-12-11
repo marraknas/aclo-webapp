@@ -1,31 +1,35 @@
-import { Link } from "react-router-dom";
-import type { Product } from "../../types/products";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useEffect } from "react";
+import {
+	deleteProduct,
+	fetchAdminProducts,
+} from "../../redux/slices/adminProductSlice";
 
 const ProductManagement = () => {
-	const products: Product[] = [
-		{
-			_id: "id123",
-			name: "Shirt",
-			description: "A nice shirt",
-			price: 115000,
-			countInStock: 10,
-			sku: "1235431562", // stock-keeping unit
-			category: "Accessories",
-			images: [
-				{url: "https://picsum.photos/50?random=1"}
-			],
-			isFeatured: false,
-            isPublished: true,
-            rating: 4.5,
-            numReviews: 10,
-            user: "user123",
-		},
-	];
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { user } = useAppSelector((state) => state.auth);
+	const { products, loading, error } = useAppSelector(
+		(state) => state.adminProducts
+	);
+
+	useEffect(() => {
+		if (!user || user.role !== "admin") {
+			navigate("/");
+		} else {
+			dispatch(fetchAdminProducts());
+		}
+	}, [dispatch, user, navigate]);
+
 	const handleDelete = (productId: string) => {
 		if (window.confirm("Are you sure you want to delete the Product?")) {
-			console.log("Deleted product with ID: ", productId);
+			dispatch(deleteProduct(productId));
 		}
 	};
+
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error}</p>;
 	return (
 		<div className="max-w-7xl mx-auto p-6">
 			<h2 className="text-2xl font-bold mb-4">Product Management</h2>

@@ -1,17 +1,35 @@
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useEffect } from "react";
+import {
+	fetchAllOrders,
+	updateOrderStatus,
+} from "../../redux/slices/adminOrderSlice";
+import type { Order } from "../../types/order";
+
 const OrderManagement = () => {
-	const orders = [
-		{
-			_id: "12314123",
-			user: {
-				name: "John Doe",
-			},
-			totalPrice: 123000,
-			status: "Processing",
-		},
-	];
-	const handleStatusChange = (orderId: string, status: string) => {
-		console.log({ id: orderId, status });
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+
+	const { user } = useAppSelector((state) => state.auth);
+	const { orders, loading, error } = useAppSelector(
+		(state) => state.adminOrders
+	);
+
+	useEffect(() => {
+		if (!user || user.role !== "admin") {
+			navigate("/");
+		} else {
+			dispatch(fetchAllOrders());
+		}
+	}, [dispatch, user, navigate]);
+
+	const handleStatusChange = (orderId: string, status: Order["status"]) => {
+		dispatch(updateOrderStatus({ id: orderId, status }));
 	};
+
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error}</p>;
 	return (
 		<div className="max-w-7xl mx-auto p-6">
 			<h2 className="text-2xl font-bold mb-6">Order Management</h2>
@@ -36,13 +54,20 @@ const OrderManagement = () => {
 									<td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
 										#{order._id}
 									</td>
-									<td className="p-4">{order.user.name}</td>
+									<td className="p-4">
+										{typeof order.user === "string"
+											? order.user
+											: order.user.name}
+									</td>
 									<td className="p-4">{order.totalPrice.toLocaleString()}</td>
 									<td className="p-4">
 										<select
 											value={order.status}
 											onChange={(e) => {
-												handleStatusChange(order._id, e.target.value);
+												handleStatusChange(
+													order._id,
+													e.target.value as Order["status"]
+												);
 											}}
 											className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
 										>

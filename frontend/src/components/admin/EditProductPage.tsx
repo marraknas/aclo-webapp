@@ -1,4 +1,11 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchProductDetails } from "../../redux/slices/productsSlice";
+import { updateProduct } from "../../redux/slices/adminProductSlice";
+import { API_URL } from "../../constants/api";
+import axios from "axios";
+import type { Product, ProductImage } from "../../types/products";
 
 type ProductData = {
 	name: string;
@@ -6,69 +13,108 @@ type ProductData = {
 	price: number;
 	countInStock: number;
 	sku: string;
-	category: string;
-	colors: string[];
-	materials: string[];
-	images: {
-		altText: string;
-		url: string;
-	}[];
+	category: Product["category"];
+	images: ProductImage[];
+	color: string[]; // will be stored in options.color when submitted (if any)
+	material: string;
 };
 
 const EditProductPage = () => {
-	// const selectedProduct = {
-	// 	name: "Stork Learning Tower",
-	// 	price: 56000,
-	// 	originalPrice: 69000,
-	// 	description: "The Ultra-Slim & Foldable Learning Tower",
-	// 	material: "Birch plywood",
-	// 	stabiliser: ["Stabiliser", "No stabiliser"],
-	// 	colors: ["Natural", "Cerulean", "Silver", "Snow"],
-	// 	images: [
-	// 		{ url: storkNatural, altText: "Stork Learning Tower - Natural" },
-	// 		{ url: storkCerulean, altText: "Stork Learning Tower - Cerulean" },
-	// 		{ url: storkSilver, altText: "Stork Learning Tower - Silver" },
-	// 		{ url: storkWhite, altText: "Stork Learning Tower - White" },
-	// 	],
-	// };
+	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { id } = useParams();
+	const { selectedProduct, loading, error } = useAppSelector(
+		(state) => state.products
+	);
 	const [productData, setProductData] = useState<ProductData>({
 		name: "",
 		description: "",
 		price: 0,
 		countInStock: 0,
 		sku: "",
-		category: "",
-		colors: [],
-		materials: [],
-		images: [
-			{
-				altText: "Product 1",
-				url: "https://picsum.photos/150?random=1",
-			},
-			{
-				altText: "",
-				url: "https://picsum.photos/150?random=2",
-			},
-		],
+		category: "Learning Tower",
+		color: [],
+		material: "",
+		images: [],
 	});
+
+	const [uploading, setUploading] = useState<boolean>(false);
+	useEffect(() => {
+		if (id) {
+			dispatch(fetchProductDetails({ id }));
+		}
+	}, [dispatch, id]);
+
+	// map selectedProduct -> local ProductData
+	useEffect(() => {
+		if (selectedProduct) {
+			setProductData({
+				name: selectedProduct.name,
+				description: selectedProduct.description,
+				price: selectedProduct.price,
+				countInStock: selectedProduct.countInStock,
+				sku: selectedProduct.sku,
+				category: selectedProduct.category,
+				images: selectedProduct.images ?? [],
+				color: selectedProduct.options?.color ?? [],
+				material: selectedProduct.material ?? "",
+			});
+		}
+		// console.log(productData);
+	}, [selectedProduct]);
+
 	const handleChange = (
 		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
 		const { name, value } = e.target;
+		const key = name as keyof ProductData; // force TS to treat the value of name as a  key of the ProductData
 		setProductData((prevData) => ({
 			...prevData,
-			[name]: value,
+			[key]: key === "price" || key === "countInStock" ? Number(value) : value,
 		}));
 	};
 	const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
 		// because we are dealing with files, we need async
 		const file = e.target.files?.[0];
-		console.log(file);
+		if (!file) return;
+
+		const formData = new FormData();
+		formData.append("image", file);
+		try {
+			setUploading(true);
+			const { data } = await axios.post(`${API_URL}/api/upload`, formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+			setProductData((prevData) => ({
+				...prevData,
+				images: [...prevData.images, { url: data.imageUrl, altText: "" }],
+			}));
+			setUploading(false);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setUploading(false);
+		}
 	};
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log(productData);
+		if (!id) return;
+
+		// mapping colors field to options
+		const { color, ...rest } = productData;
+		const productUpdatePayload: Partial<Product> = {
+			...rest,
+			options: {
+				...(selectedProduct?.options ?? {}),
+				...(color.length ? { color } : {}),
+			},
+		};
+
+		dispatch(updateProduct({ id, productData: productUpdatePayload }));
+		navigate("/admin/products");
 	};
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error}</p>;
 	return (
 		<div className="max-w-5xl mx-auto p-6 shadow-md rounded-md">
 			<h2 className="text-3xl font-bold mb-6">Edit Product</h2>
@@ -142,33 +188,29 @@ const EditProductPage = () => {
 					<input
 						type="text"
 						name="colors"
-						value={productData.colors.join(", ")}
+						value={productData.color.join(", ")}
+						// need to find fix for this field because right now user cannot type , or SPACE
 						onChange={(e) => {
-							setProductData({
-								...productData,
-								colors: e.target.value.split(",").map((color) => color.trim()),
-							});
+							const color = e.target.value
+								.split(",")
+								.map((color) => color.trim())
+								.filter((color) => color.length > 0);
+							setProductData((prev) => ({
+								...prev,
+								color,
+							}));
 						}}
 						className="w-full border border-gray-300 rounded-md p-2"
 					/>
 				</div>
 				{/* Materials */}
 				<div className="mb-6">
-					<label className="block font-semibold mb-2">
-						Materials (comma-separated)
-					</label>
+					<label className="block font-semibold mb-2">Material</label>
 					<input
 						type="text"
-						name="materials"
-						value={productData.materials.join(", ")}
-						onChange={(e) => {
-							setProductData({
-								...productData,
-								materials: e.target.value
-									.split(",")
-									.map((material) => material.trim()),
-							});
-						}}
+						name="material"
+						value={productData.material}
+						onChange={handleChange}
 						className="w-full border border-gray-300 rounded-md p-2"
 					/>
 				</div>
@@ -180,6 +222,7 @@ const EditProductPage = () => {
 						onChange={handleImageUpload}
 						className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 cursor-pointer"
 					/>
+					{uploading && <p>Uploading image...</p>}
 					<div className="flex gap-4 mt-4">
 						{productData.images.map((image, index) => (
 							<div key={index}>

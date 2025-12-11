@@ -1,10 +1,16 @@
 import { FaSignOutAlt } from "react-icons/fa";
 import { FaBoxOpen, FaClipboardList, FaStore, FaUser } from "react-icons/fa6";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../redux/hooks";
+import { logout } from "../../redux/slices/authSlice";
+import { clearCart } from "../../redux/slices/cartSlice";
 
 const AdminSidebar = () => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 	const handleLogout = () => {
+		dispatch(logout());
+		dispatch(clearCart());
 		navigate("/");
 	};
 	return (
@@ -62,7 +68,13 @@ const AdminSidebar = () => {
 				</NavLink>
 			</nav>
 			<div className="mt-6 ">
-				<button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-center justify-center space-x-2"><FaSignOutAlt/><span>Logout</span></button>
+				<button
+					onClick={handleLogout}
+					className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-center justify-center space-x-2"
+				>
+					<FaSignOutAlt />
+					<span>Logout</span>
+				</button>
 			</div>
 		</div>
 	);
