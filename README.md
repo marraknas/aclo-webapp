@@ -2,7 +2,7 @@
 
 An E-commerce website for **Aclo Kids**, built with the **MERN stack** (MongoDB, Express, ReactTS, Node.js) and styled using **TailwindCSS**.
 
-## Website
+## 🌐 Website
 Deployed on Vercel:
 [Aclo Webapp (dev)](https://aclo-webapp-dg1x.vercel.app/)
 
