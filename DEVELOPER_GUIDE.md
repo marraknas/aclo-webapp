@@ -105,7 +105,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 2. **MongoDB Atlas**
 - Create your own cluster for development.
-- Add your MONGO_URI to .env.
+- Add your MONGO_URI to `.env`.
 - Seed mock data:
 ```bash
 npm run seed
@@ -140,3 +140,4 @@ A Postman collection will be shared for API testing (currently not fully documen
 ## ✅ Development Standards
 - Always use **Prettier** with `formatOnSave`.
 - Do your best to maintain consistent code style across frontend & backend.
+- We'll follow the workflow for CS2103T for the most part yea :) Do make branches when you want to make an enhancement/fix, and name the branches `feature/feature1`, `fix/fix1`, and so on for better organization + make pull requests for every change.
