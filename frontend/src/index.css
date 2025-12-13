@@ -1,15 +1,62 @@
 @import "tailwindcss";
 
-#root {
-  font-family: "Montserrat", sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
+@theme {
+  --color-primary: #8e6e53;
+  --color-secondary: #c69c72;
+  --color-accent1: #433e3f;
+  --color-accent2: #c0b7b1;
+  --color-accent3: #7a7265;
+
+  --color-background: #ffffff;
+  /* --color-background: #fff9f3; */
+  --color-lightbrown: #d8c3a5;
+  --color-mutedbrown: #f4ede3;
+  --color-acloblue: #00b7e8;
+  --color-ink: #3a3a3a;
+  --color-line: #e7ded3;
 }
 
-@theme {
-  --color-primary: #8E6E53;
-  --color-secondary: #C69C72;
-  --color-accent1: #433E3F;
-  --color-accent2: #C0B7B1;
-  --color-accent3: #7A7265;
+#root {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  color: var(--color-ink);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", sans-serif;
+}
+
+p {
+  line-height: 1.7;
+}
+
+.landing-container {
+  @apply mx-auto max-w-6xl px-6;
+}
+.landing-section {
+  @apply py-14 md:py-20;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-medium;
+  background: var(--color-acloblue);
+  color: var(--color-background);
+}
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-medium;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-line);
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.9);
 }
