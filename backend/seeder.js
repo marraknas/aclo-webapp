@@ -3,7 +3,9 @@ const dotenv = require("dotenv");
 const Product = require("./models/Product");
 const User = require("./models/User");
 const Cart = require("./models/Cart");
+const Review = require("./models/Review");
 const products = require("./data/products");
+const reviews = require("./data/reviews");
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ const seedData = async () => {
 		await Product.deleteMany();
 		await User.deleteMany();
 		await Cart.deleteMany();
+		await Review.deleteMany();
 
 		// create default admin user
 		const createdUser = await User.create({
@@ -32,9 +35,11 @@ const seedData = async () => {
 			return { ...product, user: userID };
 		});
 
-		// insert products into the database
+		// insert products & reviews into the database
 		await Product.insertMany(sampleProducts);
-		console.log("Product data seeded successfully");
+		await Review.insertMany(reviews);
+
+		console.log("Mock data seeded successfully");
 		process.exit();
 	} catch (error) {
 		console.error("Error seeding the data: ", error);

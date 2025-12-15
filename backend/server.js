@@ -9,6 +9,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 const subscribeRoutes = require("./routes/subscribeRoutes");
 const adminRoutes = require("./routes/admin/adminRoutes");
 const productAdminRoutes = require("./routes/admin/productAdminRoutes");
@@ -37,6 +38,7 @@ app.use("/api/checkout", checkoutRoutes); // prepends /api/checkout to all the c
 app.use("/api/orders", orderRoutes); // prepends /api/orders to all the order routes
 app.use("/api/upload", uploadRoutes); // prepends /api/upload to all the upload routes
 app.use("/api/subscribe", subscribeRoutes); // prepends /api/subscribe to all the subscribe routes
+app.use("/api/reviews", reviewRoutes); //prepends /api/reviews to all the subscribe routes
 
 // Admin
 app.use("/api/admin/users", adminRoutes);
