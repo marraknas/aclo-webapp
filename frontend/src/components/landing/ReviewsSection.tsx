@@ -230,7 +230,9 @@ const ReviewsSection: React.FC = () => {
 		return <p>Error: {error}</p>;
 	}
 
-	const translateX = -index * viewportW + (isDragging ? dragOffset : 0);
+	const trackTransform = isDragging
+		? `translate3d(calc(${-index * 100}% + ${dragOffset}px), 0, 0)`
+		: `translate3d(${-index * 100}%, 0, 0)`;
 
 	return (
 		<section className="w-full bg-background">
@@ -247,21 +249,25 @@ const ReviewsSection: React.FC = () => {
 							onPointerCancel={endDrag}
 						>
 							<div
-								className={`flex ${
+								className={`flex w-full ${
 									isDragging ? "cursor-grabbing" : "cursor-grab"
 								}`}
 								style={{
-									transform: `translate3d(${translateX}px, 0, 0)`,
+									transform: trackTransform,
 									transition: isAnimating
 										? `transform ${ANIM_MS}ms ease-out`
 										: "none",
+									willChange: "transform",
 								}}
 								onTransitionEnd={onTransitionEnd}
 							>
 								{slides.map((s, i) => {
 									const url = cloudinaryImageUrl(s.publicId);
 									return (
-										<div key={`${s.publicId}-${i}`} className="w-full shrink-0">
+										<div
+											key={`${s.publicId}-${i}`}
+											className="basis-full w-full shrink-0"
+										>
 											<div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 p-5 sm:p-6 md:p-7 items-center">
 												<div className="flex justify-center">
 													<img
