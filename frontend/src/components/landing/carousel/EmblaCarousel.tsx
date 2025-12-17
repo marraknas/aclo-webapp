@@ -1,26 +1,13 @@
 import React from "react";
-import type { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import ClassNames from "embla-carousel-class-names";
-import {
-  NextButton,
-  PrevButton,
-  usePrevNextButtons,
-} from "./EmblaCarouselArrowButtons";
+import type { EmblaCarouselProps } from "../../../types/carousels";
+import { NextButton, PrevButton } from "./EmblaCarouselArrowButtons";
+import { usePrevNextButtons } from "./usePrevNextButtons";
 import "./embla.css";
 import { cloudinaryImageUrl } from "../../../constants/cloudinary";
 
-type Slide = {
-  publicId: string;
-  alt: string;
-};
-
-type PropType = {
-  slides: Slide[];
-  options?: EmblaOptionsType;
-};
-
-const EmblaCarousel: React.FC<PropType> = ({ slides, options }) => {
+const EmblaCarousel: React.FC<EmblaCarouselProps> = ({ slides, options }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [ClassNames()]);
 
   const {
@@ -43,7 +30,6 @@ const EmblaCarousel: React.FC<PropType> = ({ slides, options }) => {
                     className="embla__slide__img"
                     src={url}
                     alt={slide.alt}
-                    onError={() => console.log("IMAGE FAILED:", url)}
                   />
                 </div>
               </div>
