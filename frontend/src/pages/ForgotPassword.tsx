@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { assets, cloudinaryImageUrl } from "../constants/cloudinary";
 import type { ForgotPasswordPayload } from "../types/auth";
+import Navbar from "../components/common/Navbar";
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState<ForgotPasswordPayload>({
@@ -44,66 +45,71 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex">
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12">
-        <form
-          onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white p-8 rounded-lg border shadow-sm"
-        >
-          <div className="flex justify-center mb-6">
-            <h2 className="text-xl font-medium text-acloblue">
-              Forgot password
+    <>
+      <Navbar />
+      <div className="flex">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-md bg-white p-8 rounded-lg border shadow-sm"
+          >
+            <div className="flex justify-center mb-6">
+              <h2 className="text-xl font-medium text-acloblue">
+                Forgot password
+              </h2>
+            </div>
+
+            <h2 className="text-2xl font-bold text-center mb-6">
+              No worries 👋
             </h2>
-          </div>
+            <p className="text-center mb-6">
+              We will send you an email to reset your password.
+            </p>
 
-          <h2 className="text-2xl font-bold text-center mb-6">No worries 👋</h2>
-          <p className="text-center mb-6">
-            We will send you an email to reset your password.
-          </p>
+            {success && (
+              <div className="mb-4 rounded-md bg-green-50 text-green-700 px-3 py-2 text-sm">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="mb-4 rounded-md bg-red-50 text-red-700 px-3 py-2 text-sm">
+                {error}
+              </div>
+            )}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-acloblue/30"
+                placeholder="Enter your email address"
+                required
+              />
+            </div>
 
-          {success && (
-            <div className="mb-4 rounded-md bg-green-50 text-green-700 px-3 py-2 text-sm">
-              {success}
-            </div>
-          )}
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 text-red-700 px-3 py-2 text-sm">
-              {error}
-            </div>
-          )}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold mb-2">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-acloblue/30"
-              placeholder="Enter your email address"
-              required
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-acloblue text-white p-2 rounded-lg font-semibold mt-2 hover:opacity-80 transition disabled:opacity-60"
+            >
+              {loading ? "Sending..." : "Submit"}
+            </button>
+          </form>
+        </div>
+
+        <div className="hidden md:block w-1/2 py-10">
+          <div className="h-full flex flex-col justify-center items-center">
+            <img
+              src={cloudinaryImageUrl(assets.login.publicId)}
+              alt={assets.login.alt}
+              className="h-[750px] w-full object-cover"
             />
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-acloblue text-white p-2 rounded-lg font-semibold mt-2 hover:opacity-80 transition disabled:opacity-60"
-          >
-            {loading ? "Sending..." : "Submit"}
-          </button>
-        </form>
-      </div>
-
-      <div className="hidden md:block w-1/2 py-10">
-        <div className="h-full flex flex-col justify-center items-center">
-          <img
-            src={cloudinaryImageUrl(assets.login.publicId)}
-            alt={assets.login.alt}
-            className="h-[750px] w-full object-cover"
-          />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
