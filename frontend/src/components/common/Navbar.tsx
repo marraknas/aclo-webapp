@@ -56,7 +56,7 @@ const Navbar = () => {
             HOME
           </Link>
           <Link
-            to="#"
+            to="/story"
             className="text-ink hover:text-gray-600 uppercase font-light tracking-widest"
           >
             STORY
