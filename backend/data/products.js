@@ -1,5 +1,33 @@
 const products = [
 	{
+		name: "Quill Mittens",
+		description: "Mini Oven Mitt for Little Helpers",
+		price: 54000,
+		discountPrice: 39000,
+		countInStock: 200,
+		sku: "UTQLMT1",
+		category: "Utensils",
+		material: "Polyester, cotton, and heat-Insulating needled cotton",
+		images: [
+			{
+				url: "https://picsum.photos/seed/quillMittens1/500/500",
+				altText: "Picture of Quill Mittens only",
+			},
+			{
+				url: "https://picsum.photos/seed/quillMittens2/500/500",
+				altText: "Picture of Quill Mittens and Kid",
+			},
+		],
+		dimensions: {
+			length: 22,
+			width: 9,
+			height: 8,
+		},
+		weight: 30,
+		rating: 4.7,
+		numReviews: 13,
+	},
+	{
 		name: "Stork",
 		description: "The Ultra-Slim & Foldable Learning Tower",
 		price: 2368000,
@@ -30,34 +58,6 @@ const products = [
 		weight: 7500,
 		rating: 4.81,
 		numReviews: 32,
-	},
-	{
-		name: "Quill Mittens",
-		description: "Mini Oven Mitt for Little Helpers",
-		price: 54000,
-		discountPrice: 39000,
-		countInStock: 200,
-		sku: "UTQLMT1",
-		category: "Utensils",
-		material: "Polyester, cotton, and heat-Insulating needled cotton",
-		images: [
-			{
-				url: "https://picsum.photos/seed/quillMittens1/500/500",
-				altText: "Picture of Quill Mittens only",
-			},
-			{
-				url: "https://picsum.photos/seed/quillMittens2/500/500",
-				altText: "Picture of Quill Mittens and Kid",
-			},
-		],
-		dimensions: {
-			length: 22,
-			width: 9,
-			height: 8,
-		},
-		weight: 30,
-		rating: 4.7,
-		numReviews: 13,
 	},
 	{
 		name: "Quill",
