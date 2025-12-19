@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// for product listing
 const productSchema = new mongoose.Schema(
 	{
 		name: {
@@ -18,15 +19,6 @@ const productSchema = new mongoose.Schema(
 		discountPrice: {
 			type: Number,
 			required: false,
-		},
-		countInStock: {
-			type: Number,
-			default: 0,
-		},
-		sku: {
-			type: String,
-			unique: true,
-			required: true,
 		},
 		category: {
 			type: String,

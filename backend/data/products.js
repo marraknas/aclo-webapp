@@ -4,8 +4,6 @@ const products = [
 		description: "Mini Oven Mitt for Little Helpers",
 		price: 54000,
 		discountPrice: 39000,
-		countInStock: 200,
-		sku: "UTQLMT1",
 		category: "Utensils",
 		material: "Polyester, cotton, and heat-Insulating needled cotton",
 		images: [
@@ -32,8 +30,6 @@ const products = [
 		description: "The Ultra-Slim & Foldable Learning Tower",
 		price: 2368000,
 		discountPrice: 1469000,
-		countInStock: 200,
-		sku: "LTSTORK1",
 		category: "Learning Tower",
 		options: {
 			color: ["Natural", "Cerulean", "Silver", "Snow"],
@@ -64,8 +60,6 @@ const products = [
 		description: "Premium Kid-size Mini Kitchen Utensils",
 		price: 224000,
 		discountPrice: 119000,
-		countInStock: 200,
-		sku: "UTQUIL1",
 		category: "Utensils",
 		material: "Wood dan stainless steel",
 		images: [
@@ -92,8 +86,6 @@ const products = [
 		description: "Stabiliser for Learning Tower",
 		price: 119000,
 		discountPrice: 69000,
-		countInStock: 200,
-		sku: "ACTALN1",
 		category: "Accessories",
 		options: { variant: ["Stork", "Falcon"] },
 		material: "Birch plywood",
@@ -121,8 +113,6 @@ const products = [
 		description: "The Smallest & Compact Learning Tower",
 		price: 1099000,
 		discountPrice: 669000,
-		countInStock: 250,
-		sku: "STSPAR1",
 		category: "Stool",
 		options: { color: ["Natural", "Snow"] },
 		material: "Birch plywood",
@@ -150,8 +140,6 @@ const products = [
 		description: "Wooden Cutting Board & Knife for Kids",
 		price: 129000,
 		discountPrice: 84000,
-		countInStock: 340,
-		sku: "UTBEAK1",
 		category: "Utensils",
 		images: [
 			{
@@ -177,8 +165,6 @@ const products = [
 		description: "The Strong & Stylish Learning Tower",
 		price: 3028000,
 		discountPrice: 1579000,
-		countInStock: 250,
-		sku: "LTFLCN1",
 		category: "Learning Tower",
 		options: {
 			color: ["Natural", "Sunshine", "Silver"],
