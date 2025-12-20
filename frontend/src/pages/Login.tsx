@@ -6,6 +6,7 @@ import type { LoginPayload } from "../types/auth";
 import { mergeCart } from "../redux/slices/cartSlice";
 import { assets, cloudinaryImageUrl } from "../constants/cloudinary";
 import Navbar from "../components/common/Navbar";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 
 const Login = () => {
   const [formData, setFormData] = useState<LoginPayload>({
@@ -73,7 +74,7 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded focus:outline-acloblue"
                 placeholder="Enter your email address"
               />
             </div>
@@ -86,7 +87,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded focus:outline-acloblue"
                 placeholder="Enter your password"
               />
             </div>
@@ -102,16 +103,26 @@ const Login = () => {
                 to={`/register?redirect=${encodeURIComponent(redirect)}`}
                 className="text-acloblue hover:opacity-80"
               >
-                Register{" "}
-              </Link>
+                Register
+              </Link>{" "}
               •{" "}
               <Link
-                to={`/forgot-password`}
+                to="/forgot-password"
                 className="text-acloblue hover:opacity-80"
               >
                 Forgot your password?
               </Link>
             </p>
+
+            <div className="mt-6 flex justify-center">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-acloblue/90 hover:text-acloblue transition-colors"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                Back to Home
+              </Link>
+            </div>
           </form>
         </div>
         <div className="hidden md:block w-1/2 py-10">

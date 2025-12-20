@@ -83,7 +83,7 @@ const ForgotPassword = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-acloblue/30"
+                className="w-full p-2 border rounded focus:outline-acloblue"
                 placeholder="Enter your email address"
                 required
               />
@@ -102,8 +102,8 @@ const ForgotPassword = () => {
         <div className="hidden md:block w-1/2 py-10">
           <div className="h-full flex flex-col justify-center items-center">
             <img
-              src={cloudinaryImageUrl(assets.login.publicId)}
-              alt={assets.login.alt}
+              src={cloudinaryImageUrl(assets.forget.publicId)}
+              alt={assets.forget.alt}
               className="h-[750px] w-full object-cover"
             />
           </div>

@@ -24,6 +24,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import ResetPassword from "./pages/ResetPassword";
+import Verified from "./pages/Verified";
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="profile" element={<Profile />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verified" element={<Verified />} />
             {/* anything after a colon is a dynamic route */}
             <Route
               path="collections/:collection"

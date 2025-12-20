@@ -69,6 +69,18 @@ export const assets = {
     publicId: "Login_uji3bg",
     alt: "Child on ACLO learning tower at the counter.",
   },
+
+  reset: {
+    type: "image",
+    publicId: "Reset_ryslxk",
+    alt: "Child on ACLO learning tower and mom cooking together in kitchen",
+  },
+
+  forget: {
+    type: "image",
+    publicId: "Forget_ajawhh",
+    alt: "Child and mother cooking together using ACLO learning tower.",
+  },
 } as const;
 
 export function cloudinaryImageUrl(publicId: string) {
