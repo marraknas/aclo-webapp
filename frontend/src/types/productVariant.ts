@@ -11,6 +11,7 @@ export interface ProductVariant {
 	// option picks for this variant
 	color?: string;
 	variant?: string;
+	isDefault?: boolean;
 	// stabiliser intentionally not here (add-on)
 	images: ProductImage[];
 	createdAt?: string;

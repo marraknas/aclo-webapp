@@ -44,6 +44,12 @@ const productVariantSchema = new mongoose.Schema(
 			required: false,
 		},
 
+		isDefault: {
+			// define default productVariant to fetch
+			type: Boolean,
+			default: false,
+		},
+
 		images: {
 			type: [
 				{

@@ -19,6 +19,24 @@ router.get("/", protect, admin, async (req, res) => {
 	}
 });
 
+// @route POST /api/admin/products/variants/bulk
+// @desc Get default variants for multiple products
+// @access Private/Admin
+router.post("/variants", protect, admin, async (req, res) => {
+    try {
+        const { productIds } = req.body; // Expecting ["id1", "id2"...]
+        
+        // Find the default variant for every ID provided
+        const variants = await ProductVariant.find({
+            productId: { $in: productIds }
+        });
+
+        res.json(variants);
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 // @route GET /api/products/:id/variant?color=Red&variant=Stork
 // @desc Get a single product variant (and its details)
 // @access Private/Admin
@@ -31,7 +49,7 @@ router.get("/:id/variant", protect, admin, async (req, res) => {
 		if (color != null) q.color = color;
 		if (variant != null) q.variant = variant;
 
-		const pv = await ProductVariant.findOne(q);
+		const pv = await ProductVariant.findOne(q).sort({ isDefault: -1 });
 		if (!pv)
 			return res.status(404).json({ message: "Matching variant not found" });
 

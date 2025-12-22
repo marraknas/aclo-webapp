@@ -89,18 +89,21 @@ export const fetchSimilarProducts = createAsyncThunk<
 	}
 });
 
-// async thunk to fetch product variant details
+// async thunk to fetch ONE product variant details
 export const fetchProductVariant = createAsyncThunk<
 	ProductVariant,
-	{ productId: string; color?: string; variant?: string },
+	{ productId: string; color?: string; variant?: string,productVariantId?: string },
 	{ rejectValue: AppError }
 >("products/fetchProductVariant", async (args, { rejectWithValue }) => {
-	const { productId, color, variant } = args;
+	const { productId, color, variant, productVariantId } = args;
 
 	try {
+		const params = productVariantId 
+            ? { productVariantId } 
+            : { color, variant };
 		const response = await axios.get<ProductVariant>(
 			`${API_URL as string}/api/products/${productId}/variant`,
-			{ params: { color, variant } }
+			{ params: params }
 		);
 		return response.data;
 	} catch (err) {

@@ -59,13 +59,20 @@ router.get("/similar/:id", async (req, res) => {
 router.get("/:id/variant", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { color, variant } = req.query;
+		const { color, variant, productVariantId } = req.query;
 
 		const q = { productId: id };
-		if (color != null) q.color = color;
-		if (variant != null) q.variant = variant;
+		if (productVariantId) {
+            // Logic: If ID is provided, strictly match by that ID
+            q._id = productVariantId;
+        } else {
+            // Logic: Fallback to attributes if no ID is present
+            if (color != null) q.color = color;
+            if (variant != null) q.variant = variant;
+        }
 
-		const pv = await ProductVariant.findOne(q);
+		// fetch default variant if no params are given
+		const pv = await ProductVariant.findOne(q).sort({ isDefault: -1 });
 		if (!pv)
 			return res.status(404).json({ message: "Matching variant not found" });
 
