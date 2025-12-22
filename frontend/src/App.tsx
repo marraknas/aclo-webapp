@@ -26,6 +26,8 @@ import { store } from "./redux/store";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import ResetPassword from "./pages/ResetPassword";
 import Verified from "./pages/Verified";
+import Story from "./pages/Story";
+import Contact from "./pages/Contact";
 
 function App() {
   return (
@@ -42,6 +44,9 @@ function App() {
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verified" element={<Verified />} />
+            
+            <Route path="story" element={<Story />} />
+						<Route path="contact" element={<Contact />} />
             {/* anything after a colon is a dynamic route */}
             <Route
               path="collections/:collection"

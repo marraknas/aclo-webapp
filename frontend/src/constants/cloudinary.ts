@@ -46,17 +46,17 @@ export const assets = {
   },
 
   logos: {
-    horizontal: {
-      type: "image",
-      publicId: "ACLO_LOGO_HORIZONTAL-06_1_mdrbx8",
-      alt: "ACLO logo",
-    },
-    vertical: {
-      type: "image",
-      publicId: "ACLO_LOGO_VERTICAL-04_1_twkhki",
-      alt: "ACLO logo",
-    },
-  },
+		horizontal: {
+			type: "image",
+			publicId: "ACLO_LOGO_HORIZONTAL-06_1_mdrbx8",
+			alt: "ACLO logo",
+		},
+		vertical: {
+			type: "image",
+			publicId: "ACLO_LOGO_VERTICAL-04_1_twkhki",
+			alt: "ACLO logo",
+		},
+	},
 
   register: {
     type: "image",
@@ -81,6 +81,27 @@ export const assets = {
     publicId: "Forget_ajawhh",
     alt: "Child and mother cooking together using ACLO learning tower.",
   },
+    
+  story: {
+		story_1: {
+			type: "image",
+			publicId: "Story-1_c4rh5s",
+		},
+		story_2: {
+			type: "image",
+			publicId: "Story-2_dsqavj",
+		},
+		story_3: {
+			type: "image",
+			publicId: "Story-3_fyabcn",
+		},
+	},
+
+	contact: {
+		type: "image",
+		publicId: "Contact_xddto7",
+		alt: "ACLO family moment in the kitchen",
+	},
 } as const;
 
 export function cloudinaryImageUrl(publicId: string) {
