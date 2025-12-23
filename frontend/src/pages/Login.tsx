@@ -79,9 +79,16 @@ const Login = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold">Password</label>
+
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-acloblue hover:opacity-80"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 type="password"
                 name="password"
@@ -105,13 +112,6 @@ const Login = () => {
               >
                 Register
               </Link>{" "}
-              •{" "}
-              <Link
-                to="/forgot-password"
-                className="text-acloblue hover:opacity-80"
-              >
-                Forgot your password?
-              </Link>
             </p>
 
             <div className="mt-6 flex justify-center">

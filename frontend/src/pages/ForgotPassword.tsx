@@ -1,8 +1,9 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { assets, cloudinaryImageUrl } from "../constants/cloudinary";
 import type { ForgotPasswordPayload } from "../types/auth";
 import Navbar from "../components/common/Navbar";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState<ForgotPasswordPayload>({
@@ -27,16 +28,16 @@ const ForgotPassword = () => {
     setSuccess(null);
 
     try {
-      // await api
+      // SEND EMAIL API HERE
 
       setSuccess(
-        "If an account exists for this email, we’ve sent a reset email."
+        "If an account exists for this email, we've sent a reset email."
       );
 
       // navigate back to login
       setTimeout(() => {
         navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
-      }, 1200);
+      }, 20000);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -96,6 +97,15 @@ const ForgotPassword = () => {
             >
               {loading ? "Sending..." : "Submit"}
             </button>
+            <div className="mt-6 flex justify-center">
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-acloblue/90 hover:text-acloblue transition-colors"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                Back to Login
+              </Link>
+            </div>
           </form>
         </div>
 
