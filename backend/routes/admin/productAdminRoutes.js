@@ -6,6 +6,9 @@ const { protect, admin } = require("../../middleware/authMiddleware");
 
 const router = express.Router();
 
+// NOTE: I am keeping this just in case in the future, we want to filter 
+// what is returned from public products and admin products
+
 // @route GET /api/admin/products
 // @desc Get all products (Admin only)
 // @access Private/Admin
@@ -19,48 +22,7 @@ router.get("/", protect, admin, async (req, res) => {
 	}
 });
 
-// @route POST /api/admin/products/variants/bulk
-// @desc Get default variants for multiple products
-// @access Private/Admin
-router.post("/variants", protect, admin, async (req, res) => {
-    try {
-        const { productIds } = req.body; // Expecting ["id1", "id2"...]
-        
-        // Find the default variant for every ID provided
-        const variants = await ProductVariant.find({
-            productId: { $in: productIds }
-        });
-
-        res.json(variants);
-    } catch (error) {
-        res.status(500).json({ message: "Server Error" });
-    }
-});
-
-// @route GET /api/products/:id/variant?color=Red&variant=Stork
-// @desc Get a single product variant (and its details)
-// @access Private/Admin
-router.get("/:id/variant", protect, admin, async (req, res) => {
-	try {
-		const { id } = req.params;
-		const { color, variant } = req.query;
-
-		const q = { productId: id };
-		if (color != null) q.color = color;
-		if (variant != null) q.variant = variant;
-
-		const pv = await ProductVariant.findOne(q).sort({ isDefault: -1 });
-		if (!pv)
-			return res.status(404).json({ message: "Matching variant not found" });
-
-		return res.json(pv); // returns the variantId in the _id field
-	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ message: "Server Error" });
-	}
-});
-
-// TODO: Finish implementing this
+// TODO: Finish implementing this. Don't call this API yet
 // @route POST /api/admin/products
 // @desc Create Product + default ProductVariant
 // @access Private/Admin

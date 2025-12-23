@@ -3,9 +3,9 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchProductDetails } from "../../redux/slices/productsSlice";
 import {
-  fetchProductVariants,
   updateProduct,
 } from "../../redux/slices/adminProductSlice";
+import { fetchProductVariants } from "../../redux/slices/productsSlice";
 import { API_URL } from "../../constants/api";
 import axios from "axios";
 import type {
@@ -52,14 +52,10 @@ const EditProductPage = () => {
 
   const {
     selectedProduct,
-    loading: productLoading,
-    error: productError,
-  } = useAppSelector((state) => state.products);
-  const {
     productVariants,
-    loading: adminLoading,
-    error: adminError,
-  } = useAppSelector((state) => state.adminProducts);
+    loading,
+    error,
+  } = useAppSelector((state) => state.products);
 
   const [productData, setProductData] = useState<ProductData>({
     name: "",
@@ -113,21 +109,21 @@ const EditProductPage = () => {
   useEffect(() => {
     if (!id || !variantId || !productVariants[id]) return;
     const variantsForSelectedProduct = productVariants[id];
-    const specificVariant = variantsForSelectedProduct.find(
+    const selectedVariant = variantsForSelectedProduct.find(
       (v) => v._id === variantId
     );
-    if (specificVariant) {
-      console.log(specificVariant.images);
+    if (selectedVariant) {
+      console.log(selectedVariant.images);
       setProductVariantData({
-        variantId: specificVariant._id,
-        sku: specificVariant.sku,
-        price: specificVariant.price,
-        discountPrice: specificVariant.discountPrice,
-        countInStock: specificVariant.countInStock,
-        category: specificVariant.category,
-        color: specificVariant.color ?? "",
-        variant: specificVariant.variant ?? "",
-        variantImages: specificVariant.images || [],
+        variantId: selectedVariant._id,
+        sku: selectedVariant.sku,
+        price: selectedVariant.price,
+        discountPrice: selectedVariant.discountPrice,
+        countInStock: selectedVariant.countInStock,
+        category: selectedVariant.category,
+        color: selectedVariant.color ?? "",
+        variant: selectedVariant.variant ?? "",
+        variantImages: selectedVariant.images || [],
       });
     }
   }, [productVariants, id, variantId]);
@@ -230,9 +226,8 @@ const EditProductPage = () => {
     // dispatch(updateProduct({ id, productData: {} }));
     navigate("/admin/products");
   };
-  if (productLoading || adminLoading) return <p>Loading...</p>;
-  if (productError) return <p>Error: {productError}</p>;
-  if (adminError) return <p>Error: {adminError}</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   const availableVariants =
     id && productVariants[id] ? productVariants[id] : [];

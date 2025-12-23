@@ -11,6 +11,7 @@ import { API_URL } from "../../constants/api";
 
 interface ProductState {
 	products: Product[];
+	productVariants: Record<string, ProductVariant[]>;
 	selectedProduct: Product | null;
 	selectedVariant: ProductVariant | null;
 	similarProducts: Product[];
@@ -21,6 +22,7 @@ interface ProductState {
 
 const initialState: ProductState = {
 	products: [],
+	productVariants: {},
 	selectedProduct: null,
 	selectedVariant: null,
 	similarProducts: [],
@@ -89,10 +91,34 @@ export const fetchSimilarProducts = createAsyncThunk<
 	}
 });
 
+// async thunk to get all product variants
+export const fetchProductVariants = createAsyncThunk<
+	ProductVariant[],
+	{ productIds: string[] },
+	{ rejectValue: AppError }
+>(
+	"products/fetchVariants",
+	async ({ productIds }, { rejectWithValue }) => {
+		try {
+			const response = await axios.post<ProductVariant[]>(
+				`${API_URL}/api/products/variants/bulk`,
+				{ productIds },
+			);
+			return response.data;
+		} catch (err) {
+			const error = err as AxiosError<AppError>;
+			if (error.response && error.response.data) {
+				return rejectWithValue(error.response.data);
+			}
+			return rejectWithValue({ message: "Failed to fetch product variants" });
+		}
+	}
+);
+
 // async thunk to fetch ONE product variant details
 export const fetchProductVariant = createAsyncThunk<
 	ProductVariant,
-	{ productId: string; color?: string; variant?: string,productVariantId?: string },
+	{ productId: string; color?: string; variant?: string; productVariantId?: string },
 	{ rejectValue: AppError }
 >("products/fetchProductVariant", async (args, { rejectWithValue }) => {
 	const { productId, color, variant, productVariantId } = args;
@@ -171,6 +197,30 @@ const productSlice = createSlice({
 				state.loading = false;
 				state.error =
 					action.payload?.message || "Failed to fetch similar products";
+			})
+			// FETCH VARIANTS (BULK)
+			.addCase(fetchProductVariants.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchProductVariants.fulfilled, (state, action) => {
+				state.loading = false;
+				// Clear old data and rebuild the map
+				const newMap: Record<string, ProductVariant[]> = {};
+				
+				action.payload.forEach((variant) => {
+					if (!newMap[variant.productId]) {
+						newMap[variant.productId] = [];
+					}
+					newMap[variant.productId].push(variant);
+				});
+				
+				state.productVariants = newMap;
+			})
+			.addCase(fetchProductVariants.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.payload?.message || "Failed to bulk fetch product variants";
 			})
 			// VARIANT
 			.addCase(fetchProductVariant.pending, (state) => {

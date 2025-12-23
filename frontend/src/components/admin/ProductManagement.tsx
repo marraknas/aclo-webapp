@@ -3,9 +3,8 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useEffect } from "react";
 import {
   deleteProduct,
-  fetchAdminProducts,
-  fetchProductVariants,
 } from "../../redux/slices/adminProductSlice";
+import { fetchProducts, fetchProductVariants } from "../../redux/slices/productsSlice";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 
 const ProductManagement = () => {
@@ -13,7 +12,7 @@ const ProductManagement = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { products, productVariants, loading, error } = useAppSelector(
-    (state) => state.adminProducts
+    (state) => state.products
   );
 
   useEffect(() => {
@@ -21,14 +20,22 @@ const ProductManagement = () => {
       navigate("/");
       return;
     }
-    if (products.length === 0 && !loading) {
-      dispatch(fetchAdminProducts());
-    }
-    const hasLoadedVariants = Object.keys(productVariants).length > 0;
+    const loadData = async () => {
+        if (products.length > 0 && Object.keys(productVariants).length > 0) return;
+        try {
+            const products = await dispatch(fetchProducts()).unwrap();
+            const ids = products.map((p) => p._id);
 
-    if (products.length > 0 && !loading && !hasLoadedVariants) {
-      const productIds = products.map((p) => p._id);
-      dispatch(fetchProductVariants({ productIds }));
+            if (ids.length > 0) {
+               await dispatch(fetchProductVariants({ productIds: ids })).unwrap();
+            }
+        } catch (err) {
+            console.error("Failed to load products: ", err);
+        }
+    };
+
+    if (!loading) {
+        loadData();
     }
   }, [dispatch, user, navigate, products, loading, productVariants, error]);
 

@@ -6,7 +6,7 @@ const { protect, admin } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // @route GET /api/products
-// @desc Get all products with optional query filters and sorting
+// @desc Get all products
 // @access Public
 router.get("/", async (req, res) => {
 	try {
@@ -18,8 +18,25 @@ router.get("/", async (req, res) => {
 	}
 });
 
+// @route POST /api/products/variants/bulk
+// @desc Get default variants for multiple products
+// @access Public
+router.post("/variants/bulk", async (req, res) => {
+	try {
+		const { productIds } = req.body; // Expecting ["id1", "id2"...]
+		
+		const variants = await ProductVariant.find({
+			productId: { $in: productIds }
+		});
+
+		res.json(variants);
+	} catch (error) {
+		res.status(500).json({ message: "Server Error" });
+	}
+});
+
 // @route GET /api/products/similar/:id
-// @desc Retrieve similar products based on current product's category
+// @desc Retrieve similar products based on current product's default variant's category
 // @access Public
 router.get("/similar/:id", async (req, res) => {
 	const { id } = req.params;
@@ -54,7 +71,7 @@ router.get("/similar/:id", async (req, res) => {
 });
 
 // @route GET /api/products/:id/variant?color=Red&variant=Stork
-// @desc Get a single product variant (and its details)
+// @desc Get a single product variant based on query params. Return value includes variant's _id
 // @access Public
 router.get("/:id/variant", async (req, res) => {
 	try {
@@ -63,10 +80,10 @@ router.get("/:id/variant", async (req, res) => {
 
 		const q = { productId: id };
 		if (productVariantId) {
-            // Logic: If ID is provided, strictly match by that ID
+            // If ID is provided, strictly match by that ID
             q._id = productVariantId;
         } else {
-            // Logic: Fallback to attributes if no ID is present
+            // Fallback to attributes if no ID is present
             if (color != null) q.color = color;
             if (variant != null) q.variant = variant;
         }
@@ -84,7 +101,7 @@ router.get("/:id/variant", async (req, res) => {
 });
 
 // @route GET /api/products/:id
-// @desc Get a single product (and its details) by ID
+// @desc Get a single product by ID
 // @access Public
 router.get("/:id", async (req, res) => {
 	try {
