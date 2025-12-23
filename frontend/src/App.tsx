@@ -19,61 +19,70 @@ import UserManagement from "./components/admin/UserManagement";
 import ProductManagement from "./components/admin/ProductManagement";
 import EditProductPage from "./components/admin/EditProductPage";
 import OrderManagement from "./components/admin/OrderManagement";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import ResetPassword from "./pages/ResetPassword";
+import Verified from "./pages/Verified";
 import Story from "./pages/Story";
 import Contact from "./pages/Contact";
 
 function App() {
-	return (
-		<Provider store={store}>
-			<BrowserRouter>
-				<Toaster position="top-right" />
-				<Routes>
-					<Route path="/" element={<UserLayout />}>
-						{/* User Layout */}
-						<Route index element={<Home />} />
-						<Route path="login" element={<Login />} />
-						<Route path="register" element={<Register />} />
-						<Route path="profile" element={<Profile />} />
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <Toaster position="top-right" />
+        <Routes>
+          <Route path="/" element={<UserLayout />}>
+            {/* User Layout */}
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verified" element={<Verified />} />
 
-						<Route path="story" element={<Story />} />
-						<Route path="contact" element={<Contact />} />
-						{/* anything after a colon is a dynamic route */}
-						<Route
-							path="collections/:collection"
-							element={<CollectionPage />}
-						/>
-						<Route path="product/:id" element={<ProductDetails />} />
-						<Route path="checkout" element={<Checkout />} />
-						<Route
-							path="order-confirmation"
-							element={<OrderConfirmationPage />}
-						/>
-						<Route path="order/:id" element={<OrderDetailsPage />} />
-						<Route path="my-orders" element={<MyOrdersPage />} />
-					</Route>
-					<Route
-						path="/admin"
-						element={
-							<ProtectedRoute role="admin">
-								<AdminLayout />
-							</ProtectedRoute>
-						}
-					>
-						{/* Admin Layout */}
-						<Route index element={<AdminHomePage />} />
-						<Route path="users" element={<UserManagement />} />
-						<Route path="products" element={<ProductManagement />} />
-						<Route path="products/:id/edit/:variantId" element={<EditProductPage />} />
-						<Route path="orders" element={<OrderManagement />} />
-					</Route>
-				</Routes>
-			</BrowserRouter>
-		</Provider>
-	);
+            <Route path="story" element={<Story />} />
+            <Route path="contact" element={<Contact />} />
+            {/* anything after a colon is a dynamic route */}
+            <Route
+              path="collections/:collection"
+              element={<CollectionPage />}
+            />
+            <Route path="product/:id" element={<ProductDetails />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route
+              path="order-confirmation"
+              element={<OrderConfirmationPage />}
+            />
+            <Route path="order/:id" element={<OrderDetailsPage />} />
+            <Route path="my-orders" element={<MyOrdersPage />} />
+          </Route>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* Admin Layout */}
+            <Route index element={<AdminHomePage />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="products" element={<ProductManagement />} />
+            <Route
+              path="products/:id/edit/:variantId"
+              element={<EditProductPage />}
+            />
+            <Route path="orders" element={<OrderManagement />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  );
 }
 
 export default App;

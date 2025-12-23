@@ -3,40 +3,40 @@ import type { Product } from "../../types/product";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 
 type ProductGridProps = {
-	products: Product[];
-	loading: boolean;
-	error: string | null;
+  products: Product[];
+  loading: boolean;
+  error: string | null;
 };
 
 const ProductGrid = ({ products, loading, error }: ProductGridProps) => {
-	if (loading) {
-		return <p>Loading...</p>;
-	}
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
-	if (error) {
-		return <p>Error: {error}</p>;
-	}
-	return (
-		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 space-y-4">
-			{products.map((product, index) => (
-				<Link key={index} to={`/product/${product._id}`} className="block">
-					<div className="bg-white p-4 rounded-lg">
-						<div className="w-full h-96 mb-3">
-							<img
-								src={cloudinaryImageUrl(product.images[0].publicId)}
-								alt={product.images[0].alt || product.name}
-								className="w-full h-full object-cover rounded-lg"
-							/>
-						</div>
-					</div>
-					<h3 className="text-sm px-4 mb-2">{product.name}</h3>
-					<p className="text-gray-500 px-4 font-medium text-sm tracking-tighter">
-						IDR {product.price.toLocaleString()}
-					</p>
-				</Link>
-			))}
-		</div>
-	);
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 space-y-4">
+      {products.map((product, index) => (
+        <Link key={index} to={`/product/${product._id}`} className="block">
+          <div className="bg-white p-4 rounded-lg">
+            <div className="w-full h-96 mb-3">
+              <img
+                src={cloudinaryImageUrl(product.images[0].publicId)}
+                alt={product.images[0].alt || product.name}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            </div>
+          </div>
+          <h3 className="text-sm px-4 mb-2">{product.name}</h3>
+          <p className="text-gray-500 px-4 font-medium text-sm tracking-tighter">
+            IDR {product.price.toLocaleString()}
+          </p>
+        </Link>
+      ))}
+    </div>
+  );
 };
 
 export default ProductGrid;
