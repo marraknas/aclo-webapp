@@ -18,9 +18,14 @@ const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const { selectedProduct, selectedVariant, loading, error, similarProducts, similarProductVariants } = useAppSelector(
-    (state) => state.products
-  );
+  const {
+    selectedProduct,
+    selectedVariant,
+    loading,
+    error,
+    similarProducts,
+    similarProductVariants,
+  } = useAppSelector((state) => state.products);
   const { user, guestId } = useAppSelector((state) => state.auth);
 
   // ui states
@@ -31,16 +36,17 @@ const ProductDetails = () => {
   // fetch product & variant
   useEffect(() => {
     if (id) {
-      dispatch(fetchProductDetails({ id: id }))
+      dispatch(fetchProductDetails({ id: id }));
       // dispatch(fetchProductVariants({productIds: [id]}))
       dispatch(fetchSimilarProducts({ id: id }))
         .unwrap()
         .then((returnedSimilarProducts) => {
           if (returnedSimilarProducts.length > 0) {
-          const productIds = returnedSimilarProducts.map((p) => p._id);
-          dispatch(fetchSimilarProductVariants({ productIds }));
-        }
-        }).catch((err) => console.error("Failed to load similar products:", err));;
+            const productIds = returnedSimilarProducts.map((p) => p._id);
+            dispatch(fetchSimilarProductVariants({ productIds }));
+          }
+        })
+        .catch((err) => console.error("Failed to load similar products:", err));
     }
   }, [dispatch, id]);
   useEffect(() => {
@@ -58,7 +64,7 @@ const ProductDetails = () => {
     }
   }, [dispatch, id, searchParams]);
 
-    // when product changes, change main image
+  // when product changes, change main image
   useEffect(() => {
     // if (selectedProduct?.images?.[0]?.publicId) {
     //   setMainImage(selectedProduct.images[0].publicId);
@@ -105,9 +111,12 @@ const ProductDetails = () => {
       const requiredKeys = Object.keys(selectedProduct.options);
       const missing = requiredKeys.filter((key) => !searchParams.get(key));
       if (missing.length > 0) {
-        toast.error(`Please select ${missing.join(", ")} before adding to cart.`, {
-          duration: 1500,
-        });
+        toast.error(
+          `Please select ${missing.join(", ")} before adding to cart.`,
+          {
+            duration: 1500,
+          }
+        );
         return;
       }
     }
@@ -116,9 +125,11 @@ const ProductDetails = () => {
     searchParams.forEach((value, key) => {
       finalOptions[key] = value;
     });
+    console.log(finalOptions);
     dispatch(
       addToCart({
         productId: id,
+        productVariantId: selectedVariant!._id,
         quantity,
         options: finalOptions,
         guestId,
@@ -149,7 +160,7 @@ const ProductDetails = () => {
   const hasOptions =
     !!selectedProduct.options &&
     Object.keys(selectedProduct.options).length > 0;
-  const displayPrice = selectedVariant?.discountPrice || selectedVariant?.price ;
+  const displayPrice = selectedVariant?.discountPrice || selectedVariant?.price;
 
   return (
     <div className="p-6">
@@ -164,7 +175,9 @@ const ProductDetails = () => {
                   src={cloudinaryImageUrl(mainImage)}
                   alt={image.alt || `Thumbnail ${index}`}
                   className={`w-20 h-20 object-cover rounded-lg cursor-pointer border ${
-                    mainImage === image.publicId ? "border-black" : "border-gray-200"
+                    mainImage === image.publicId
+                      ? "border-black"
+                      : "border-gray-200"
                   }`}
                   onClick={() => setMainImage(image.publicId)}
                 />
@@ -174,10 +187,11 @@ const ProductDetails = () => {
             <div className="md:w-1/2">
               <div className="mb-4">
                 <img
-                  src={mainImage || selectedProduct.images[0]?.publicId}
-                  alt={
-                    selectedProduct.images[0]?.alt || selectedProduct.name
+                  src={
+                    cloudinaryImageUrl(mainImage) ||
+                    selectedProduct.images[0]?.publicId
                   }
+                  alt={selectedProduct.images[0]?.alt || selectedProduct.name}
                   className="w-full h-auto object-cover rounded-lg"
                 />
               </div>
@@ -190,7 +204,9 @@ const ProductDetails = () => {
                   src={cloudinaryImageUrl(mainImage)}
                   alt={image.alt || `Thumbnail ${index}`}
                   className={`w-20 h-20 object-cover rounded-lg cursor-pointer border ${
-                    mainImage === image.publicId ? "border-black" : "border-gray-200"
+                    mainImage === image.publicId
+                      ? "border-black"
+                      : "border-gray-200"
                   }`}
                   onClick={() => setMainImage(image.publicId)}
                 />
@@ -202,22 +218,25 @@ const ProductDetails = () => {
                 {selectedProduct.name}
               </h1>
               {/* Price Display */}
-            <div className="mb-4">
-               {selectedVariant?.discountPrice ? (
-                 <>
-                   <span className="text-lg text-gray-500 line-through mr-2">
-                     IDR {selectedVariant.price.toLocaleString()}
-                   </span>
-                   <span className="text-xl font-medium text-red-600">
-                     IDR {selectedVariant.discountPrice.toLocaleString()}
-                   </span>
-                 </>
-               ) : (
-                 <span className="text-xl text-gray-800">
-                    IDR {displayPrice ? displayPrice.toLocaleString() : "Price Not Available"}
-                 </span>
-               )}
-            </div>
+              <div className="mb-4">
+                {selectedVariant?.discountPrice ? (
+                  <>
+                    <span className="text-lg text-gray-500 line-through mr-2">
+                      IDR {selectedVariant.price.toLocaleString()}
+                    </span>
+                    <span className="text-xl font-medium text-red-600">
+                      IDR {selectedVariant.discountPrice.toLocaleString()}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xl text-gray-800">
+                    IDR{" "}
+                    {displayPrice
+                      ? displayPrice.toLocaleString()
+                      : "Price Not Available"}
+                  </span>
+                )}
+              </div>
               <p className="text-gray-600 mb-4">
                 {selectedProduct.description}
               </p>
@@ -226,28 +245,31 @@ const ProductDetails = () => {
                   ([key, values]) => (
                     <div className="mb-4" key={key}>
                       <p className="text-sm font-medium text-gray-900 capitalize mb-2">
-                    {key}: <span className="text-gray-500 font-normal">{searchParams.get(key)}</span>
-                  </p>
+                        {key}:{" "}
+                        <span className="text-gray-500 font-normal">
+                          {searchParams.get(key)}
+                        </span>
+                      </p>
                       <div className="flex flex-wrap gap-2">
-                    {values.map((value: string) => {
-                      // Check if this specific value is currently in the URL params
-                      const isSelected = searchParams.get(key) === value;
+                        {values.map((value: string) => {
+                          // Check if this specific value is currently in the URL params
+                          const isSelected = searchParams.get(key) === value;
 
-                      return (
-                        <button
-                          key={value}
-                          onClick={() => handleOptionSelect(key, value)}
-                          className={`px-4 py-2 rounded-md border text-sm transition-all duration-200 ${
-                            isSelected
-                              ? "bg-black text-white border-black shadow-md"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                          }`}
-                        >
-                          {value}
-                        </button>
-                      );
-                    })}
-                  </div>
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => handleOptionSelect(key, value)}
+                              className={`px-4 py-2 rounded-md border text-sm transition-all duration-200 ${
+                                isSelected
+                                  ? "bg-black text-white border-black shadow-md"
+                                  : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                              }`}
+                            >
+                              {value}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )
                 )}

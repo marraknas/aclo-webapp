@@ -127,6 +127,7 @@ function buildSampleOrders({ insertedProducts, insertedVariants, userId }) {
     orderItems: [
       {
         productId: p0._id,
+        productVariantId: p0Variant._id,
         name: p0.name,
         image:
           p0Variant.images?.[0]?.publicId || p0Variant.images?.[0]?.alt || "",
@@ -226,6 +227,7 @@ const seedData = async () => {
           productId: beak._id,
         };
       }
+      throw new Error(`Unknown SKU in productVariants seed: ${sku}`);
     });
 
     const insertedVariants = await ProductVariant.insertMany(
