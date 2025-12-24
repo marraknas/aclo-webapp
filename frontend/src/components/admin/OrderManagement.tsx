@@ -7,13 +7,14 @@ import {
 	generateShippingLabel,
 } from "../../redux/slices/adminOrderSlice";
 import type { Order } from "../../types/order";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const OrderManagement = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
 	const { user } = useAppSelector((state) => state.auth);
-	const { orders, loading, error } = useAppSelector(
+	const { orders, loading, error, generatingLabelForOrder } = useAppSelector(
 		(state) => state.adminOrders
 	);
 
@@ -83,18 +84,33 @@ const OrderManagement = () => {
 										</select>
 									</td>
 									<td className="p-4">
-										<button
-											onClick={() => handleGenerateLabel(order._id)}
-											className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
-										>
-											Generate Shipping Label
-										</button>
-										<button
-											onClick={() => handleStatusChange(order._id, "Delivered")}
-											className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-										>
-											Mark as Delivered
-										</button>
+										<div className="flex gap-2">
+											<button
+												onClick={() => handleStatusChange(order._id, "Delivered")}
+												className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+											>
+												Mark as Delivered
+											</button>
+											<button
+												onClick={() => handleGenerateLabel(order._id)}
+												disabled={generatingLabelForOrder === order._id}
+												className={`px-4 py-2 rounded flex items-center ${
+													generatingLabelForOrder === order._id
+														? "bg-blue-500/50 cursor-not-allowed"
+														: "bg-blue-500 hover:bg-blue-600 text-white"
+												}`}
+											>
+												{generatingLabelForOrder === order._id ? (
+													<>
+														<AiOutlineLoading3Quarters className="animate-spin mr-2 h-4 w-4" />
+														Generating...
+													</>
+												) : (
+													"Generate Shipping Label"
+												)}
+											</button>
+											
+										</div>
 									</td>
 								</tr>
 							))
