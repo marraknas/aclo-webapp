@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import {
 	fetchAllOrders,
 	updateOrderStatus,
+	generateShippingLabel,
 } from "../../redux/slices/adminOrderSlice";
 import type { Order } from "../../types/order";
 
@@ -26,6 +27,10 @@ const OrderManagement = () => {
 
 	const handleStatusChange = (orderId: string, status: Order["status"]) => {
 		dispatch(updateOrderStatus({ id: orderId, status }));
+	};
+
+	const handleGenerateLabel = (orderId: string) => {
+		dispatch(generateShippingLabel(orderId));
 	};
 
 	if (loading) return <p>Loading...</p>;
@@ -78,6 +83,12 @@ const OrderManagement = () => {
 										</select>
 									</td>
 									<td className="p-4">
+										<button
+											onClick={() => handleGenerateLabel(order._id)}
+											className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
+										>
+											Generate Shipping Label
+										</button>
 										<button
 											onClick={() => handleStatusChange(order._id, "Delivered")}
 											className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"

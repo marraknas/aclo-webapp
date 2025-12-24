@@ -93,6 +93,37 @@ export const deleteOrder = createAsyncThunk<
 	}
 });
 
+// async thunk to generate shipping label PDF (admin only)
+export const generateShippingLabel = createAsyncThunk<
+	void,
+	string,
+	{ rejectValue: AppError }
+>("adminOrders/generateShippingLabel", async (id, { rejectWithValue }) => {
+	try {
+		const response = await axios.get(
+			`${API_URL}/api/admin/orders/${id}/shipping-label`,
+			{
+				headers: getAuthHeader(),
+				responseType: "blob",
+			}
+		);
+
+		// create blob URL and open in new tab
+		const blob = new Blob([response.data], { type: "application/pdf" });
+		const url = window.URL.createObjectURL(blob);
+		window.open(url, "_blank");
+
+		// clean up the URL
+		setTimeout(() => window.URL.revokeObjectURL(url), 100);
+	} catch (err) {
+		const error = err as AxiosError<AppError>;
+		if (error.response && error.response.data) {
+			return rejectWithValue(error.response.data);
+		}
+		return rejectWithValue({ message: "Failed to generate shipping label" });
+	}
+});
+
 const adminOrderSlice = createSlice({
 	name: "adminOrders",
 	initialState,

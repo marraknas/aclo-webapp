@@ -1,6 +1,7 @@
 const express = require("express");
 const Order = require("../../models/Order");
 const { protect, admin } = require("../../middleware/authMiddleware");
+const { generateShippingLabelPDF } = require("../../utils/generateShippingLabel");
 
 const router = express.Router();
 
@@ -56,6 +57,30 @@ router.delete("/:id", protect, admin, async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Server Error" });
+	}
+});
+
+// @route GET /api/admin/orders/:id/shipping-label
+// @desc Generate shipping label for an order (in PDF)
+// @access Private/Admin
+router.get("/:id/shipping-label", protect, admin, async (req, res) => {
+	try {
+		const order = await Order.findById(req.params.id).populate("user", "name email");
+		
+		if (!order) {
+			return res.status(404).json({ message: "Order Not Found" });
+		}
+
+		const pdfBuffer = await generateShippingLabelPDF(order);
+
+		res.setHeader("Content-Type", "application/pdf");
+		res.setHeader("Content-Disposition", `inline; filename=shipping-label-${order._id}.pdf`);
+		res.setHeader("Content-Length", pdfBuffer.length);
+
+		res.send(pdfBuffer);
+	} catch (error) {
+		console.error("Error generating shipping label:", error);
+		res.status(500).json({ message: "Failed to generate shipping label" });
 	}
 });
 
