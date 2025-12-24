@@ -4,12 +4,15 @@ import { FaFilter } from "react-icons/fa6";
 import FilterSidebar from "../components/products/FilterSidebar";
 import SortOptions from "../components/products/SortOptions";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { fetchProducts } from "../redux/slices/productsSlice";
+import { fetchProducts, fetchProductVariants } from "../redux/slices/productsSlice";
 import Navbar from "../components/common/Navbar";
 
 const CollectionPage = () => {
   const dispatch = useAppDispatch();
-  const { products, loading, error } = useAppSelector(
+  // productVariants is of the form = { 
+  // "id1": [variant1, variant2], "id2": [variant1, variant2, variant3], ... 
+  // }
+  const { products, productVariants, loading, error } = useAppSelector(
     (state) => state.products
   );
 
@@ -17,7 +20,23 @@ const CollectionPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(fetchProducts());
+      const loadData = async () => {
+          try {
+              const products = await dispatch(fetchProducts()).unwrap();
+              const ids = products.map((product) => product._id);
+
+              if (ids.length > 0) {
+                  dispatch(fetchProductVariants({ productIds: ids })).unwrap();
+              }
+          } catch (error) {
+              console.error("Failed to fetch initial products:", error);
+              // Handle error if needed (e.g., show a toast notification)
+          }
+      };
+
+    if (!loading) {
+        loadData();
+    }
   }, [dispatch]);
 
   const toggleSidebar = () => {
@@ -66,7 +85,7 @@ const CollectionPage = () => {
           {/* Sort options */}
           <SortOptions />
           {/* Product Grid */}
-          <ProductGrid products={products} loading={loading} error={error} />
+          <ProductGrid products={products} productVariants={productVariants} loading={loading} error={error} />
         </div>
       </div>
     </div>

@@ -44,9 +44,9 @@ function App() {
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verified" element={<Verified />} />
-            
+
             <Route path="story" element={<Story />} />
-						<Route path="contact" element={<Contact />} />
+            <Route path="contact" element={<Contact />} />
             {/* anything after a colon is a dynamic route */}
             <Route
               path="collections/:collection"
@@ -73,7 +73,10 @@ function App() {
             <Route index element={<AdminHomePage />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductManagement />} />
-            <Route path="products/:id/edit" element={<EditProductPage />} />
+            <Route
+              path="products/:id/edit/:variantId"
+              element={<EditProductPage />}
+            />
             <Route path="orders" element={<OrderManagement />} />
           </Route>
         </Routes>

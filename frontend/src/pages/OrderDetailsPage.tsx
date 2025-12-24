@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchOrderDetails } from "../redux/slices/orderSlice";
+import { cloudinaryImageUrl } from "../constants/cloudinary";
 
 const OrderDetailsPage = () => {
 	const { id } = useParams<{ id: string }>();
@@ -85,11 +86,11 @@ const OrderDetailsPage = () => {
 							</thead>
 							<tbody>
 								{orderDetails.orderItems.map((item) => (
-									<tr key={item.productId} className="border-b">
+									<tr key={item.productVariantId} className="border-b">
 										<td className="py-2 px-4">
 											<div className="flex items-center gap-6">
 												<img
-													src={item.image}
+													src={cloudinaryImageUrl(item.image)}
 													alt={item.name}
 													className="w-12 h-12 object-cover rounded-lg"
 												/>

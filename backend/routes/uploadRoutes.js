@@ -27,13 +27,16 @@ router.post("/", upload.single("image"), async (req, res) => {
 		// helper function to handle stream upload to Cloudinary
 		const streamUpload = (fileBuffer) => {
 			return new Promise((resolve, reject) => {
-				const stream = cloudinary.uploader.upload_stream({folder: "aclo/dev"},(error, result) => {
-					if (result) {
-						resolve(result);
-					} else {
-						reject(error);
+				const stream = cloudinary.uploader.upload_stream(
+					{ folder: "aclo/dev" },
+					(error, result) => {
+						if (result) {
+							resolve(result);
+						} else {
+							reject(error);
+						}
 					}
-				});
+				);
 
 				// use streamifier to convert file buffer to stream
 				streamifier.createReadStream(fileBuffer).pipe(stream);
@@ -43,7 +46,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 		const result = await streamUpload(req.file.buffer);
 
 		// Respond with uploaded image URL
-		res.json({ imageUrl: result.secure_url });
+		res.json({ publicId: result.public_id, imageUrl: result.secure_url });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Server Error" });

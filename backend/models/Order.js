@@ -7,6 +7,11 @@ const orderItemSchema = new mongoose.Schema(
 			ref: "Product",
 			required: true,
 		},
+		productVariantId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "ProductVariant",
+			required: true,
+		},
 		name: {
 			type: String,
 			required: true,

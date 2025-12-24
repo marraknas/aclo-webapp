@@ -1,39 +1,37 @@
-import { Link } from "react-router-dom";
-import type { Product } from "../../types/products";
+import type { Product } from "../../types/product";
+import type { ProductVariant } from "../../types/productVariant";
+import ProductCard from "./ProductCard"; // Adjust import path as needed
 
 type ProductGridProps = {
   products: Product[];
+  productVariants: Record<string, ProductVariant[]>;
   loading: boolean;
   error: string | null;
 };
 
-const ProductGrid = ({ products, loading, error }: ProductGridProps) => {
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+const ProductGrid = ({
+  products,
+  productVariants,
+  loading,
+  error,
+}: ProductGridProps) => {
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 space-y-4">
-      {products.map((product, index) => (
-        <Link key={index} to={`/product/${product._id}`} className="block">
-          <div className="bg-white p-4 rounded-lg">
-            <div className="w-full h-96 mb-3">
-              <img
-                src={product.images[0].url}
-                alt={product.images[0].altText || product.name}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-          </div>
-          <h3 className="text-sm px-4 mb-2">{product.name}</h3>
-          <p className="text-gray-500 px-4 font-medium text-sm tracking-tighter">
-            IDR {product.price.toLocaleString()}
-          </p>
-        </Link>
-      ))}
+      {products.map((product) => {
+        // Pass only the variants relevant to this specific product
+        const variants = productVariants[product._id] || [];
+
+        return (
+          <ProductCard 
+            key={product._id} 
+            product={product} 
+            variants={variants} 
+          />
+        );
+      })}
     </div>
   );
 };

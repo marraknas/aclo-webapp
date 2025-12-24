@@ -1,166 +1,116 @@
 const products = [
 	{
-		name: "Quill Mittens",
-		description: "Mini Oven Mitt for Little Helpers",
-		price: 54000,
-		discountPrice: 39000,
-		countInStock: 200,
-		sku: "UTQLMT1",
-		category: "Utensils",
-		material: "Polyester, cotton, and heat-Insulating needled cotton",
+		name: "Mini Oven Mitt for Kids (QUILL)",
+		description:
+			"✨ Mini Oven Mitt for Little Helpers (complement to the QUILL kid-size kitchen utensils)Sarung tangan ini dirancang khusus untuk tangan kecil anak. Aman, ringan, dan tahan panas — sempurna untuk anak yang suka membantu di dapur atau bermain peran memasak di rumah.\nSpesifikasi\nDimensi: 17.5 x 11 x 1 cm\nMaterial: Polyester, kapas, dan heat-Insulating needled cotton",
 		images: [
 			{
-				url: "https://picsum.photos/seed/quillMittens1/500/500",
-				altText: "Picture of Quill Mittens only",
-			},
-			{
-				url: "https://picsum.photos/seed/quillMittens2/500/500",
-				altText: "Picture of Quill Mittens and Kid",
+				publicId: "QUILL_MITTENS_ouvpoz",
+				alt: "Quill Mittens",
 			},
 		],
+		rating: 4.7,
+		numReviews: 13,
 		dimensions: {
 			length: 22,
 			width: 9,
 			height: 8,
 		},
 		weight: 30,
-		rating: 4.7,
-		numReviews: 13,
 	},
 	{
-		name: "Stork",
-		description: "The Ultra-Slim & Foldable Learning Tower",
-		price: 2368000,
-		discountPrice: 1469000,
-		countInStock: 200,
-		sku: "LTSTORK1",
-		category: "Learning Tower",
+		name: "STORK - Ultra-Slim & Foldable Learning Tower",
+		description:
+			"✨ STORK - The Ultra-Slim & Foldable Learning Tower ✨ Satu-satunya learning tower Montessori di Indonesia, yang dapat dilipat sampai ketebalan 10cm saja! Cocok untuk moms yang ingin menciptakan lingkungan Montessori di rumah dan mengutamakan ruang, keamanan, dan kesederhanaan.",
 		options: {
 			color: ["Natural", "Cerulean", "Silver", "Snow"],
 			stabiliser: ["Stabiliser", "No stabiliser"],
 		},
-		material: "Birch plywood",
 		images: [
 			{
-				url: "https://picsum.photos/seed/stork1/500/500",
-				altText: "Picture of Stork only",
-			},
-			{
-				url: "https://picsum.photos/seed/stork2/500/500",
-				altText: "Picture of Stork and Kid",
+				publicId: "STORK-1_zlt3i8",
+				alt: "Stork",
 			},
 		],
+		rating: 4.81,
+		numReviews: 32,
 		dimensions: {
 			length: 46,
 			width: 12,
 			height: 102,
 		},
 		weight: 7500,
-		rating: 4.81,
-		numReviews: 32,
 	},
 	{
-		name: "Quill",
-		description: "Premium Kid-size Mini Kitchen Utensils",
-		price: 224000,
-		discountPrice: 119000,
-		countInStock: 200,
-		sku: "UTQUIL1",
-		category: "Utensils",
-		material: "Wood dan stainless steel",
+		name: "QUILL - Premium Kid-size Mini Kitchen Utensils",
+		description:
+			"✨ QUILL - Premium Kid-size Mini Kitchen Utensils ✨Peralatan masak sungguhan untuk little chef di rumah! Dirancang dengan ukuran mini, aman, dan ergonomis — pas di tangan anak namun tetap bisa dipakai orang dewasa. Cocok untuk mendukung kemandirian, rasa percaya diri, dan rasa ingin tahu anak sejak dini.\nSpesifikasi\nTahan panas: hingga 150°C",
+		options: {
+			ovenMitt: ["Oven mitt, No oven mitt"],
+		},
 		images: [
 			{
-				url: "https://picsum.photos/seed/quill1/500/500",
-				altText: "Picture of Quill only",
-			},
-			{
-				url: "https://picsum.photos/seed/quill2/500/500",
-				altText: "Picture of Quill and Kid",
+				publicId: "QUILL_xvxmet",
+				alt: "Quill",
 			},
 		],
-		dimensions: {
-			length: 22,
-			width: 9,
-			height: 8,
-		},
-		weight: 30,
 		rating: 4.1,
 		numReviews: 7,
-	},
-	{
-		name: "Talon",
-		description: "Stabiliser for Learning Tower",
-		price: 119000,
-		discountPrice: 69000,
-		countInStock: 200,
-		sku: "ACTALN1",
-		category: "Accessories",
-		options: { variant: ["Stork", "Falcon"] },
-		material: "Birch plywood",
-		images: [
-			{
-				url: "https://picsum.photos/seed/talon1/500/500",
-				altText: "Picture of Talon Stork only",
-			},
-			{
-				url: "https://picsum.photos/seed/talon2/500/500",
-				altText: "Picture of Talon Stork and Kid",
-			},
-		],
 		dimensions: {
 			length: 22,
 			width: 9,
 			height: 8,
 		},
 		weight: 30,
-		rating: 5.0,
-		numReviews: 1,
 	},
 	{
-		name: "Sparrow",
-		description: "The Smallest & Compact Learning Tower",
-		price: 1099000,
-		discountPrice: 669000,
-		countInStock: 250,
-		sku: "STSPAR1",
-		category: "Stool",
-		options: { color: ["Natural", "Snow"] },
-		material: "Birch plywood",
+		name: "TALON - Stabiliser for Learning Tower",
+		description:
+			"✨ TALON - Stabiliser for Learning Tower ✨ Kaki tambahan yang meningkatkan stabilitas & keamanan learning tower. Cocok untuk STORK & FALCON. Instalasi mudah & tahan lama.\nSpesifikasi\n Bahan: Birch Plywood\n Dimensi Stabiliser (lebar x tinggi x tebal):\nSTORK: 8.5 x 6.5 x 1.8 cm\nFALCON: 11.5 x 8.5 x 1.8 cm\nBerat: 500 gram",
+		options: { variant: ["Stork", "Falcon"] },
 		images: [
 			{
-				url: "https://picsum.photos/seed/sparrow1/500/500",
-				altText: "Picture of Sparrow only",
-			},
-			{
-				url: "https://picsum.photos/seed/sparrow2/500/500",
-				altText: "Picture of Sparrow and Kid",
+				publicId: "TALON_srzloj",
+				alt: "Talon",
 			},
 		],
+		rating: 5.0,
+		numReviews: 1,
+		dimensions: {
+			length: 22,
+			width: 9,
+			height: 8,
+		},
+		weight: 30,
+	},
+	{
+		name: "SPARROW - Mini Foldable Learning Tower",
+		description:
+			"✨ SPARROW - The Smallest & Compact Learning Tower ✨ Learning tower Montessori mini yang compact dan mudah dibawa-bawa. Cocok untuk moms yang ingin menciptakan lingkungan Montessori di rumah dan mengutamakan fungsi, mobilitas, dan kenyamanan.\nSpesifikasi 🎨\nDimensi terbuka (tinggi x lebar x dalam): 56 x 40 x 38 cm\nKetebalan ketika dilipat: 12.5 cm\nBerat: 3 kg\nMaterial: Birch plywood\nKapasitas Maksimal: 50 kg. Dikirim dalam kondisi BELUM dirakit.",
+		options: { color: ["Natural", "Snow"] },
+		images: [
+			{
+				publicId: "SPARROW-1_ykme2r",
+				alt: "Sparrow",
+			},
+		],
+		rating: 4.5,
+		numReviews: 9,
 		dimensions: {
 			length: 33,
 			width: 8,
 			height: 58,
 		},
 		weight: 4000,
-		rating: 4.5,
-		numReviews: 9,
 	},
 	{
-		name: "Beak",
-		description: "Wooden Cutting Board & Knife for Kids",
-		price: 129000,
-		discountPrice: 84000,
-		countInStock: 340,
-		sku: "UTBEAK1",
-		category: "Utensils",
+		name: "BEAK - Wooden Cutting Board & Knife for Kids",
+		description:
+			"✨ BEAK - Wooden Cutting Board & Knife for Kids ✨ Talenan & pisau kayu ACLO dirancang khusus untuk anak-anak belajar memotong makanan dengan aman. Cocok untuk tangan kecil, ukuran ideal untuk penggunaan anak. Bahan tahan lama dan ramah lingkungan, mendukung kepercayaan diri anak.\nSpesifikasi\nDimensi talenan (panjang x lebar x tebal): 15.5 x 9.5 x 1.2 cm\nDimensi pisau (panjang x tinggi x tebal): 12.5 x 2.5 x 1.2 cm",
 		images: [
 			{
-				url: "https://picsum.photos/seed/beak1/500/500",
-				altText: "Picture of Beak only",
-			},
-			{
-				url: "https://picsum.photos/seed/beak2/500/500",
-				altText: "Picture of Beak and Kid",
+				publicId: "BEAK_oyabro",
+				alt: "Beak",
 			},
 		],
 		dimensions: {
@@ -169,40 +119,29 @@ const products = [
 			height: 3,
 		},
 		weight: 200,
-		rating: 4.6,
-		numReviews: 21,
 	},
 	{
-		name: "Falcon",
-		description: "The Strong & Stylish Learning Tower",
-		price: 3028000,
-		discountPrice: 1579000,
-		countInStock: 250,
-		sku: "LTFLCN1",
-		category: "Learning Tower",
+		name: "FALCON - Strong & Foldable Learning Tower",
+		description:
+			"✨ FALCON - The Strong & Stylish Learning Tower ✨ Learning tower Montessori yang kuat namun hemat ruang. Ideal untuk ibu yang ingin rumah seperti lingkungan Montessori dan prioritas keamanan. Cocok untuk anak-anak.\nSpesifikasi 💡\nDimensi terbuka (tinggi x lebar x dalam): 90 x 44 x 44 cm\nKetebalan ketika dilipat: 14 cm (tanpa pijakan kaki); 22 cm (dengan pijakan kaki)\nBerat: 6 kg\nMaterial: Birch plywood\nKapasitas Maksimal: 100 kg.",
 		options: {
 			color: ["Natural", "Sunshine", "Silver"],
 			stabiliser: ["Stabiliser", "No stabiliser"],
 		},
-		material: "Birch plywood",
 		images: [
 			{
-				url: "https://picsum.photos/seed/falcon1/500/500",
-				altText: "Picture of Falcon only",
-			},
-			{
-				url: "https://picsum.photos/seed/falcon2/500/500",
-				altText: "Picture of Falcon and Kid",
+				publicId: "FALCON-1_gjqzmy",
+				alt: "Falcon",
 			},
 		],
+		rating: 4.95,
+		numReviews: 43,
 		dimensions: {
 			length: 51,
 			width: 16,
 			height: 100,
 		},
 		weight: 7500,
-		rating: 4.95,
-		numReviews: 43,
 	},
 ];
 
