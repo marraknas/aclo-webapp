@@ -128,8 +128,10 @@ router.put("/", async (req, res) => {
     if (!cart) return res.status(404).json({ message: "Cart Not Found" });
 
     const productIndex = cart.products.findIndex((p) => {
-      p.productVariantId?.toString() === productVariantId &&
-        sameOptions(p.options, options);
+      return (
+        p.productVariantId?.toString() === productVariantId &&
+        sameOptions(p.options, options)
+      );
     });
 
     if (productIndex === -1) {
@@ -181,6 +183,7 @@ router.delete("/", async (req, res) => {
       (acc, item) => acc + item.price * item.quantity,
       0
     );
+    // TODO: add logic to remove the cart document if it's empty
     await cart.save();
     return res.status(200).json(cart);
   } catch (error) {

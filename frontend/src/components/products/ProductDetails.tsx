@@ -37,7 +37,6 @@ const ProductDetails = () => {
   useEffect(() => {
     if (id) {
       dispatch(fetchProductDetails({ id: id }));
-      // dispatch(fetchProductVariants({productIds: [id]}))
       dispatch(fetchSimilarProducts({ id: id }))
         .unwrap()
         .then((returnedSimilarProducts) => {
@@ -92,10 +91,6 @@ const ProductDetails = () => {
   };
 
   const handleOptionSelect = (key: string, value: string) => {
-    // setSelectedOptions((prev) => ({
-    //   ...prev,
-    //   [key]: value,
-    // }));
     const newParams = new URLSearchParams(searchParams);
     newParams.set(key, value);
     setSearchParams(newParams);
