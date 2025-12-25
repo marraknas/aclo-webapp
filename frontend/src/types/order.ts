@@ -1,5 +1,6 @@
 export interface OrderItem {
 	productId: string;
+	productVariantId: string;
 	name: string;
 	image: string;
 	price: number;

@@ -2,248 +2,480 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchProductDetails } from "../../redux/slices/productsSlice";
-import { updateProduct } from "../../redux/slices/adminProductSlice";
+// import { updateProduct } from "../../redux/slices/adminProductSlice";
+import { fetchProductVariants } from "../../redux/slices/productsSlice";
 import { API_URL } from "../../constants/api";
 import axios from "axios";
-import type { Product, ProductImage } from "../../types/products";
+import type {
+  AddOnProduct,
+  ProductCategory,
+  ProductDimensions,
+  ProductImage,
+} from "../../types/product";
+import { cloudinaryImageUrl } from "../../constants/cloudinary";
 
-type ProductData = {
-	name: string;
-	description: string;
-	price: number;
-	countInStock: number;
-	sku: string;
-	category: Product["category"];
-	images: ProductImage[];
-	color: string[]; // will be stored in options.color when submitted (if any)
-	material: string;
+type ProductVariantData = {
+  variantId: string; // required for variant-specific updates
+  sku: string;
+  price: number;
+  discountPrice?: number;
+  countInStock: number;
+  category: ProductCategory;
+  color?: string;
+  variant?: string;
+  variantImages: ProductImage[];
 };
+type ProductData = {
+  name: string;
+  description: string;
+  // product fields
+  images: ProductImage[];
+  isListed: boolean;
+  dimensions?: ProductDimensions;
+  weight?: number;
+  addOnProducts?: AddOnProduct[];
+  // options editing (we'll only expose color here like your current page)
+};
+const CATEGORIES: ProductCategory[] = [
+  "Learning Tower",
+  "Stool",
+  "Utensils",
+  "Accessories",
+];
 
 const EditProductPage = () => {
-	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const { id } = useParams();
-	const { selectedProduct, loading, error } = useAppSelector(
-		(state) => state.products
-	);
-	const [productData, setProductData] = useState<ProductData>({
-		name: "",
-		description: "",
-		price: 0,
-		countInStock: 0,
-		sku: "",
-		category: "Learning Tower",
-		color: [],
-		material: "",
-		images: [],
-	});
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { id, variantId } = useParams();
 
-	const [uploading, setUploading] = useState<boolean>(false);
-	useEffect(() => {
-		if (id) {
-			dispatch(fetchProductDetails({ id }));
-		}
-	}, [dispatch, id]);
+  const {
+    selectedProduct,
+    productVariants,
+    loading,
+    error,
+  } = useAppSelector((state) => state.products);
 
-	// map selectedProduct -> local ProductData
-	useEffect(() => {
-		if (selectedProduct) {
-			setProductData({
-				name: selectedProduct.name,
-				description: selectedProduct.description,
-				price: selectedProduct.price,
-				countInStock: selectedProduct.countInStock,
-				sku: selectedProduct.sku,
-				category: selectedProduct.category,
-				images: selectedProduct.images ?? [],
-				color: selectedProduct.options?.color ?? [],
-				material: selectedProduct.material ?? "",
-			});
-		}
-		// console.log(productData);
-	}, [selectedProduct]);
+  const [productData, setProductData] = useState<ProductData>({
+    name: "",
+    description: "",
+    images: [],
+    isListed: false,
+    dimensions: undefined,
+    weight: undefined,
+    addOnProducts: [],
+  });
 
-	const handleChange = (
-		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-	) => {
-		const { name, value } = e.target;
-		const key = name as keyof ProductData; // force TS to treat the value of name as a  key of the ProductData
-		setProductData((prevData) => ({
-			...prevData,
-			[key]: key === "price" || key === "countInStock" ? Number(value) : value,
-		}));
-	};
-	const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-		// because we are dealing with files, we need async
-		const file = e.target.files?.[0];
-		if (!file) return;
+  const [productVariantData, setProductVariantData] =
+    useState<ProductVariantData>({
+      variantId: "",
+      sku: "",
+      price: 0,
+      discountPrice: undefined,
+      countInStock: 0,
+      category: "Learning Tower",
+      color: undefined,
+      variant: undefined,
+      variantImages: [],
+    });
 
-		const formData = new FormData();
-		formData.append("image", file);
-		try {
-			setUploading(true);
-			const { data } = await axios.post(`${API_URL}/api/upload`, formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			});
-			setProductData((prevData) => ({
-				...prevData,
-				images: [...prevData.images, { url: data.imageUrl, altText: "" }],
-			}));
-			setUploading(false);
-		} catch (error) {
-			console.error(error);
-		} finally {
-			setUploading(false);
-		}
-	};
-	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (!id) return;
+  // const [applyToAll, setApplyToAll] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  // fetch product details
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProductDetails({ id }));
+      dispatch(fetchProductVariants({ productIds: [id] }));
+    }
+  }, [dispatch, id]);
 
-		// mapping colors field to options
-		const { color, ...rest } = productData;
-		const productUpdatePayload: Partial<Product> = {
-			...rest,
-			options: {
-				...(selectedProduct?.options ?? {}),
-				...(color.length ? { color } : {}),
-			},
-		};
+  // map selectedProduct -> ProductData
+  useEffect(() => {
+    if (selectedProduct) {
+      setProductData({
+        name: selectedProduct.name ?? "",
+        description: selectedProduct.description ?? "",
+        images: selectedProduct.images ?? [],
+        isListed: selectedProduct.isListed ?? false,
+        dimensions: selectedProduct.dimensions,
+        weight: selectedProduct.weight,
+        addOnProducts: selectedProduct.addOnProducts ?? [],
+      });
+    }
+  }, [selectedProduct]);
 
-		dispatch(updateProduct({ id, productData: productUpdatePayload }));
-		navigate("/admin/products");
-	};
-	if (loading) return <p>Loading...</p>;
-	if (error) return <p>Error: {error}</p>;
-	return (
-		<div className="max-w-5xl mx-auto p-6 shadow-md rounded-md">
-			<h2 className="text-3xl font-bold mb-6">Edit Product</h2>
-			<form onSubmit={handleSubmit}>
-				{/* Name */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">Product Name</label>
-					<input
-						type="text"
-						name="name"
-						value={productData.name}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-						required
-					/>
-				</div>
-				{/* Description */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">Description</label>
-					<textarea
-						name="description"
-						value={productData.description}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-						rows={4}
-						required
-					></textarea>
-				</div>
+  // auto-fetch the product's default variant
+  useEffect(() => {
+    if (!id || !variantId || !productVariants[id]) return;
+    const variantsForSelectedProduct = productVariants[id];
+    const selectedVariant = variantsForSelectedProduct.find(
+      (v) => v._id === variantId
+    );
+    if (selectedVariant) {
+      console.log(selectedVariant.images);
+      setProductVariantData({
+        variantId: selectedVariant._id,
+        sku: selectedVariant.sku,
+        price: selectedVariant.price,
+        discountPrice: selectedVariant.discountPrice,
+        countInStock: selectedVariant.countInStock,
+        category: selectedVariant.category,
+        color: selectedVariant.color ?? "",
+        variant: selectedVariant.variant ?? "",
+        variantImages: selectedVariant.images || [],
+      });
+    }
+  }, [productVariants, id, variantId]);
 
-				{/* Price */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">Price</label>
-					<input
-						type="number"
-						name="price"
-						value={productData.price}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-					/>
-				</div>
+  // variant switcher logic
+  const handleSwitchVariant = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newVariantId = e.target.value;
+    if (newVariantId && id) {
+      // Update the URL to point to the new variant
+      navigate(`/admin/products/${id}/edit/${newVariantId}`);
+    }
+  };
 
-				{/* Count in Stock */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">Count in Stock</label>
-					<input
-						type="number"
-						name="countInStock"
-						value={productData.countInStock}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-					/>
-				</div>
+  const displayPrice =
+    productVariantData.discountPrice ?? productVariantData.price;
 
-				{/* SKU */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">SKU</label>
-					<input
-						type="text"
-						name="sku"
-						value={productData.sku}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-					/>
-				</div>
+  // Generic Product Handler
+  const handleProductChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
 
-				{/* Colors */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">
-						Colors (comma-separated)
-					</label>
-					<input
-						type="text"
-						name="colors"
-						value={productData.color.join(", ")}
-						// need to find fix for this field because right now user cannot type , or SPACE
-						onChange={(e) => {
-							const color = e.target.value
-								.split(",")
-								.map((color) => color.trim())
-								.filter((color) => color.length > 0);
-							setProductData((prev) => ({
-								...prev,
-								color,
-							}));
-						}}
-						className="w-full border border-gray-300 rounded-md p-2"
-					/>
-				</div>
-				{/* Materials */}
-				<div className="mb-6">
-					<label className="block font-semibold mb-2">Material</label>
-					<input
-						type="text"
-						name="material"
-						value={productData.material}
-						onChange={handleChange}
-						className="w-full border border-gray-300 rounded-md p-2"
-					/>
-				</div>
-				{/* Image upload */}
-				<div className="mb-8">
-					<label className="block font-semibold mb-2">Upload Image</label>
-					<input
-						type="file"
-						onChange={handleImageUpload}
-						className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 cursor-pointer"
-					/>
-					{uploading && <p>Uploading image...</p>}
-					<div className="flex gap-4 mt-4">
-						{productData.images.map((image, index) => (
-							<div key={index}>
-								<img
-									src={image.url}
-									alt={image.altText || "Product Image"}
-									className="w-20 h-20 object-cover rounded-md shadow-md"
-								/>
-							</div>
-						))}
-					</div>
-				</div>
-				<button
-					type="submit"
-					className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors"
-				>
-					Update Product
-				</button>
-			</form>
-		</div>
-	);
+    // Handle Checkbox
+    if (type === "checkbox") {
+      const checked = (e.target as HTMLInputElement).checked;
+      setProductData((prev) => ({ ...prev, [name]: checked }));
+      return;
+    }
+
+    setProductData((prev) => ({ ...prev, [name]: value }));
+  };
+  // Specific Dimensions Handler
+  const handleDimensionChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProductData((prev) => ({
+      ...prev,
+      dimensions: {
+        ...prev.dimensions,
+        [name]: Number(value),
+      },
+    }));
+  };
+  // Generic Variant Handler
+  const handleVariantChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setProductVariantData((prev) => ({
+      ...prev,
+      [name]: ["price", "discountPrice", "countInStock"].includes(name)
+        ? Number(value)
+        : value,
+    }));
+  };
+
+  // Image Upload (Shared Logic)
+  const handleImageUpload = async (
+    e: ChangeEvent<HTMLInputElement>,
+    target: "product" | "variant"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      setUploading(true);
+      const { data } = await axios.post(`${API_URL}/api/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const newImage = { publicId: data.publicId, altText: "" };
+
+      if (target === "product") {
+        setProductData((prev) => ({
+          ...prev,
+          images: [...prev.images, newImage],
+        }));
+      } else {
+        setProductVariantData((prev) => ({
+          ...prev,
+          variantImages: [...prev.variantImages, newImage],
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!id) return;
+
+    console.log("Submitting Product:", productData);
+    console.log("Submitting Variant:", productVariantData);
+
+    // TODO FIX THIS DISPATCH
+    // dispatch(updateProduct({ id, productData: {} }));
+    navigate("/admin/products");
+  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  const availableVariants =
+    id && productVariants[id] ? productVariants[id] : [];
+
+  return (
+    <div className="max-w-5xl mx-auto p-6 shadow-md rounded-md">
+      <h2 className="text-3xl font-bold mb-6">Edit Product</h2>
+      <div className="mb-8 p-4 bg-gray-50 border border-blue-200 rounded-md">
+        <label className="block font-bold text-gray-700 mb-2">
+          Switch to a different variant:
+        </label>
+        <select
+          value={productVariantData.variantId}
+          onChange={handleSwitchVariant}
+          className="w-full p-2 border border-blue-300 rounded-md bg-white shadow-sm"
+        >
+          <option value="" disabled>
+            Select a variant to edit
+          </option>
+          {availableVariants.map((v) => {
+            // Create a readable label for the dropdown
+            const labelParts = [v.sku];
+            if (v.color) labelParts.push(v.color);
+            if (v.variant) labelParts.push(v.variant);
+            return (
+              <option key={v._id} value={v._id}>
+                {labelParts.join(" - ")} (Stock: {v.countInStock})
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      <form onSubmit={handleSubmit}>
+        {/* GLOBAL PRODUCT DETAILS */}
+        {/* Name */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Product Name</label>
+          <input
+            type="text"
+            name="name"
+            value={productData.name}
+            onChange={handleProductChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+            required
+          />
+        </div>
+        {/* Description */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Description</label>
+          <textarea
+            name="description"
+            value={productData.description}
+            onChange={handleProductChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+            rows={4}
+            required
+          ></textarea>
+        </div>
+        {/* Dimensions */}
+        <div className="col-span-2">
+          <label className="block font-semibold mb-2">Dimensions (cm)</label>
+          <div className="flex gap-4">
+            <input
+              placeholder="Length"
+              type="number"
+              name="length"
+              value={productData.dimensions?.length}
+              onChange={handleDimensionChange}
+              className="w-full border border-gray-300 p-2 rounded"
+            />
+            <input
+              placeholder="Width"
+              type="number"
+              name="width"
+              value={productData.dimensions?.width}
+              onChange={handleDimensionChange}
+              className="w-full border border-gray-300 p-2 rounded"
+            />
+            <input
+              placeholder="Height"
+              type="number"
+              name="height"
+              value={productData.dimensions?.height}
+              onChange={handleDimensionChange}
+              className="w-full border border-gray-300 p-2 rounded"
+            />
+          </div>
+        </div>
+        {/* Weight */}
+        <div>
+          <label className="block font-semibold mb-1">Weight (kg)</label>
+          <input
+            type="number"
+            name="weight"
+            value={productData.weight}
+            onChange={handleProductChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+        {/* Is Listed Checkbox */}
+        <div className="flex items-center mt-6">
+          <input
+            type="checkbox"
+            name="isListed"
+            id="isListed"
+            checked={productData.isListed}
+            onChange={handleProductChange}
+            className="w-5 h-5 text-green-600 rounded"
+          />
+          <label htmlFor="isListed" className="ml-2 font-semibold">
+            List Product for Sale?
+          </label>
+        </div>
+        {/* Product Images */}
+        <div className="col-span-2">
+          <label className="block font-semibold mb-2">
+            Global Product Images
+          </label>
+          {uploading && <p>Uploading image...</p>}
+          <input
+            type="file"
+            onChange={(e) => handleImageUpload(e, "product")}
+            className="mb-2"
+          />
+          <div className="flex gap-2 flex-wrap">
+            {productData.images.map((img, i) => (
+              <img
+                key={i}
+                src={cloudinaryImageUrl(img.publicId)}
+                className="w-16 h-16 object-cover rounded border"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* VARIANT SPECIFIC DETAILS */}
+        <h3 className="text-xl font-semibold border-b pb-2 mb-4 mt-8 bg-gray-100 p-2 rounded-t">
+          Current Variant:{" "}
+          <span className="text-blue-600">{productVariantData.sku}</span>
+        </h3>
+        {/* Price */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Price</label>
+          <input
+            type="number"
+            name="price"
+            value={displayPrice}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        {/* Category Dropdown */}
+        <div>
+          <label className="block font-semibold mb-1">Category</label>
+          <select
+            name="category"
+            value={productVariantData.category}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2 bg-white"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+        {/* SKU */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">SKU</label>
+          <input
+            type="text"
+            name="sku"
+            value={productVariantData.sku}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+        {/* Count in Stock */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Count in Stock</label>
+          <input
+            type="number"
+            name="countInStock"
+            value={productVariantData.countInStock}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+
+        {/* Color & Variant */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block font-semibold mb-1">
+              Color (Raw Input)
+            </label>
+            <input
+              type="text"
+              name="color"
+              placeholder="e.g. Blue"
+              value={productVariantData.color}
+              onChange={handleVariantChange}
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
+          <div>
+            <label className="block font-semibold mb-1">
+              Variant Option (Raw Input)
+            </label>
+            <input
+              type="text"
+              name="variant"
+              placeholder="e.g. Falcon"
+              value={productVariantData.variant}
+              onChange={handleVariantChange}
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
+        </div>
+        {/* Variant Images */}
+        <div className="col-span-2">
+          <label className="block font-semibold mb-2">
+            Variant Specific Images
+          </label>
+          {uploading && <p>Uploading image...</p>}
+          <input
+            type="file"
+            onChange={(e) => handleImageUpload(e, "variant")}
+            className="mb-2"
+          />
+          <div className="flex gap-2 flex-wrap">
+            {productVariantData.variantImages.map((img, i) => (
+              <img
+                key={i}
+                src={cloudinaryImageUrl(img.publicId)}
+                className="w-16 h-16 object-cover rounded border border-blue-300"
+              />
+            ))}
+          </div>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors"
+        >
+          Update Product
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default EditProductPage;

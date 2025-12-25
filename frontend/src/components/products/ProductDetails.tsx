@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import ProductGrid from "./ProductGrid";
@@ -7,53 +7,83 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   fetchProductDetails,
   fetchSimilarProducts,
+  fetchProductVariant,
+  // fetchProductVariants,
+  fetchSimilarProductVariants,
 } from "../../redux/slices/productsSlice";
 import { addToCart } from "../../redux/slices/cartSlice";
+import { cloudinaryImageUrl } from "../../constants/cloudinary";
 
-type ProductDetailsProps = {
-  productId?: string; // used when Home passes bestSeller productId
-};
-
-const ProductDetails = ({ productId }: ProductDetailsProps) => {
+const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const { selectedProduct, loading, error, similarProducts } = useAppSelector(
-    (state) => state.products
-  );
+  const {
+    selectedProduct,
+    selectedVariant,
+    loading,
+    error,
+    similarProducts,
+    similarProductVariants,
+  } = useAppSelector((state) => state.products);
   const { user, guestId } = useAppSelector((state) => state.auth);
+
+  // ui states
   const [mainImage, setMainImage] = useState<string>("");
-  const [selectedOptions, setSelectedOptions] = useState<
-    Record<string, string>
-  >({});
   const [quantity, setQuantity] = useState<number>(1);
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false); // for disabling add to cart button during processing
 
-  const productFetchId = productId || id; // use productId for the best seller product, and id for other cases
+  // fetch product & variant
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProductDetails({ id: id }));
+      dispatch(fetchSimilarProducts({ id: id }))
+        .unwrap()
+        .then((returnedSimilarProducts) => {
+          if (returnedSimilarProducts.length > 0) {
+            const productIds = returnedSimilarProducts.map((p) => p._id);
+            dispatch(fetchSimilarProductVariants({ productIds }));
+          }
+        })
+        .catch((err) => console.error("Failed to load similar products:", err));
+    }
+  }, [dispatch, id]);
+  useEffect(() => {
+    if (id) {
+      const color = searchParams.get("color") || undefined;
+      const variant = searchParams.get("variant") || undefined;
+      // if no parameters defined, default variant is fetched.
+      dispatch(
+        fetchProductVariant({
+          productId: id,
+          color,
+          variant,
+        })
+      );
+    }
+  }, [dispatch, id, searchParams]);
 
   // when product changes, change main image
   useEffect(() => {
-    if (selectedProduct?.images?.[0]?.url) {
-      setMainImage(selectedProduct.images[0].url);
-    }
-    if (selectedProduct?.options) {
-      const initialOptions: Record<string, string> = {};
-      for (const [key, values] of Object.entries(selectedProduct.options)) {
-        if (values.length > 0) {
-          initialOptions[key] = values[0];
-        }
-      }
-      setSelectedOptions(initialOptions);
-    } else {
-      setSelectedOptions({});
+    // if (selectedProduct?.images?.[0]?.publicId) {
+    //   setMainImage(selectedProduct.images[0].publicId);
+    // }
+    // if (selectedProduct?.options) {
+    //   const initialOptions: Record<string, string> = {};
+    //   for (const [key, values] of Object.entries(selectedProduct.options)) {
+    //     if (values.length > 0) {
+    //       initialOptions[key] = values[0];
+    //     }
+    //   }
+    //   setSelectedOptions(initialOptions);
+    // } else {
+    //   setSelectedOptions({});
+    // }
+    // Fallback to product image if no variant image
+    if (selectedProduct?.images?.[0]?.publicId) {
+      setMainImage(selectedProduct.images[0].publicId);
     }
   }, [selectedProduct]);
-
-  useEffect(() => {
-    if (productFetchId) {
-      dispatch(fetchProductDetails({ id: productFetchId }));
-      dispatch(fetchSimilarProducts({ id: productFetchId }));
-    }
-  }, [dispatch, productFetchId]);
 
   const handleQuantityChange = (action: string) => {
     if (action === "incr") setQuantity((prev) => prev + 1);
@@ -61,35 +91,41 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
   };
 
   const handleOptionSelect = (key: string, value: string) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams);
   };
 
   const handleAddToCart = () => {
-    if (!productFetchId) {
+    if (!id) {
       toast.error("Invalid product ID.");
       return;
     }
 
     if (selectedProduct?.options) {
-      const missing = Object.keys(selectedProduct.options).filter(
-        (key) => !selectedOptions[key]
-      );
+      const requiredKeys = Object.keys(selectedProduct.options);
+      const missing = requiredKeys.filter((key) => !searchParams.get(key));
       if (missing.length > 0) {
-        toast.error("Please select all options before adding to cart.", {
-          duration: 1000,
-        });
+        toast.error(
+          `Please select ${missing.join(", ")} before adding to cart.`,
+          {
+            duration: 1500,
+          }
+        );
         return;
       }
     }
     setIsButtonDisabled(true);
+    const finalOptions: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      finalOptions[key] = value;
+    });
     dispatch(
       addToCart({
-        productId: productFetchId,
+        productId: id,
+        productVariantId: selectedVariant!._id,
         quantity,
-        options: selectedOptions,
+        options: finalOptions,
         guestId,
         userId: user?._id,
       })
@@ -108,23 +144,18 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
       });
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading) return <p>Loading...</p>;
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  if (error) return <p>Error: {error}</p>;
 
-  if (!selectedProduct) {
-    return null;
-  }
+  if (!selectedProduct) return null;
 
   // check if the selected product has options
   const hasOptions =
     !!selectedProduct.options &&
     Object.keys(selectedProduct.options).length > 0;
-  const effectivePrice = selectedProduct.discountPrice ?? selectedProduct.price;
+  const displayPrice = selectedVariant?.discountPrice || selectedVariant?.price;
+
   return (
     <div className="p-6">
       {selectedProduct && (
@@ -135,12 +166,14 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
               {selectedProduct.images.map((image, index) => (
                 <img
                   key={index}
-                  src={image.url}
-                  alt={image.altText || `Thumbnail ${index}`}
+                  src={cloudinaryImageUrl(mainImage)}
+                  alt={image.alt || `Thumbnail ${index}`}
                   className={`w-20 h-20 object-cover rounded-lg cursor-pointer border ${
-                    mainImage === image.url ? "border-black" : "border-gray-200"
+                    mainImage === image.publicId
+                      ? "border-black"
+                      : "border-gray-200"
                   }`}
-                  onClick={() => setMainImage(image.url)}
+                  onClick={() => setMainImage(image.publicId)}
                 />
               ))}
             </div>
@@ -148,10 +181,11 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
             <div className="md:w-1/2">
               <div className="mb-4">
                 <img
-                  src={mainImage || selectedProduct.images[0]?.url}
-                  alt={
-                    selectedProduct.images[0]?.altText || selectedProduct.name
+                  src={
+                    cloudinaryImageUrl(mainImage) ||
+                    selectedProduct.images[0]?.publicId
                   }
+                  alt={selectedProduct.images[0]?.alt || selectedProduct.name}
                   className="w-full h-auto object-cover rounded-lg"
                 />
               </div>
@@ -161,28 +195,42 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
               {selectedProduct.images.map((image, index) => (
                 <img
                   key={index}
-                  src={image.url}
-                  alt={image.altText || `Thumbnail ${index}`}
+                  src={cloudinaryImageUrl(mainImage)}
+                  alt={image.alt || `Thumbnail ${index}`}
                   className={`w-20 h-20 object-cover rounded-lg cursor-pointer border ${
-                    mainImage === image.url ? "border-black" : "border-gray-200"
+                    mainImage === image.publicId
+                      ? "border-black"
+                      : "border-gray-200"
                   }`}
-                  onClick={() => setMainImage(image.url)}
+                  onClick={() => setMainImage(image.publicId)}
                 />
               ))}
             </div>
-            {/* Right side */}
+            {/* Right side - Details */}
             <div className="md:w-1/2 md:ml-10">
               <h1 className="text-2xl md:text-3xl font-semibold mb-2">
                 {selectedProduct.name}
               </h1>
-              {selectedProduct.discountPrice && (
-                <p className="text-lg text-gray-600 mb-1 line-through">
-                  IDR {selectedProduct.price.toLocaleString()}
-                </p>
-              )}
-              <p className="text-xl text-gray-500 mb-2">
-                IDR {effectivePrice.toLocaleString()}
-              </p>
+              {/* Price Display */}
+              <div className="mb-4">
+                {selectedVariant?.discountPrice ? (
+                  <>
+                    <span className="text-lg text-gray-500 line-through mr-2">
+                      IDR {selectedVariant.price.toLocaleString()}
+                    </span>
+                    <span className="text-xl font-medium text-red-600">
+                      IDR {selectedVariant.discountPrice.toLocaleString()}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xl text-gray-800">
+                    IDR{" "}
+                    {displayPrice
+                      ? displayPrice.toLocaleString()
+                      : "Price Not Available"}
+                  </span>
+                )}
+              </div>
               <p className="text-gray-600 mb-4">
                 {selectedProduct.description}
               </p>
@@ -190,21 +238,31 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
                 Object.entries(selectedProduct.options!).map(
                   ([key, values]) => (
                     <div className="mb-4" key={key}>
-                      <p className="text-gray-700 capitalize">{key}:</p>
-                      <div className="flex gap-2 mt-2">
-                        {values.map((value) => (
-                          <button
-                            key={value}
-                            onClick={() => handleOptionSelect(key, value)}
-                            className={`px-4 py-2 rounded border ${
-                              selectedOptions[key] === value
-                                ? "bg-black text-white"
-                                : ""
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        ))}
+                      <p className="text-sm font-medium text-gray-900 capitalize mb-2">
+                        {key}:{" "}
+                        <span className="text-gray-500 font-normal">
+                          {searchParams.get(key)}
+                        </span>
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {values.map((value: string) => {
+                          // Check if this specific value is currently in the URL params
+                          const isSelected = searchParams.get(key) === value;
+
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => handleOptionSelect(key, value)}
+                              className={`px-4 py-2 rounded-md border text-sm transition-all duration-200 ${
+                                isSelected
+                                  ? "bg-black text-white border-black shadow-md"
+                                  : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                              }`}
+                            >
+                              {value}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   )
@@ -236,16 +294,12 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
                     : "hover:bg-gray-800"
                 }`}
               >
-                {isButtonDisabled ? "Adding..." : "ADD TO CART"}
+                {isButtonDisabled ? "Processing..." : "ADD TO CART"}
               </button>
               <div className="mt-10 text-gray-700">
                 <h3 className="text-xl font-bold mb-4">Characteristics:</h3>
                 <table className="w-full text-left text-sm text-gray-600">
                   <tbody>
-                    <tr>
-                      <td className="py-1">Material</td>
-                      <td className="py-1">{selectedProduct.material}</td>
-                    </tr>
                     {selectedProduct.weight && (
                       <tr>
                         <td className="py-1">Weight</td>
@@ -265,6 +319,7 @@ const ProductDetails = ({ productId }: ProductDetailsProps) => {
             </h2>
             <ProductGrid
               products={similarProducts}
+              productVariants={similarProductVariants}
               loading={loading}
               error={error}
             />
