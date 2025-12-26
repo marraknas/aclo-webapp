@@ -132,6 +132,7 @@ function buildSampleOrders({ insertedProducts, insertedVariants, userId }) {
         image:
           p0Variant.images?.[0]?.publicId || p0Variant.images?.[0]?.alt || "",
         price: p0Variant.discountPrice ?? p0Variant.price,
+        weight: p0.weight || 0,
         quantity: 1,
       },
     ],

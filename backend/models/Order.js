@@ -32,6 +32,10 @@ const orderItemSchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
+		weight: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{ _id: false }
 );

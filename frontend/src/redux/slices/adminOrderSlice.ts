@@ -14,6 +14,7 @@ interface AdminOrderState {
 	totalSales: number;
 	loading: boolean;
 	error: string | null;
+	generatingLabelForOrder: string | null;
 }
 
 const initialState: AdminOrderState = {
@@ -22,6 +23,7 @@ const initialState: AdminOrderState = {
 	totalSales: 0,
 	loading: false,
 	error: null,
+	generatingLabelForOrder: null,
 };
 
 // async thunk to fetch all orders (admin only)
@@ -90,6 +92,43 @@ export const deleteOrder = createAsyncThunk<
 			return rejectWithValue(error.response.data);
 		}
 		return rejectWithValue({ message: "Failed to delete order" });
+	}
+});
+
+// async thunk to generate shipping label PDF (admin only)
+export const generateShippingLabel = createAsyncThunk<
+	void,
+	string,
+	{ rejectValue: AppError }
+>("adminOrders/generateShippingLabel", async (id, { rejectWithValue }) => {
+	try {
+		const response = await axios.get(
+			`${API_URL}/api/admin/orders/${id}/shipping-label`,
+			{
+				headers: getAuthHeader(),
+				responseType: "blob",
+			}
+		);
+
+		// create blob and trigger download
+		const blob = new Blob([response.data], { type: "application/pdf" });
+		const url = window.URL.createObjectURL(blob);
+		
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = `shipping-label-${id}.pdf`;
+		document.body.appendChild(link);
+		link.click();
+		
+		// clean up
+		document.body.removeChild(link);
+		window.URL.revokeObjectURL(url);
+	} catch (err) {
+		const error = err as AxiosError<AppError>;
+		if (error.response && error.response.data) {
+			return rejectWithValue(error.response.data);
+		}
+		return rejectWithValue({ message: "Failed to generate shipping label" });
 	}
 });
 
@@ -168,6 +207,18 @@ const adminOrderSlice = createSlice({
 			.addCase(deleteOrder.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload?.message || "Failed to delete order";
+			})
+			// generate shipping label
+			.addCase(generateShippingLabel.pending, (state, action) => {
+				state.generatingLabelForOrder = action.meta.arg;
+				state.error = null;
+			})
+			.addCase(generateShippingLabel.fulfilled, (state) => {
+				state.generatingLabelForOrder = null;
+			})
+			.addCase(generateShippingLabel.rejected, (state, action) => {
+				state.generatingLabelForOrder = null;
+				state.error = action.payload?.message || "Failed to generate shipping label";
 			});
 	},
 });
