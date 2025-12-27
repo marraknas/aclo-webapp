@@ -5,30 +5,28 @@ const puppeteer = require("puppeteer");
  * TODO: Add shipping method
  */
 const generateShippingLabelHTML = (order) => {
-
     // TODO: this will be hardcoded, replace with actual sender address
-	const senderAddress = {
-		name: "ACLO Kids",
-		address: "Jl. Example Street No. 123",
-		city: "KOTA JAKARTA UTARA",
-		postalCode: "12345",
-		phone: "+6282128528968",
-	};
+    const senderAddress = {
+        name: "ACLO Kids",
+        address: "Jl. Example Street No. 123",
+        city: "KOTA JAKARTA UTARA",
+        postalCode: "12345",
+        phone: "+6282128528968",
+    };
 
     // ACLO logo
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const logoPublicId = "ACLO_LOGO_HORIZONTAL-06_1_mdrbx8";
     const logoUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${logoPublicId}`;
 
-	const orderDate = new Date(order.createdAt).toLocaleDateString("id-ID", {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-	});
-
+    const orderDate = new Date(order.createdAt).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
 
     // return HTML string
-	return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -232,7 +230,9 @@ const generateShippingLabelHTML = (order) => {
                     <p><strong>${order.shippingDetails.name}</strong></p>
                     <p>${order.shippingDetails.phone}</p>
                     <p>${order.shippingDetails.address}</p>
-                    <p>${order.shippingDetails.city}, ${order.shippingDetails.postalCode}</p>
+                    <p>${order.shippingDetails.city}, ${
+        order.shippingDetails.postalCode
+    }</p>
                 </div>
             </div>
         </div>
@@ -249,19 +249,20 @@ const generateShippingLabelHTML = (order) => {
             </thead>
             <tbody>
                 ${order.orderItems
-									.map(
-										(item, index) => {
-											let variantText = "N/A";
-											
-											if (item.productVariantId) {
-												const variant = item.productVariantId;
-												const variantParts = [];
-												if (variant.color) variantParts.push(variant.color);
-												if (variant.variant) variantParts.push(variant.variant);
-												if (variantParts.length > 0) variantText = variantParts.join(", ");
-											}
-											
-											return `
+                    .map((item, index) => {
+                        let variantText = "N/A";
+
+                        if (item.productVariantId) {
+                            const variant = item.productVariantId;
+                            const variantParts = [];
+                            if (variant.color) variantParts.push(variant.color);
+                            if (variant.variant)
+                                variantParts.push(variant.variant);
+                            if (variantParts.length > 0)
+                                variantText = variantParts.join(", ");
+                        }
+
+                        return `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${item.name}</td>
@@ -269,9 +270,8 @@ const generateShippingLabelHTML = (order) => {
                         <td>${item.quantity}</td>
                     </tr>
                 `;
-										}
-									)
-									.join("")}
+                    })
+                    .join("")}
             </tbody>
         </table>
         
@@ -282,7 +282,13 @@ const generateShippingLabelHTML = (order) => {
         
         <!-- Footer -->
         <div class="footer">
-            <p>Weight: ${order.orderItems.reduce((total, item) => total + (item.weight || 0) * item.quantity, 0)}g | Total Items: ${order.orderItems.reduce((total, item) => total + item.quantity, 0)}</p>
+            <p>Weight: ${order.orderItems.reduce(
+                (total, item) => total + (item.weight || 0) * item.quantity,
+                0
+            )}g | Total Items: ${order.orderItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+    )}</p>
             <p>This is an automated shipping label. Handle with care.</p>
         </div>
     </div>
@@ -295,38 +301,38 @@ const generateShippingLabelHTML = (order) => {
  * Generate shipping label in PDF from order data
  */
 const generateShippingLabelPDF = async (order) => {
-	let browser;
-	try {
-		browser = await puppeteer.launch({
-			headless: true,
-			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-		});
+    let browser;
+    try {
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        });
 
-		const page = await browser.newPage();
-		const html = generateShippingLabelHTML(order);
+        const page = await browser.newPage();
+        const html = generateShippingLabelHTML(order);
 
-		await page.setContent(html, { waitUntil: "networkidle0" });
-		await page.setViewport({ width: 800, height: 1200 });
+        await page.setContent(html, { waitUntil: "networkidle0" });
+        await page.setViewport({ width: 800, height: 1200 });
 
-		const pdfBuffer = await page.pdf({
-			format: "A4",
-			printBackground: true,
-			margin: {
-				top: "10mm",
-				right: "10mm",
-				bottom: "10mm",
-				left: "10mm",
-			},
-		});
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            margin: {
+                top: "10mm",
+                right: "10mm",
+                bottom: "10mm",
+                left: "10mm",
+            },
+        });
 
-		await browser.close();
-		return pdfBuffer;
-	} catch (error) {
-		if (browser) {
-			await browser.close();
-		}
-		throw error;
-	}
+        await browser.close();
+        return pdfBuffer;
+    } catch (error) {
+        if (browser) {
+            await browser.close();
+        }
+        throw error;
+    }
 };
 
 module.exports = { generateShippingLabelPDF };

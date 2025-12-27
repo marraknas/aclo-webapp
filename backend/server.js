@@ -11,6 +11,10 @@ const orderRoutes = require("./routes/orderRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const subscribeRoutes = require("./routes/subscribeRoutes");
+
+const midtransRoutes = require("./routes/midtrans/midtransRoutes");
+const midtransWebhook = require("./routes/midtrans/midtransWebhookRoutes");
+
 const adminRoutes = require("./routes/admin/adminRoutes");
 const productAdminRoutes = require("./routes/admin/productAdminRoutes");
 const orderAdminRoutes = require("./routes/admin/orderAdminRoutes");
@@ -27,7 +31,7 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.get("/", (req, res) => {
-	res.send("WELCOME TO ACLO API");
+    res.send("WELCOME TO ACLO API");
 });
 
 // API Routes
@@ -40,11 +44,14 @@ app.use("/api/upload", uploadRoutes); // prepends /api/upload to all the upload 
 app.use("/api/subscribe", subscribeRoutes); // prepends /api/subscribe to all the subscribe routes
 app.use("/api/reviews", reviewRoutes); //prepends /api/reviews to all the subscribe routes
 
+app.use("/api/payments/midtrans", midtransRoutes); // prepends /api/payments/midtrans for midtrans payment route
+app.use("/api/webhooks/midtrans", midtransWebhook);
+
 // Admin
 app.use("/api/admin/users", adminRoutes);
 app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/orders", orderAdminRoutes);
 
 app.listen(PORT, () => {
-	console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

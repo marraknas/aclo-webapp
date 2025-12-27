@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import PayPalButton from "./PayPalButton";
+import MidtransPayButton from "./MidtransPayButton";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { createCheckout } from "../../redux/slices/checkoutSlice";
 import { API_URL, getAuthHeader } from "../../constants/api";
@@ -38,9 +38,12 @@ const Checkout = () => {
     try {
       const createdCheckout: Checkout = await dispatch(
         createCheckout({
-          checkoutItems: cart.products,
+          checkoutItems: cart.products.map((p) => ({
+            ...p,
+            options: p.options ?? {},
+          })),
           shippingDetails,
-          paymentMethod: "Paypal",
+          paymentMethod: "Midtrans",
           totalPrice: cart.totalPrice,
         })
       ).unwrap();
@@ -51,31 +54,29 @@ const Checkout = () => {
     } catch (error) {
       console.error("Failed to create checkout: ", error);
     }
+  };
 
-    // paypal developer's account needed for this at https://developer.paypal.com/home/
-    // setCheckoutId("dummy-checkout-id");
-  };
-  const handlePaymentSuccess = async (details: Record<string, unknown>) => {
-    if (!checkoutId) {
-      console.error("No checkoutId available for payment update.");
-      return;
-    }
-    try {
-      await axios.put(
-        `${API_URL}/api/checkout/${checkoutId}/pay`,
-        {
-          paymentStatus: "paid",
-          paymentDetails: details,
-        },
-        {
-          headers: getAuthHeader(),
-        }
-      );
-      await handleFinalizeCheckout(checkoutId); // finalize checkout if payment is successful
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const handlePaymentSuccess = async (details: Record<string, unknown>) => {
+  //   if (!checkoutId) {
+  //     console.error("No checkoutId available for payment update.");
+  //     return;
+  //   }
+  //   try {
+  //     await axios.put(
+  //       `${API_URL}/api/checkout/${checkoutId}/pay`,
+  //       {
+  //         paymentStatus: "paid",
+  //         paymentDetails: details,
+  //       },
+  //       {
+  //         headers: getAuthHeader(),
+  //       }
+  //     );
+  //     await handleFinalizeCheckout(checkoutId); // finalize checkout if payment is successful
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const handleFinalizeCheckout = async (checkoutId: string) => {
     try {
@@ -85,7 +86,9 @@ const Checkout = () => {
         { headers: getAuthHeader() }
       );
       navigate("/order-confirmation");
-    } catch (error) {
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || "Finalize failed";
+      alert(msg);
       console.error("Error in handleFinalizeCheckout:", error);
     }
   };
@@ -200,16 +203,21 @@ const Checkout = () => {
               </button>
             ) : (
               <div>
-                <h3 className="text-lg mb-4">Pay with Paypal</h3>
-                {/* Paypal button component */}
-                <PayPalButton
+                <MidtransPayButton
+                  checkoutId={checkoutId}
                   amount={cart.totalPrice}
-                  onSuccess={handlePaymentSuccess}
+                  onSuccess={() => {
+                    handleFinalizeCheckout(checkoutId);
+                  }}
                   onError={(err) => {
                     alert("Payment failed. Try again later.");
                     console.log(err);
                   }}
                 />
+                <p className="text-sm text-gray-500 mt-2">
+                  After payment, we will confirm your transaction and create
+                  your order.
+                </p>
               </div>
             )}
           </div>
