@@ -6,19 +6,45 @@ const router = express.Router();
 
 router.post("/notification", async (req, res) => {
     try {
-        const n = req.body;
+        const n = req.body || {};
 
         // verify signature key
         const raw = `${n.order_id}${n.status_code}${n.gross_amount}${process.env.MIDTRANS_SERVER_KEY}`;
         const expected = crypto.createHash("sha512").update(raw).digest("hex");
 
         if (expected !== n.signature_key) {
+            console.warn("[Midtrans webhook] Invalid signature", {
+                order_id: n.order_id,
+                status_code: n.status_code,
+                gross_amount: n.gross_amount,
+            });
             return res.status(401).json({ message: "Invalid signature" });
         }
 
+        if (!mongoose.Types.ObjectId.isValid(n.order_id)) {
+            console.info(
+                "[Midtrans webhook] Non-ObjectId order_id (likely dashboard test). Ignoring.",
+                {
+                    order_id: n.order_id,
+                    transaction_status: n.transaction_status,
+                }
+            );
+            return res
+                .status(200)
+                .json({ received: true, ignored: "test_order_id" });
+        }
+
         const checkout = await Checkout.findById(n.order_id);
-        if (!checkout)
-            return res.status(404).json({ message: "Checkout not found" });
+        if (!checkout) {
+            console.info("[Midtrans webhook] Checkout not found. Ignoring.", {
+                order_id: n.order_id,
+                transaction_status: n.transaction_status,
+            });
+            // Return 200 to stop retries
+            return res
+                .status(200)
+                .json({ received: true, ignored: "checkout_not_found" });
+        }
 
         const status = n.transaction_status; // settlement, pending, deny, expire, cancel, capture
         const fraud = n.fraud_status;
