@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { useEffect } from "react";
 import { clearCart } from "../redux/slices/cartSlice";
+import { cloudinaryImageUrl } from "../constants/cloudinary";
 
 const OrderConfirmationPage = () => {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ const OrderConfirmationPage = () => {
             {checkout.checkoutItems.map((item) => (
               <div key={item.productId} className="flex items-center mb-4">
                 <img
-                  src={item.image}
+                  src={cloudinaryImageUrl(item.image)}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded-md mr-4"
                 />

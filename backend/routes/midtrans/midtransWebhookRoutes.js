@@ -24,7 +24,7 @@ router.post("/notification", async (req, res) => {
 
         if (!mongoose.Types.ObjectId.isValid(n.order_id)) {
             console.info(
-                "[Midtrans webhook] Non-ObjectId order_id (likely dashboard test). Ignoring.",
+                "[Midtrans webhook] Non-Mongo-ObjectId order_id (likely dashboard test). Ignoring.",
                 {
                     order_id: n.order_id,
                     transaction_status: n.transaction_status,
@@ -73,7 +73,8 @@ router.post("/notification", async (req, res) => {
             checkout.paymentStatus = status || "pending";
         }
 
-        checkout.paymentDetails = n;
+        checkout.paymentDetails = checkout.paymentDetails || {};
+        checkout.paymentDetails.midtransNotification = n; // store the webhook payload
         await checkout.save();
 
         return res.status(200).json({ received: true });

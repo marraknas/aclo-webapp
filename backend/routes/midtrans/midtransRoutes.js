@@ -31,14 +31,25 @@ router.post("/token", protect, async (req, res) => {
             return res.status(403).json({ message: "Not allowed" });
         }
 
-        if (checkout.isFinalized) {
+        if (checkout.isFinalized)
             return res
                 .status(400)
                 .json({ message: "Checkout already finalized" });
-        }
-
-        if (checkout.checkoutItems.length <= 0) {
+        if (checkout.checkoutItems.length <= 0)
             return res.status(400).json({ message: "No items to checkout" });
+
+        // reuse token if we already created one and it's still pending
+        const midtrans = checkout.paymentDetails?.midtrans;
+        if (
+            checkout.paymentMethod === "Midtrans" &&
+            checkout.paymentStatus === "pending" &&
+            midtrans?.token
+        ) {
+            return res.json({
+                token: midtrans.token,
+                redirect_url: midtrans.redirectUrl,
+                reused: true,
+            });
         }
 
         const orderId = checkout._id.toString();
@@ -71,10 +82,21 @@ router.post("/token", protect, async (req, res) => {
 
         const trx = await snap.createTransaction(parameter);
 
-        // checkout.paymentMethod = "Midtrans"
-        // checkout.paymentStatus = "pending"
-        // await checkout.save();
-        return res.json({ token: trx.token, redirect_url: trx.redirect_url });
+        // store token in paymentDetails.midtrans
+
+        checkout.paymentDetails = checkout.paymentDetails || {};
+        checkout.paymentDetails.midtrans = {
+            orderId,
+            token: trx.token,
+            redirectUrl: trx.redirect_url,
+            createdAt: new Date(),
+        };
+        await checkout.save();
+        return res.json({
+            token: trx.token,
+            redirect_url: trx.redirect_url,
+            reused: false,
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Midtrans token error" });
