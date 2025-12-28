@@ -77,6 +77,22 @@ const checkoutSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.Mixed, // stores payment related details (transactionID, response from payment gateway)
 			required: false,
 		},
+		shippingCost: {
+			type: Number,
+			default: 0,
+		},
+		shippingMethod: {
+			type: String,
+			required: false,
+		},
+		shippingCourier: {
+			type: String,
+			required: false,
+		},
+		shippingDuration: {
+			type: String,
+			required: false,
+		},
 		isFinalized: {
 			type: Boolean,
 			default: false,

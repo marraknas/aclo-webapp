@@ -1,8 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MidtransPayButton from "./MidtransPayButton";
+import ShippingCalculatorModal from "./ShippingCalculatorModal";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { createCheckout } from "../../redux/slices/checkoutSlice";
+import { 
+  createCheckout, 
+  calculateShippingCost,
+  setSelectedShipping,
+  clearShipping
+} from "../../redux/slices/checkoutSlice";
 import { API_URL, getAuthHeader } from "../../constants/api";
 import axios from "axios";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
@@ -13,8 +19,15 @@ const Checkout = () => {
   const dispatch = useAppDispatch();
   const { cart, loading, error } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.auth);
+  const { 
+    shippingOptions, 
+    selectedShipping, 
+    shippingLoading, 
+    shippingError 
+  } = useAppSelector((state) => state.checkout);
 
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
+  const [showShippingModal, setShowShippingModal] = useState(false);
   const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
     name: "",
     address: "",
@@ -30,12 +43,55 @@ const Checkout = () => {
     }
   }, [cart, navigate]);
 
+  // Clear shipping when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearShipping());
+    };
+  }, [dispatch]);
+
+  const handleCalculateShipping = async () => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      return;
+    }
+
+    if (shippingDetails.postalCode.length < 5) {
+      alert("Please enter a valid 5-digit postal code");
+      return;
+    }
+
+    try {
+      await dispatch(
+        calculateShippingCost({
+          destinationPostalCode: shippingDetails.postalCode,
+          cartItems: cart.products.map((p) => ({
+            productId: p.productId,
+            price: p.price,
+            quantity: p.quantity,
+          })),
+        })
+      ).unwrap();
+    } catch (error: any) {
+      console.error("Failed to calculate shipping:", error);
+      alert(error.message || "Failed to calculate shipping. Please try again.");
+    }
+  };
+
   const handleCreateCheckout = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!cart || !cart.products || cart.products.length === 0) {
       return;
     }
+
+    // Validate shipping is calculated
+    if (!selectedShipping) {
+      alert("Please calculate and select a shipping method");
+      return;
+    }
+
     try {
+      const totalWithShipping = cart.totalPrice + selectedShipping.price;
+      
       const createdCheckout: Checkout = await dispatch(
         createCheckout({
           checkoutItems: cart.products.map((p) => ({
@@ -44,7 +100,11 @@ const Checkout = () => {
           })),
           shippingDetails,
           paymentMethod: "Midtrans",
-          totalPrice: cart.totalPrice,
+          totalPrice: totalWithShipping,
+          shippingCost: selectedShipping.price,
+          shippingMethod: selectedShipping.courier_service_name,
+          shippingCourier: selectedShipping.courier_code,
+          shippingDuration: selectedShipping.duration,
         })
       ).unwrap();
 
@@ -176,6 +236,26 @@ const Checkout = () => {
                 className="w-full p-2 border rounded"
                 required
               />
+              <button
+                type="button"
+                onClick={handleCalculateShipping}
+                disabled={shippingDetails.postalCode.length < 5 || shippingLoading}
+                className="mt-2 w-full bg-acloblue text-white py-2 rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-acloblue/80 transition"
+              >
+                {shippingLoading ? "Calculating..." : "Calculate Shipping"}
+              </button>
+              {shippingError && (
+                <div className="mt-2">
+                  <p className="text-red-600 text-sm">{shippingError}</p>
+                  <button
+                    type="button"
+                    onClick={handleCalculateShipping}
+                    className="mt-1 text-sm text-blue-600 hover:underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           <div className="mb-4">
@@ -197,7 +277,8 @@ const Checkout = () => {
             {!checkoutId ? (
               <button
                 type="submit"
-                className="w-full bg-black text-white py-3 rounded"
+                disabled={!selectedShipping}
+                className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
               >
                 Continue to Payment
               </button>
@@ -205,7 +286,7 @@ const Checkout = () => {
               <div>
                 <MidtransPayButton
                   checkoutId={checkoutId}
-                  amount={cart.totalPrice}
+                  amount={cart.totalPrice + (selectedShipping?.price || 0)}
                   onSuccess={() => {
                     handleFinalizeCheckout(checkoutId);
                   }}
@@ -265,13 +346,48 @@ const Checkout = () => {
         </div>
         <div className="flex justify-between items-center text-lg">
           <p>Shipping</p>
-          <p>Free</p>
+          <div className="text-right">
+            {selectedShipping ? (
+              <div>
+                <p className="text-xl">
+                  IDR {selectedShipping.price.toLocaleString()}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowShippingModal(true)}
+                  className="text-sm text-blue-600 hover:underline mt-1"
+                >
+                  View Options
+                </button>
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">
+                Please calculate shipping
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex justify-between items-center text-lg mt-4 border-t border-gray-300 pt-4">
           <p>Total</p>
-          <p>IDR {cart.totalPrice?.toLocaleString()}</p>
+          <p>
+            IDR{" "}
+            {(
+              cart.totalPrice + (selectedShipping?.price || 0)
+            ).toLocaleString()}
+          </p>
         </div>
       </div>
+
+      {/* Shipping Calculator Modal */}
+      <ShippingCalculatorModal
+        isOpen={showShippingModal}
+        onClose={() => setShowShippingModal(false)}
+        shippingOptions={shippingOptions}
+        selectedShipping={selectedShipping}
+        onSelectShipping={(option) => {
+          dispatch(setSelectedShipping(option));
+        }}
+      />
     </div>
   );
 };

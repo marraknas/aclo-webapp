@@ -15,6 +15,8 @@ const subscribeRoutes = require("./routes/subscribeRoutes");
 const midtransRoutes = require("./routes/midtrans/midtransRoutes");
 const midtransWebhook = require("./routes/midtrans/midtransWebhookRoutes");
 
+const biteshipRoutes = require("./routes/biteship/biteshipRoutes");
+
 const adminRoutes = require("./routes/admin/adminRoutes");
 const productAdminRoutes = require("./routes/admin/productAdminRoutes");
 const orderAdminRoutes = require("./routes/admin/orderAdminRoutes");
@@ -46,6 +48,8 @@ app.use("/api/reviews", reviewRoutes); //prepends /api/reviews to all the subscr
 
 app.use("/api/payments/midtrans", midtransRoutes); // prepends /api/payments/midtrans for midtrans payment route
 app.use("/api/webhooks/midtrans", midtransWebhook);
+
+app.use("/api/calculate-shipping", biteshipRoutes); // prepends /api/calculate-shipping for shipping cost calculation
 
 // Admin
 app.use("/api/admin/users", adminRoutes);
