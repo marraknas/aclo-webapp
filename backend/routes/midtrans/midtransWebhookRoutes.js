@@ -22,18 +22,18 @@ router.post("/notification", async (req, res) => {
             return res.status(401).json({ message: "Invalid signature" });
         }
 
-        // if (!mongoose.Types.ObjectId.isValid(n.order_id)) {
-        //     console.info(
-        //         "[Midtrans webhook] Non-ObjectId order_id (likely dashboard test). Ignoring.",
-        //         {
-        //             order_id: n.order_id,
-        //             transaction_status: n.transaction_status,
-        //         }
-        //     );
-        //     return res
-        //         .status(200)
-        //         .json({ received: true, ignored: "test_order_id" });
-        // }
+        if (!mongoose.Types.ObjectId.isValid(n.order_id)) {
+            console.info(
+                "[Midtrans webhook] Non-ObjectId order_id (likely dashboard test). Ignoring.",
+                {
+                    order_id: n.order_id,
+                    transaction_status: n.transaction_status,
+                }
+            );
+            return res
+                .status(200)
+                .json({ received: true, ignored: "test_order_id" });
+        }
 
         const checkout = await Checkout.findById(n.order_id);
         if (!checkout) {
