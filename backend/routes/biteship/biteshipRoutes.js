@@ -13,7 +13,6 @@ router.post("/", protect, async (req, res) => {
 try {
     const { destinationPostalCode, cartItems } = req.body;
 
-    // Validate required fields
     if (!destinationPostalCode || !cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({
           success: false,
@@ -21,7 +20,7 @@ try {
       });
     }
 
-    // Validate postal code format (Indonesian postal codes are 5 digits)
+    // Validate postal code format
     if (!/^\d{5}$/.test(destinationPostalCode)) {
         return res.status(400).json({
             success: false,
@@ -55,18 +54,11 @@ try {
         const product = productMap[cartItem.productId];
       
         if (!product) {
-            console.log(`PRODUCT not found: ${cartItem.productId}`);
-            return res.status(400).json({
-            success: false,
-            message: `Product Not Found: ${cartItem.productId}`,
-            });
+            return res.status(400).json({ message: `Product Not Found: ${cartItem.productId}`});
         }
 
         if (!product.weight || product.weight <= 0) {
-            return res.status(400).json({
-            success: false,
-            message: `Product "${product.name}" does not have weight data configured`,
-            });
+            return res.status(400).json({ message: `Product "${product.name}" does not have weight data configured` });
         }
 
         biteshipItems.push({
@@ -81,12 +73,11 @@ try {
         });
     }
 
-    // build request and send to Biteship API
+    // Build request and send to Biteship API
     const biteshipApiKey = process.env.BITESHIP_API_KEY;
     if (!biteshipApiKey) {
         console.error("BITESHIP_API_KEY not configured");
         return res.status(500).json({
-            success: false,
             message: "Shipping service not properly configured",
         });
     }
@@ -102,7 +93,7 @@ try {
         items: biteshipItems,
     };
 
-    console.log("Biteship request:", JSON.stringify(biteshipRequest, null, 2));
+    // console.log("Biteship request:", JSON.stringify(biteshipRequest, null, 2));
 
     const biteshipResponse = await axios.post(
         "https://api.biteship.com/v1/rates/couriers",
@@ -126,17 +117,14 @@ try {
     const pricing = biteshipResponse.data.pricing || [];
     
     if (pricing.length === 0) {
-        return res.status(404).json({
-            success: false,
-            message: "No shipping options available for this postal code",
-        });
+        return res.status(404).json({ message: "No shipping options available for this postal code" });
     }
 
     const shippingOptions = pricing.map((option) => ({
-        courier_name: option.courier_name,
-        courier_code: option.courier_code,
-        courier_service_name: option.courier_service_name,
-        courier_service_code: option.courier_service_code,
+        courierName: option.courier_name,
+        courierCode: option.courier_code,
+        courierServiceName: option.courier_service_name,
+        courierServiceCode: option.courier_service_code,
         description: option.description,
         duration: option.duration,
         price: option.price,
@@ -152,18 +140,16 @@ try {
         destination: biteshipResponse.data.destination,
     });
   } catch (error) {
-    console.error("Error calculating shipping cost:", error);
+    console.error(error);
     
     if (error.response?.data) {
         return res.status(error.response.status || 500).json({
-            success: false,
             message: error.response.data.message || "Failed to calculate shipping cost",
             error: error.response.data,
         });
     }
 
     res.status(500).json({
-        success: false,
         message: "Failed to calculate shipping cost",
         error: error.message,
     });
