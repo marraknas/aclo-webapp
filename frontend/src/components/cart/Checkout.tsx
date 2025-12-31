@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MidtransPayButton from "./MidtransPayButton";
+// import MidtransPayButton from "./MidtransPayButton";
 import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -10,8 +10,6 @@ import {
   setSelectedShipping,
   clearShipping,
 } from "../../redux/slices/checkoutSlice";
-// import { API_URL, getAuthHeader } from "../../constants/api";
-// import axios from "axios";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 
@@ -113,21 +111,6 @@ const Checkout = () => {
       console.error("Failed to create checkout: ", error);
     }
   };
-
-  // const handleFinalizeCheckout = async (checkoutId: string) => {
-  //   try {
-  //     await axios.post(
-  //       `${API_URL}/api/checkout/${checkoutId}/finalize`,
-  //       {},
-  //       { headers: getAuthHeader() }
-  //     );
-  //     navigate("/order-confirmation");
-  //   } catch (error: any) {
-  //     const msg = error?.response?.data?.message || "Finalize failed";
-  //     alert(msg);
-  //     console.error("Error in handleFinalizeCheckout:", error);
-  //   }
-  // };
 
   if (loading) return <p>Loading cart...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -247,13 +230,13 @@ const Checkout = () => {
               type="button"
               onClick={handleCreateCheckout}
               disabled={!selectedShipping}
-              className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
+              className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition cursor-pointer"
             >
               Continue to Payment
             </button>
           ) : (
             <div>
-              <MidtransPayButton
+              {/* <MidtransPayButton
                 checkoutId={checkoutId}
                 amount={cart.totalPrice + (selectedShipping?.price || 0)}
                 onSuccess={() => {
@@ -264,10 +247,11 @@ const Checkout = () => {
                   alert("Payment failed. Try again later.");
                   console.log(err);
                 }}
-              />
-              <p className="text-sm text-gray-500 mt-2">
+              /> */}
+              <div className="text-2xl uppercase">Payment Instructions</div>
+              <p className="text-base text-gray-500 mt-2">
                 After payment, we will confirm your transaction and create your
-                order.
+                order within 1-2 business days.
               </p>
             </div>
           )}
