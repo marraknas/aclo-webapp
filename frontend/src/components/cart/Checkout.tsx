@@ -1,8 +1,15 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MidtransPayButton from "./MidtransPayButton";
+import ShippingOptionsModal from "./ShippingOptionsModal";
+import ShippingDetailsModal from "./ShippingDetailsModal";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { createCheckout } from "../../redux/slices/checkoutSlice";
+import {
+  createCheckout,
+  calculateShippingCost,
+  setSelectedShipping,
+  clearShipping,
+} from "../../redux/slices/checkoutSlice";
 // import { API_URL, getAuthHeader } from "../../constants/api";
 // import axios from "axios";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
@@ -13,8 +20,14 @@ const Checkout = () => {
   const dispatch = useAppDispatch();
   const { cart, loading, error } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.auth);
+  const { shippingOptions, selectedShipping, shippingLoading } = useAppSelector(
+    (state) => state.checkout
+  );
 
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
+  const [showShippingModal, setShowShippingModal] = useState(false);
+  const [showShippingDetailsModal, setShowShippingDetailsModal] =
+    useState(true);
   const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
     name: "",
     address: "",
@@ -30,12 +43,53 @@ const Checkout = () => {
     }
   }, [cart, navigate]);
 
-  const handleCreateCheckout = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Clear shipping when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearShipping());
+    };
+  }, [dispatch]);
+
+  const handleShippingDetailsSubmit = async (
+    shippingDetails: ShippingDetails
+  ) => {
+    setShippingDetails(shippingDetails);
+
     if (!cart || !cart.products || cart.products.length === 0) {
       return;
     }
+
     try {
+      await dispatch(
+        calculateShippingCost({
+          destinationPostalCode: shippingDetails.postalCode,
+          cartItems: cart.products.map((p) => ({
+            productId: p.productId,
+            price: p.price,
+            quantity: p.quantity,
+          })),
+        })
+      ).unwrap();
+      setShowShippingDetailsModal(false);
+    } catch (error: any) {
+      alert(error.message || "Failed to update. Please try again.");
+      console.error("Error in handleShippingDetails:", error);
+    }
+  };
+
+  const handleCreateCheckout = async () => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      return;
+    }
+
+    if (!selectedShipping) {
+      alert("Please select a shipping method");
+      return;
+    }
+
+    try {
+      const totalWithShipping = cart.totalPrice + selectedShipping.price;
+
       const createdCheckout: Checkout = await dispatch(
         createCheckout({
           checkoutItems: cart.products.map((p) => ({
@@ -44,7 +98,11 @@ const Checkout = () => {
           })),
           shippingDetails,
           paymentMethod: "Midtrans",
-          totalPrice: cart.totalPrice,
+          totalPrice: totalWithShipping,
+          shippingCost: selectedShipping.price,
+          shippingMethod: selectedShipping.courierServiceName,
+          shippingCourier: selectedShipping.courierCode,
+          shippingDuration: selectedShipping.duration,
         })
       ).unwrap();
 
@@ -78,133 +136,44 @@ const Checkout = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
-      {/* Left Section */}
-      <div className="bg-white rounded-lg p-6">
-        <h2 className="text-2xl uppercase mb-6">Checkout</h2>
-        <form onSubmit={handleCreateCheckout}>
-          <h3 className="text-lg mb-4">Contact Details</h3>
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              value={user ? user.email : ""}
-              className="w-full p-2 border rounded"
-              disabled
-            />
+    <div className="max-w-4xl mx-auto py-10 px-6 tracking-tighter">
+      <ShippingDetailsModal
+        isOpen={showShippingDetailsModal}
+        onClose={() => navigate("/")}
+        onSubmit={handleShippingDetailsSubmit}
+        userEmail={user?.email}
+        isCalculating={shippingLoading}
+      />
+
+      {/* Order Summary Section */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl uppercase">Order Summary</h2>
+          <button
+            type="button"
+            onClick={() => setShowShippingDetailsModal(true)}
+            className="text-sm text-acloblue hover:underline"
+          >
+            Edit Shipping Details
+          </button>
+        </div>
+
+        {/* Shipping Details Display */}
+        {shippingDetails.name && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              Shipping To:
+            </h3>
+            <p className="text-sm text-gray-800">{shippingDetails.name}</p>
+            <p className="text-sm text-gray-600">{shippingDetails.address}</p>
+            <p className="text-sm text-gray-600">
+              {shippingDetails.city}, {shippingDetails.postalCode}
+            </p>
+            <p className="text-sm text-gray-600">{shippingDetails.phone}</p>
           </div>
-          <h3 className="text-lg mb-4">Delivery</h3>
-          <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
-            <input
-              type="text"
-              value={shippingDetails.name}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  name: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Address</label>
-            <input
-              type="text"
-              value={shippingDetails.address}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  address: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">City</label>
-              <input
-                type="text"
-                value={shippingDetails.city}
-                onChange={(e) =>
-                  setShippingDetails({
-                    ...shippingDetails,
-                    city: e.target.value,
-                  })
-                }
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700">Postal Code</label>
-              <input
-                type="text"
-                value={shippingDetails.postalCode}
-                onChange={(e) =>
-                  setShippingDetails({
-                    ...shippingDetails,
-                    postalCode: e.target.value,
-                  })
-                }
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Phone</label>
-            <input
-              type="tel"
-              value={shippingDetails.phone}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  phone: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mt-6">
-            {!checkoutId ? (
-              <button
-                type="submit"
-                className="w-full bg-black text-white py-3 rounded"
-              >
-                Continue to Payment
-              </button>
-            ) : (
-              <div>
-                <MidtransPayButton
-                  checkoutId={checkoutId}
-                  amount={cart.totalPrice}
-                  onSuccess={() => {
-                    // handleFinalizeCheckout(checkoutId);
-                    navigate(`/order-processing?checkoutId=${checkoutId}`);
-                  }}
-                  onError={(err) => {
-                    alert("Payment failed. Try again later.");
-                    console.log(err);
-                  }}
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  After payment, we will confirm your transaction and create
-                  your order.
-                </p>
-              </div>
-            )}
-          </div>
-        </form>
-      </div>
-      {/* Right section */}
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg mb-4">Order Summary</h3>
+        )}
+
+        {/* Products List */}
         <div className="border-t border-gray-300 py-4 mb-4">
           {cart.products.map((product, index) => (
             <div
@@ -242,15 +211,78 @@ const Checkout = () => {
           <p>Subtotal</p>
           <p>IDR {cart.totalPrice?.toLocaleString()}</p>
         </div>
-        <div className="flex justify-between items-center text-lg">
+        <div className="flex justify-between items-center text-lg mb-4">
           <p>Shipping</p>
-          <p>Free</p>
+          <div className="text-right">
+            {selectedShipping ? (
+              <div>
+                <p className="text-xl">
+                  IDR {selectedShipping.price.toLocaleString()}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowShippingModal(true)}
+                  className="text-sm text-acloblue hover:underline mt-1"
+                >
+                  View Shipping Options
+                </button>
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">N/A</p>
+            )}
+          </div>
         </div>
-        <div className="flex justify-between items-center text-lg mt-4 border-t border-gray-300 pt-4">
+        <div className="flex justify-between items-center text-xl font-semibold mt-4 border-t border-gray-300 pt-4">
           <p>Total</p>
-          <p>IDR {cart.totalPrice?.toLocaleString()}</p>
+          <p>
+            IDR{" "}
+            {(
+              cart.totalPrice + (selectedShipping?.price || 0)
+            ).toLocaleString()}
+          </p>
+        </div>
+        <div className="mt-6">
+          {!checkoutId ? (
+            <button
+              type="button"
+              onClick={handleCreateCheckout}
+              disabled={!selectedShipping}
+              className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
+            >
+              Continue to Payment
+            </button>
+          ) : (
+            <div>
+              <MidtransPayButton
+                checkoutId={checkoutId}
+                amount={cart.totalPrice + (selectedShipping?.price || 0)}
+                onSuccess={() => {
+                  // handleFinalizeCheckout(checkoutId);
+                  navigate(`/order-processing?checkoutId=${checkoutId}`);
+                }}
+                onError={(err) => {
+                  alert("Payment failed. Try again later.");
+                  console.log(err);
+                }}
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                After payment, we will confirm your transaction and create your
+                order.
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+      <ShippingOptionsModal
+        isOpen={showShippingModal}
+        onClose={() => setShowShippingModal(false)}
+        shippingOptions={shippingOptions}
+        selectedShipping={selectedShipping}
+        onSelectShipping={(option) => {
+          dispatch(setSelectedShipping(option));
+        }}
+      />
     </div>
   );
 };

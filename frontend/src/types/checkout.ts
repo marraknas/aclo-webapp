@@ -27,10 +27,41 @@ export interface Checkout {
   paidAt?: string;
   paymentStatus: string;
   paymentDetails?: Record<string, any>;
+  shippingCost?: number;
+  shippingMethod?: string;
+  shippingCourier?: string;
+  shippingDuration?: string;
   isFinalized: boolean;
   finalizedAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ShippingOption {
+  courierName: string;
+  courierCode: string;
+  courierServiceName: string;
+  courierServiceCode: string;
+  description: string;
+  duration: string;
+  price: number;
+  type: string;
+}
+
+export interface ShippingCostRequest {
+  destinationPostalCode: string;
+  cartItems: Array<{
+    productId: string;
+    price: number;
+    quantity: number;
+  }>;
+}
+
+export interface ShippingCostResponse {
+  success: boolean;
+  options: ShippingOption[];
+  origin?: any;
+  destination?: any;
 }
 
 // Payload when calling createCheckout
@@ -39,4 +70,8 @@ export interface CreateCheckoutPayload {
   shippingDetails: ShippingDetails;
   paymentMethod: string;
   totalPrice: number;
+  shippingCost?: number;
+  shippingMethod?: string;
+  shippingCourier?: string;
+  shippingDuration?: string;
 }
