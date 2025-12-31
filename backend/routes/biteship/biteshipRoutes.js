@@ -39,14 +39,11 @@ try {
             message: "Shipping service not properly configured",
         });
     }
-
-    // Fetch product details for each cart item
     const productIds = cartItems.map((item) => item.productId);
     const products = await Product.find({ _id: { $in: productIds } }).select(
         "name dimensions weight"
     );
 
-    // Create a map for quick lookup
     const productMap = {};
     products.forEach((product) => {
         productMap[product._id.toString()] = product;
@@ -65,7 +62,6 @@ try {
             });
         }
 
-        // Validate product has required shipping data
         if (!product.weight || product.weight <= 0) {
             return res.status(400).json({
             success: false,
@@ -95,6 +91,10 @@ try {
         });
     }
 
+    // Currently requesting major Indonesian couriers: JNE, TIKI, Grab, J&T, SiCepat, AnterAja
+    // to add more couriers in the future (eg Grab, Lalamove, DHL, etc):
+    // - update the couriers field below with additional courier codes
+    // - refer to biteship documentation: https://biteship.com/en/docs/api/couriers/overview
     const biteshipRequest = {
         origin_postal_code: originPostalCode,
         destination_postal_code: destinationPostalCode,
@@ -123,7 +123,6 @@ try {
         });
     }
 
-    // Extract and format pricing options
     const pricing = biteshipResponse.data.pricing || [];
     
     if (pricing.length === 0) {
@@ -133,7 +132,6 @@ try {
         });
     }
 
-    // Format the response
     const shippingOptions = pricing.map((option) => ({
         courier_name: option.courier_name,
         courier_code: option.courier_code,
@@ -145,7 +143,6 @@ try {
         type: option.type,
     }));
 
-    // Sort by price (cheapest first)
     shippingOptions.sort((a, b) => a.price - b.price);
 
     res.json({
@@ -157,7 +154,6 @@ try {
   } catch (error) {
     console.error("Error calculating shipping cost:", error);
     
-    // Handle Biteship API errors
     if (error.response?.data) {
         return res.status(error.response.status || 500).json({
             success: false,

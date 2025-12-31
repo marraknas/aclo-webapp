@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MidtransPayButton from "./MidtransPayButton";
 import ShippingCalculatorModal from "./ShippingCalculatorModal";
+import ShippingDetailsModal from "./ShippingDetailsModal";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
   createCheckout, 
@@ -23,11 +24,11 @@ const Checkout = () => {
     shippingOptions, 
     selectedShipping, 
     shippingLoading, 
-    shippingError 
   } = useAppSelector((state) => state.checkout);
 
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [showShippingModal, setShowShippingModal] = useState(false);
+  const [showShippingDetailsModal, setShowShippingDetailsModal] = useState(true);
   const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
     name: "",
     address: "",
@@ -50,13 +51,10 @@ const Checkout = () => {
     };
   }, [dispatch]);
 
-  const handleCalculateShipping = async () => {
-    if (!cart || !cart.products || cart.products.length === 0) {
-      return;
-    }
+  const handleShippingDetailsSubmit = async (shippingDetails: ShippingDetails) => {
+    setShippingDetails(shippingDetails);
 
-    if (shippingDetails.postalCode.length < 5) {
-      alert("Please enter a valid 5-digit postal code");
+    if (!cart || !cart.products || cart.products.length === 0) {
       return;
     }
 
@@ -71,21 +69,20 @@ const Checkout = () => {
           })),
         })
       ).unwrap();
+      setShowShippingDetailsModal(false);
     } catch (error: any) {
-      console.error("Failed to calculate shipping:", error);
-      alert(error.message || "Failed to calculate shipping. Please try again.");
+      alert(error.message || "Failed to update. Please try again.");
+      console.error("Error in handleShippingDetails:", error);
     }
   };
 
-  const handleCreateCheckout = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleCreateCheckout = async () => {
     if (!cart || !cart.products || cart.products.length === 0) {
       return;
     }
 
-    // Validate shipping is calculated
     if (!selectedShipping) {
-      alert("Please calculate and select a shipping method");
+      alert("Please select a shipping method");
       return;
     }
 
@@ -102,8 +99,8 @@ const Checkout = () => {
           paymentMethod: "Midtrans",
           totalPrice: totalWithShipping,
           shippingCost: selectedShipping.price,
-          shippingMethod: selectedShipping.courier_service_name,
-          shippingCourier: selectedShipping.courier_code,
+          shippingMethod: selectedShipping.courierServiceName,
+          shippingCourier: selectedShipping.courierCode,
           shippingDuration: selectedShipping.duration,
         })
       ).unwrap();
@@ -160,153 +157,44 @@ const Checkout = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
-      {/* Left Section */}
-      <div className="bg-white rounded-lg p-6">
-        <h2 className="text-2xl uppercase mb-6">Checkout</h2>
-        <form onSubmit={handleCreateCheckout}>
-          <h3 className="text-lg mb-4">Contact Details</h3>
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              value={user ? user.email : ""}
-              className="w-full p-2 border rounded"
-              disabled
-            />
+    <div className="max-w-4xl mx-auto py-10 px-6 tracking-tighter">
+      <ShippingDetailsModal
+        isOpen={showShippingDetailsModal}
+        onClose={() => navigate("/")}
+        onSubmit={handleShippingDetailsSubmit}
+        userEmail={user?.email}
+        isCalculating={shippingLoading}
+      />
+
+      {/* Order Summary Section */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl uppercase">Order Summary</h2>
+          <button
+            type="button"
+            onClick={() => setShowShippingDetailsModal(true)}
+            className="text-sm text-acloblue hover:underline"
+          >
+            Edit Shipping Details
+          </button>
+        </div>
+
+        {/* Shipping Details Display */}
+        {shippingDetails.name && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              Shipping To:
+            </h3>
+            <p className="text-sm text-gray-800">{shippingDetails.name}</p>
+            <p className="text-sm text-gray-600">{shippingDetails.address}</p>
+            <p className="text-sm text-gray-600">
+              {shippingDetails.city}, {shippingDetails.postalCode}
+            </p>
+            <p className="text-sm text-gray-600">{shippingDetails.phone}</p>
           </div>
-          <h3 className="text-lg mb-4">Delivery</h3>
-          <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
-            <input
-              type="text"
-              value={shippingDetails.name}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  name: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Address</label>
-            <input
-              type="text"
-              value={shippingDetails.address}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  address: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">City</label>
-              <input
-                type="text"
-                value={shippingDetails.city}
-                onChange={(e) =>
-                  setShippingDetails({
-                    ...shippingDetails,
-                    city: e.target.value,
-                  })
-                }
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700">Postal Code</label>
-              <input
-                type="text"
-                value={shippingDetails.postalCode}
-                onChange={(e) =>
-                  setShippingDetails({
-                    ...shippingDetails,
-                    postalCode: e.target.value,
-                  })
-                }
-                className="w-full p-2 border rounded"
-                required
-              />
-              <button
-                type="button"
-                onClick={handleCalculateShipping}
-                disabled={shippingDetails.postalCode.length < 5 || shippingLoading}
-                className="mt-2 w-full bg-acloblue text-white py-2 rounded disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-acloblue/80 transition"
-              >
-                {shippingLoading ? "Calculating..." : "Calculate Shipping"}
-              </button>
-              {shippingError && (
-                <div className="mt-2">
-                  <p className="text-red-600 text-sm">{shippingError}</p>
-                  <button
-                    type="button"
-                    onClick={handleCalculateShipping}
-                    className="mt-1 text-sm text-blue-600 hover:underline"
-                  >
-                    Try again
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Phone</label>
-            <input
-              type="tel"
-              value={shippingDetails.phone}
-              onChange={(e) =>
-                setShippingDetails({
-                  ...shippingDetails,
-                  phone: e.target.value,
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mt-6">
-            {!checkoutId ? (
-              <button
-                type="submit"
-                disabled={!selectedShipping}
-                className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
-              >
-                Continue to Payment
-              </button>
-            ) : (
-              <div>
-                <MidtransPayButton
-                  checkoutId={checkoutId}
-                  amount={cart.totalPrice + (selectedShipping?.price || 0)}
-                  onSuccess={() => {
-                    handleFinalizeCheckout(checkoutId);
-                  }}
-                  onError={(err) => {
-                    alert("Payment failed. Try again later.");
-                    console.log(err);
-                  }}
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  After payment, we will confirm your transaction and create
-                  your order.
-                </p>
-              </div>
-            )}
-          </div>
-        </form>
-      </div>
-      {/* Right section */}
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg mb-4">Order Summary</h3>
+        )}
+
+        {/* Products List */}
         <div className="border-t border-gray-300 py-4 mb-4">
           {cart.products.map((product, index) => (
             <div
@@ -344,7 +232,7 @@ const Checkout = () => {
           <p>Subtotal</p>
           <p>IDR {cart.totalPrice?.toLocaleString()}</p>
         </div>
-        <div className="flex justify-between items-center text-lg">
+        <div className="flex justify-between items-center text-lg mb-4">
           <p>Shipping</p>
           <div className="text-right">
             {selectedShipping ? (
@@ -355,19 +243,19 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={() => setShowShippingModal(true)}
-                  className="text-sm text-blue-600 hover:underline mt-1"
+                  className="text-sm text-acloblue hover:underline mt-1"
                 >
-                  View Options
+                  View Shipping Options
                 </button>
               </div>
             ) : (
               <p className="text-gray-500 text-sm">
-                Please calculate shipping
+                N/A
               </p>
             )}
           </div>
         </div>
-        <div className="flex justify-between items-center text-lg mt-4 border-t border-gray-300 pt-4">
+        <div className="flex justify-between items-center text-xl font-semibold mt-4 border-t border-gray-300 pt-4">
           <p>Total</p>
           <p>
             IDR{" "}
@@ -376,9 +264,38 @@ const Checkout = () => {
             ).toLocaleString()}
           </p>
         </div>
+        <div className="mt-6">
+          {!checkoutId ? (
+            <button
+              type="button"
+              onClick={handleCreateCheckout}
+              disabled={!selectedShipping}
+              className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
+            >
+              Continue to Payment
+            </button>
+          ) : (
+            <div>
+              <MidtransPayButton
+                checkoutId={checkoutId}
+                amount={cart.totalPrice + (selectedShipping?.price || 0)}
+                onSuccess={() => {
+                  handleFinalizeCheckout(checkoutId);
+                }}
+                onError={(err) => {
+                  alert("Payment failed. Try again later.");
+                  console.log(err);
+                }}
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                After payment, we will confirm your transaction and create
+                your order.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Shipping Calculator Modal */}
       <ShippingCalculatorModal
         isOpen={showShippingModal}
         onClose={() => setShowShippingModal(false)}

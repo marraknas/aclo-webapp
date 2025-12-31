@@ -38,10 +38,10 @@ export interface Checkout {
 }
 
 export interface ShippingOption {
-  courier_name: string;
-  courier_code: string;
-  courier_service_name: string;
-  courier_service_code: string;
+  courierName: string;
+  courierCode: string;
+  courierServiceName: string;
+  courierServiceCode: string;
   description: string;
   duration: string;
   price: number;
