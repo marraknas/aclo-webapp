@@ -1,7 +1,7 @@
 import type { ShippingOption } from "../../types/checkout";
 import { IoMdClose } from "react-icons/io";
 
-interface ShippingCalculatorModalProps {
+interface ShippingOptionsModalProps {
     isOpen: boolean;
     onClose: () => void;
     shippingOptions: ShippingOption[];
@@ -9,13 +9,13 @@ interface ShippingCalculatorModalProps {
     onSelectShipping: (option: ShippingOption) => void;
 }
 
-const ShippingCalculatorModal = ({
+const ShippingOptionsModal = ({
     isOpen,
     onClose,
     shippingOptions,
     selectedShipping,
     onSelectShipping,
-}: ShippingCalculatorModalProps) => {
+}: ShippingOptionsModalProps) => {
     if (!isOpen) return null;
 
     const handleSelect = (option: ShippingOption) => {
@@ -101,4 +101,4 @@ const ShippingCalculatorModal = ({
     );
 };
 
-export default ShippingCalculatorModal;
+export default ShippingOptionsModal;

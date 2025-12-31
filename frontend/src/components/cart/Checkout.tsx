@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import MidtransPayButton from "./MidtransPayButton";
-import ShippingCalculatorModal from "./ShippingCalculatorModal";
+import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
@@ -296,7 +296,7 @@ const Checkout = () => {
         </div>
       </div>
 
-      <ShippingCalculatorModal
+      <ShippingOptionsModal
         isOpen={showShippingModal}
         onClose={() => setShowShippingModal(false)}
         shippingOptions={shippingOptions}
