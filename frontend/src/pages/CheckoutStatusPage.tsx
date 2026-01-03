@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { clearCart } from "../redux/slices/cartSlice";
 import { cloudinaryImageUrl } from "../constants/cloudinary";
 
-const OrderConfirmationPage = () => {
+const CheckoutStatusPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { checkout } = useAppSelector((state) => state.checkout);
@@ -103,4 +103,4 @@ const OrderConfirmationPage = () => {
   );
 };
 
-export default OrderConfirmationPage;
+export default CheckoutStatusPage;

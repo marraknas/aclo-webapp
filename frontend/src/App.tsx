@@ -11,8 +11,7 @@ import ProductDetails from "./components/products/ProductDetails";
 // @ts-ignore
 import Checkout from "./components/cart/Checkout";
 import Payment from "./components/cart/Payment";
-import PaymentPending from "./components/cart/PaymentPending";
-import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import CheckoutStatusPage from "./pages/CheckoutStatusPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -30,7 +29,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Verified from "./pages/Verified";
 import Story from "./pages/Story";
 import Contact from "./pages/Contact";
-// import OrderProcessingPage from "./pages/OrderProcessingPage";
+// import CheckoutProcessingPage from "./pages/CheckoutProcessingPage";
 
 function App() {
   return (
@@ -58,12 +57,8 @@ function App() {
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="payment" element={<Payment />} />
-            <Route path="payment-pending" element={<PaymentPending />} />
-            <Route
-              path="order-confirmation"
-              element={<OrderConfirmationPage />}
-            />
-            {/* <Route path="order-processing" element={<OrderProcessingPage />} /> */}
+            <Route path="order-confirmation" element={<CheckoutStatusPage />} />
+            {/* <Route path="checkout-processing" element={<CheckoutProcessingPage />} /> */}
             <Route path="order/:id" element={<OrderDetailsPage />} />
             <Route path="my-orders" element={<MyOrdersPage />} />
           </Route>

@@ -14,7 +14,7 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-const OrderProcessingPage = () => {
+const CheckoutProcessingPage = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const checkoutId = params.get("checkoutId") ?? params.get("order_id");
@@ -163,4 +163,4 @@ const OrderProcessingPage = () => {
   );
 };
 
-export default OrderProcessingPage;
+export default CheckoutProcessingPage;
