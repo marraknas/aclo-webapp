@@ -1,6 +1,6 @@
 import type { Product } from "../../types/product";
 import type { ProductVariant } from "../../types/productVariant";
-import ProductCard from "./ProductCard"; // Adjust import path as needed
+import ProductCard from "./ProductCard";
 
 type ProductGridProps = {
   products: Product[];
@@ -23,12 +23,11 @@ const ProductGrid = ({
       {products.map((product) => {
         // Pass only the variants relevant to this specific product
         const variants = productVariants[product._id] || [];
-
         return (
-          <ProductCard 
-            key={product._id} 
-            product={product} 
-            variants={variants} 
+          <ProductCard
+            key={product._id}
+            product={product}
+            variants={variants}
           />
         );
       })}

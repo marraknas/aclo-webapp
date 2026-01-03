@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-import CollectionPage from "./pages/CollectionPage";
+import ShopPage from "./pages/ShopPage";
 import ProductDetails from "./components/products/ProductDetails";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -48,10 +48,7 @@ function App() {
             <Route path="story" element={<Story />} />
             <Route path="contact" element={<Contact />} />
             {/* anything after a colon is a dynamic route */}
-            <Route
-              path="collections/:collection"
-              element={<CollectionPage />}
-            />
+            <Route path="shop" element={<ShopPage />} />
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="checkout" element={<Checkout />} />
             <Route

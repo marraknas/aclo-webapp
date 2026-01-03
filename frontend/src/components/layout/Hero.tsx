@@ -25,7 +25,7 @@ const Hero = () => {
             One Home at a Time.
           </p>
           <Link
-            to="/collections/all"
+            to="/shop"
             className="
 				inline-flex items-center justify-center
 				bg-acloblue text-background font-light rounded-xl

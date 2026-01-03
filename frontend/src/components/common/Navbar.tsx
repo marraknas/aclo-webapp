@@ -62,7 +62,7 @@ const Navbar = () => {
             STORY
           </Link>
           <Link
-            to="/collections/all"
+            to="/shop"
             className="text-ink hover:text-gray-600 uppercase font-light tracking-widest"
           >
             SHOP

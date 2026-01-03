@@ -22,7 +22,7 @@ const ShopNowSection = () => {
               <p>Let their “I can do it myself” moments begin here.</p>
 
               <Link
-                to="/collections/all"
+                to="/shop"
                 className="inline-flex items-center justify-center
                     bg-acloblue text-background font-light rounded-xl
                     text-sm sm:text-base md:text-lg

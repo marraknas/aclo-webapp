@@ -141,7 +141,7 @@ const Story: React.FC = () => {
 
           <div className="mt-6 flex justify-center">
             <a
-              href="/collections/all"
+              href="/shop"
               className="inline-flex items-center justify-center rounded-full bg-acloblue px-7 py-3 text-sm font-medium text-white hover:opacity-80 transition"
             >
               Shop Now
