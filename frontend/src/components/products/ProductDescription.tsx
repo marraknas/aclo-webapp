@@ -7,7 +7,6 @@ type Props = { md?: string };
 
 const schema = {
   ...defaultSchema,
-  // allow <u> for underline
   tagNames: [...(defaultSchema.tagNames || []), "u"],
 };
 
@@ -18,11 +17,7 @@ export default function ProductDescription({ md }: Props) {
     <div className="mt-4 text-justify">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[
-          // If you don't need underline, remove rehypeRaw + sanitize and keep it purely markdown.
-          rehypeRaw,
-          [rehypeSanitize, schema],
-        ]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, schema]]}
         components={{
           h3: ({ children }) => (
             <h3 className="text-acloblue font-semibold text-lg mt-5 mb-2">
