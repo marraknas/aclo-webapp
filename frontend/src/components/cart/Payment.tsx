@@ -117,13 +117,13 @@ const Payment = () => {
     try {
       setSubmitting(true);
 
-      await axios.put(
-        `${API_URL}/api/checkout/${checkout._id}/payment-proof`,
+      const { data } = await axios.post(
+        `${API_URL}/api/checkout/${checkout._id}/submit-proof`,
         { publicId: screenshot, note: note }, // optional: send proof id to backend
         { headers: getAuthHeader() }
       );
 
-      navigate("/payment-pending");
+      navigate(`/order/${data._id}/confirmation`);
     } catch (err) {
       console.error(err);
       // optionally show toast / set local error message

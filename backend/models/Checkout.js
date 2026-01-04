@@ -60,6 +60,7 @@ const checkoutSchema = new mongoose.Schema(
             publicId: { type: String, default: "" },
             uploadedAt: { type: Date },
             status: {
+                // unsure whether to keep this status field because we may want to settle the proof through email/whatsapp instead if it comes to this
                 type: String,
                 enum: ["none", "pending", "approved", "rejected"],
                 default: "none",
@@ -78,10 +79,6 @@ const checkoutSchema = new mongoose.Schema(
             // timestamp when payment was made
             type: Date,
             required: false,
-        },
-        paymentStatus: {
-            type: String,
-            default: "pending",
         },
         paymentDetails: {
             type: mongoose.Schema.Types.Mixed, // stores payment related details (transactionID, response from payment gateway)
