@@ -1,45 +1,62 @@
-import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../redux/hooks";
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import axios from "axios";
 import { API_URL, getAuthHeader } from "../../constants/api";
 import LoadingOverlay from "../common/LoadingOverlay";
+import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import { fetchCheckoutById } from "../../redux/slices/checkoutSlice";
 
 const REDIRECT_AFTER_MS = 2000;
 
 const Payment = () => {
-  // const dispatch = useAppDispatch();
+  const { checkoutId } = useParams<{ checkoutId: string }>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const {
     checkout,
     loading: checkoutLoading,
     error,
   } = useAppSelector((state) => state.checkout);
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [screenshot, setScreenshot] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [screenshot, setScreenshot] = useState<string>(""); // cloudinary publicId
+  const [uploadedFileName, setUploadedFileName] = useState<string>(""); // string to show to users
+  const [note, setNote] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+
+  const [uploading, setUploading] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!checkoutLoading && !checkout) {
-      setLoading(true);
+    if (!checkoutId) {
+      navigate("/");
       return;
     }
 
-    if (checkout) {
-      setLoading(false);
-      return;
+    // fetch if missing OR wrong checkout in redux
+    if (!checkout?._id || checkout._id !== checkoutId) {
+      dispatch(fetchCheckoutById({ checkoutId }));
     }
+  }, [checkoutId, checkout?._id, dispatch, navigate]);
 
-    setLoading(true);
+  useEffect(() => {
+    if (!checkoutId) return;
+    if (checkoutLoading) return;
 
-    const t = setTimeout(() => {
-      navigate("/checkout");
-    }, REDIRECT_AFTER_MS);
+    // after loading finishes, if we still don't have the checkout, redirect
+    if (!checkout || checkout._id !== checkoutId) {
+      const t = setTimeout(() => navigate("/"), REDIRECT_AFTER_MS);
+      return () => clearTimeout(t);
+    }
+  }, [checkoutId, checkoutLoading, checkout?._id, navigate]);
 
-    return () => clearTimeout(t);
-  }, [checkout, navigate, checkoutLoading]);
+  const deleteByPublicId = async (publicId: string) => {
+    await axios.delete(`${API_URL}/api/upload`, {
+      data: { publicId },
+    });
+  };
 
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,18 +64,50 @@ const Payment = () => {
 
     const formData = new FormData();
     formData.append("image", file);
+    formData.append("folder", "payments");
 
     try {
       setUploading(true);
+
+      if (screenshot) {
+        try {
+          setDeleting(true);
+          await deleteByPublicId(screenshot);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setDeleting(false);
+        }
+      }
       const { data } = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       setScreenshot(data.publicId);
+      setUploadedFileName(file.name);
     } catch (error) {
       console.error(error);
     } finally {
       setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleDeleteScreenshot = async () => {
+    if (!screenshot) return;
+
+    try {
+      setDeleting(true);
+      await deleteByPublicId(screenshot);
+
+      // Clear UI state
+      setScreenshot("");
+      setUploadedFileName("");
+      setPreviewOpen(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -68,13 +117,13 @@ const Payment = () => {
     try {
       setSubmitting(true);
 
-      await axios.post(
-        `${API_URL}/api/checkout/${checkout._id}/finalize`,
-        { publicId: screenshot }, // optional: send proof id to backend
+      await axios.put(
+        `${API_URL}/api/checkout/${checkout._id}/payment-proof`,
+        { publicId: screenshot, note: note }, // optional: send proof id to backend
         { headers: getAuthHeader() }
       );
 
-      navigate("/order-confirmation");
+      navigate("/payment-pending");
     } catch (err) {
       console.error(err);
       // optionally show toast / set local error message
@@ -86,7 +135,7 @@ const Payment = () => {
   if (error) return <p>Error: {error}</p>;
   return (
     <div className="flex justify-center px-4 py-10">
-      <LoadingOverlay show={loading} />
+      <LoadingOverlay show={checkoutLoading} />
       <div className="max-w-4xl border-black border-2 rounded-lg mx-auto py-10 px-6 tracking-tighter">
         <div className="text-3xl uppercase mb-4 text-acloblue">
           Payment Instructions
@@ -98,29 +147,95 @@ const Payment = () => {
           </span>
           .
         </div>
-        <div className="text-xl mb-2">
+        <div className="text-xl mb-6">
           Please do a bank transfer to this account xxxxxxxxxxxxx and upload a
           screenshot of the proof of transaction. If a proof of transaction is
           not provided or is deemed invalid, we cannot process your order.
         </div>
         {uploading && <p>Uploading image...</p>}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="bg-acloblue/80 text-white py-2 px-4 rounded hover:bg-acloblue cursor-pointer"
+        >
+          Choose file
+        </button>
+
+        <span className="ml-3 text-sm text-gray-600">
+          {uploadedFileName ? uploadedFileName : "No file selected"}
+        </span>
         <input
+          ref={fileInputRef}
           type="file"
           onChange={handleImageUpload}
-          className="w-full text-sm text-gray-600
-            file:mr-4 file:py-2 file:px-4
-            file:rounded file:border-0
-            file:bg-black file:text-white
-            file:cursor-pointer
-            hover:file:bg-gray-800
-            mb-2 mt-2"
+          className="hidden"
         />
         {screenshot && (
-          <p className="text-sm text-gray-600 mt-2">
-            Uploaded: <span className="break-all">{screenshot}</span>
-          </p>
+          <div>
+            <p className="text-base text-gray-600 mt-2 mb-2">
+              Uploaded screenshot
+            </p>
+            <div className="relative inline-block group">
+              <img
+                src={cloudinaryImageUrl(screenshot)}
+                alt="Uploaded screenshot"
+                className="w-32 h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
+                onClick={() => setPreviewOpen(true)}
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteScreenshot();
+                }}
+                disabled={deleting}
+                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-200 text-black disabled:opacity-50"
+              >
+                x
+              </button>
+              {deleting && (
+                <div className="absolute inset-0 rounded-lg bg-black/30 flex items-center justify-center text-white text-xs">
+                  Deleting...
+                </div>
+              )}
+            </div>
+          </div>
         )}
-        <div className="text-base text-gray-500 mt-4">
+        {previewOpen && screenshot && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setPreviewOpen(false)} // click backdrop to close
+          >
+            <div
+              className="relative max-w-4xl w-full"
+              onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
+            >
+              <button
+                onClick={() => setPreviewOpen(false)}
+                className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+              >
+                Close
+              </button>
+
+              <img
+                src={cloudinaryImageUrl(screenshot)}
+                alt="Uploaded screenshot preview"
+                className="w-full max-h-[85vh] object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        )}
+        <div className="mt-6 mb-4">
+          <div className="block font-semibold mb-2 mt-2">Note (optional)</div>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2"
+            rows={2}
+            required
+          ></textarea>
+        </div>
+        <div className="text-base text-gray-500 mt-4 mb-2">
           After payment, we will confirm your transaction and create your order
           within 1-2 business days.
         </div>
@@ -128,9 +243,9 @@ const Payment = () => {
           type="button"
           onClick={handleSubmit}
           disabled={screenshot.length === 0 || submitting || !checkout?._id}
-          className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition cursor-pointer"
+          className="w-full bg-acloblue/80 text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-acloblue transition cursor-pointer"
         >
-          Submit
+          {submitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </div>

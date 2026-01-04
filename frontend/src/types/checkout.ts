@@ -16,12 +16,20 @@ export interface ShippingDetails {
   phone: string;
 }
 
+export interface PaymentProof {
+  publicId: string;
+  uploadedAt: string;
+  status: "none" | "pending" | "approved" | "rejected";
+  note: string;
+}
+
 export interface Checkout {
   _id: string;
   user: string; // userId
   checkoutItems: CheckoutItem[];
   shippingDetails: ShippingDetails;
   paymentMethod: string;
+  paymentProof?: PaymentProof;
   totalPrice: number;
   isPaid: boolean;
   paidAt?: string;

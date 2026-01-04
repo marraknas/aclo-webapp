@@ -55,9 +55,12 @@ function App() {
               element={<CollectionPage />}
             />
             <Route path="product/:id" element={<ProductDetails />} />
-            <Route path="checkout" element={<Checkout />} />
-            <Route path="payment" element={<Payment />} />
-            <Route path="order-confirmation" element={<CheckoutStatusPage />} />
+            <Route path="checkout/:cartId" element={<Checkout />} />
+            <Route path="payment/:checkoutId" element={<Payment />} />
+            <Route
+              path="checkout/:checkoutId/status"
+              element={<CheckoutStatusPage />}
+            />
             {/* <Route path="checkout-processing" element={<CheckoutProcessingPage />} /> */}
             <Route path="order/:id" element={<OrderDetailsPage />} />
             <Route path="my-orders" element={<MyOrdersPage />} />

@@ -204,7 +204,7 @@ router.post("/:id/finalize", protect, async (req, res) => {
 });
 
 // @router GET /api/checkout/:id
-// @desc Return minimal checkout info for polling
+// @desc Fetch checkout info by id
 // @access Private
 router.get("/:id", protect, async (req, res) => {
     try {
@@ -214,9 +214,7 @@ router.get("/:id", protect, async (req, res) => {
             return res.status(400).json({ message: "Invalid checkout id" });
         }
 
-        const checkout = await Checkout.findById(id).select(
-            "_id user isPaid isFinalized paymentStatus paidAt finalizedAt"
-        );
+        const checkout = await Checkout.findById(id);
 
         if (!checkout) {
             return res.status(404).json({ message: "Checkout Not Found" });
@@ -228,12 +226,7 @@ router.get("/:id", protect, async (req, res) => {
         }
 
         // respond with exactly what frontend needs
-        return res.status(200).json({
-            _id: checkout._id,
-            isPaid: checkout.isPaid,
-            isFinalized: checkout.isFinalized,
-            paymentStatus: checkout.paymentStatus,
-        });
+        return res.status(200).json(checkout);
     } catch (err) {
         console.error("GET /api/checkout/:id error:", err);
         return res.status(500).json({ message: "Server Error" });

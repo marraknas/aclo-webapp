@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 // import MidtransPayButton from "./MidtransPayButton";
 import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
@@ -12,17 +12,18 @@ import {
 } from "../../redux/slices/checkoutSlice";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import { fetchCartById } from "../../redux/slices/cartSlice";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { cart, loading, error } = useAppSelector((state) => state.cart);
+  const { cartId } = useParams<{ cartId: string }>();
   const { user } = useAppSelector((state) => state.auth);
   const { shippingOptions, selectedShipping, shippingLoading } = useAppSelector(
     (state) => state.checkout
   );
 
-  const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showShippingDetailsModal, setShowShippingDetailsModal] =
     useState(true);
@@ -34,12 +35,22 @@ const Checkout = () => {
     phone: "",
   });
 
-  // Ensure cart is loaded before proceeding
   useEffect(() => {
-    if (!cart || !cart.products || cart.products.length === 0) {
+    if (!cartId) {
+      navigate("/");
+      return;
+    }
+
+    if (!cart?._id || cart._id !== cartId) {
+      dispatch(fetchCartById({ cartId }));
+      return;
+    }
+
+    if (!loading && (!cart.products || cart.products.length === 0)) {
       navigate("/");
     }
-  }, [cart, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartId, cart?._id, cart?.products?.length, loading, dispatch, navigate]);
 
   // Clear shipping when component unmounts
   useEffect(() => {
@@ -95,7 +106,7 @@ const Checkout = () => {
             options: p.options ?? {},
           })),
           shippingDetails,
-          paymentMethod: "Midtrans",
+          paymentMethod: "BankTransfer",
           totalPrice: totalWithShipping,
           shippingCost: selectedShipping.price,
           shippingMethod: selectedShipping.courierServiceName,
@@ -104,9 +115,7 @@ const Checkout = () => {
         })
       ).unwrap();
 
-      if (createdCheckout._id) {
-        setCheckoutId(createdCheckout._id);
-      }
+      return createdCheckout._id ?? null;
     } catch (error) {
       console.error("Failed to create checkout: ", error);
     }
@@ -225,37 +234,17 @@ const Checkout = () => {
           </p>
         </div>
         <div className="mt-6">
-          {
-            !checkoutId && (
-              <button
-                type="button"
-                onClick={() => {
-                  handleCreateCheckout();
-                  navigate("/payment");
-                }}
-                disabled={!selectedShipping}
-                className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition cursor-pointer"
-              >
-                Continue to Payment
-              </button>
-            )
-            // : (
-            //   <div>
-            //     <MidtransPayButton
-            //       checkoutId={checkoutId}
-            //       amount={cart.totalPrice + (selectedShipping?.price || 0)}
-            //       onSuccess={() => {
-            //         // handleFinalizeCheckout(checkoutId);
-            //         navigate(`/order-processing?checkoutId=${checkoutId}`);
-            //       }}
-            //       onError={(err) => {
-            //         alert("Payment failed. Try again later.");
-            //         console.log(err);
-            //       }}
-            //     />
-            //   </div>
-            // )
-          }
+          <button
+            type="button"
+            onClick={async () => {
+              const id = await handleCreateCheckout(); // return checkout
+              if (id) navigate(`/payment/${id}`);
+            }}
+            disabled={!selectedShipping}
+            className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition cursor-pointer"
+          >
+            Continue to Payment
+          </button>
         </div>
       </div>
 

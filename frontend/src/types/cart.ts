@@ -9,6 +9,7 @@ export interface CartItem {
 }
 
 export interface Cart {
+  _id: string;
   user?: string; // ObjectId of user
   guestId?: string;
   products: CartItem[];

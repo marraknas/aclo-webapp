@@ -16,7 +16,7 @@ const loadCartFromStorage = (): Cart => {
   const storedCart = localStorage.getItem("cart");
   return storedCart
     ? (JSON.parse(storedCart) as Cart)
-    : { products: [], totalPrice: 0 };
+    : { _id: "", products: [], totalPrice: 0 };
 };
 
 const initialState: CartState = {
@@ -47,6 +47,23 @@ export const fetchCart = createAsyncThunk<
       return rejectWithValue(error.response.data);
     }
     return rejectWithValue({ message: "Failed to fetch cart" });
+  }
+});
+
+export const fetchCartById = createAsyncThunk<
+  Cart,
+  { cartId: string },
+  { rejectValue: AppError }
+>("cart/fetchCartById", async ({ cartId }, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<Cart>(`${API_URL}/api/cart/${cartId}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (err) {
+    const error = err as AxiosError<AppError>;
+    if (error.response?.data) return rejectWithValue(error.response.data);
+    return rejectWithValue({ message: "Failed to fetch cart by id" });
   }
 });
 
@@ -185,7 +202,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     clearCart: (state) => {
-      state.cart = { products: [], totalPrice: 0 };
+      state.cart = { _id: "", products: [], totalPrice: 0 };
       localStorage.removeItem("cart");
     },
   },
@@ -203,6 +220,19 @@ const cartSlice = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Failed to fetch cart";
+      })
+      .addCase(fetchCartById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCartById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cart = action.payload;
+        saveCartToStorage(action.payload);
+      })
+      .addCase(fetchCartById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Failed to fetch cart by Id";
       })
       .addCase(addToCart.pending, (state) => {
         state.loading = true;

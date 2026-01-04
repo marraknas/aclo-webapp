@@ -14,7 +14,7 @@ const CHECKED_KEYS = ["color", "variant"];
 const ProductCard = ({ product, variants }: ProductCardProps) => {
   const [selections, setSelections] = useState<Record<string, string>>({});
   const queryString = new URLSearchParams(selections).toString();
-  const productUrl = queryString 
+  const productUrl = queryString
     ? `/product/${product._id}?${queryString}`
     : `/product/${product._id}`;
 
@@ -76,12 +76,8 @@ const ProductCard = ({ product, variants }: ProductCardProps) => {
         <div className="px-4 mb-3 space-y-2">
           {Object.entries(product.options).map(([key, rawValues]) => {
             const values = rawValues as string[];
-            
-            if (
-              !CHECKED_KEYS.includes(key) ||
-              !values ||
-              values.length === 0
-            ) {
+
+            if (!CHECKED_KEYS.includes(key) || !values || values.length === 0) {
               return null;
             }
 
@@ -97,7 +93,7 @@ const ProductCard = ({ product, variants }: ProductCardProps) => {
                       <button
                         key={value}
                         onClick={(e) => handleOptionSelect(e, key, value)}
-                        className={`px-2 py-1 rounded border text-xs transition-colors ${
+                        className={`px-2 py-1 rounded border text-xs transition-colors cursor-pointer ${
                           isSelected
                             ? "bg-black text-white border-black"
                             : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
