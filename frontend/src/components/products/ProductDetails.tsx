@@ -302,7 +302,9 @@ const ProductDetails = () => {
                   {/* Main image */}
                   <div className="mb-4 relative">
                     <img
-                      src={mainImage ? cloudinaryImageUrl(mainImage) : ""}
+                      src={
+                        mainImage ? cloudinaryImageUrl(mainImage) : undefined
+                      }
                       alt={selectedProduct.name}
                       className="w-full h-auto object-cover"
                     />
