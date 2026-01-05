@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "../common/Navbar";
 import ProductDescription from "./ProductDescription";
+import LoadingOverlay from "../common/LoadingOverlay";
 
 import ProductGrid from "./ProductGrid";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -63,6 +64,20 @@ const ProductDetails = () => {
     return merged.length ? merged : productImgs;
   }, [selectedProduct, selectedVariant, hasUserSelectedOption]);
 
+  // Don't show first image in product details
+  const blockedProductFirstId = selectedProduct?.images?.[0]?.publicId || null;
+
+  const carouselImages = useMemo(() => {
+    if (!displayedImages?.length) return [];
+    if (!blockedProductFirstId) return displayedImages;
+
+    const filtered = displayedImages.filter(
+      (img: any) => img.publicId !== blockedProductFirstId
+    );
+
+    return filtered.length ? filtered : displayedImages;
+  }, [displayedImages, blockedProductFirstId]);
+
   useEffect(() => {
     if (!id) return;
 
@@ -85,8 +100,14 @@ const ProductDetails = () => {
     const color = searchParams.get("color") || undefined;
     const variant = searchParams.get("variant") || undefined;
     const ovenMitt = searchParams.get("ovenMitt") || undefined;
+    const stabiliser = searchParams.get("stabiliser") || undefined;
 
-    console.log("fetchProductVariant params:", { color, variant, ovenMitt });
+    console.log("fetchProductVariant params:", {
+      color,
+      variant,
+      ovenMitt,
+      stabiliser,
+    });
 
     dispatch(
       fetchProductVariant({
@@ -94,6 +115,7 @@ const ProductDetails = () => {
         color,
         variant,
         ovenMitt,
+        stabiliser,
       })
     );
   }, [dispatch, id, searchParams]);
@@ -101,24 +123,52 @@ const ProductDetails = () => {
   const lastVariantIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!displayedImages.length) return;
+    if (!carouselImages.length) return;
 
     const variantId = selectedVariant?._id ?? null;
-    const variantFirst = selectedVariant?.images?.[0]?.publicId;
 
-    if (variantId && variantId !== lastVariantIdRef.current && variantFirst) {
-      setMainImage(variantFirst);
+    if (!hasUserSelectedOption) {
+      lastVariantIdRef.current = null;
+
+      const exists = carouselImages.some(
+        (img: any) => img.publicId === mainImage
+      );
+      if (!mainImage || !exists) {
+        setMainImage(carouselImages[0].publicId);
+      }
+      return;
+    }
+
+    if (variantId && variantId !== lastVariantIdRef.current) {
+      const vImgs = selectedVariant?.images || [];
+
+      const variantPick =
+        vImgs.find((img: any) => img.publicId !== blockedProductFirstId)
+          ?.publicId || "";
+
+      if (variantPick) {
+        setMainImage(variantPick);
+      } else {
+        setMainImage(carouselImages[0].publicId);
+      }
+
       lastVariantIdRef.current = variantId;
       return;
     }
 
-    const exists = displayedImages.some(
+    const exists = carouselImages.some(
       (img: any) => img.publicId === mainImage
     );
     if (!mainImage || !exists) {
-      setMainImage(displayedImages[0].publicId);
+      setMainImage(carouselImages[0].publicId);
     }
-  }, [displayedImages, mainImage, selectedVariant?._id]);
+  }, [
+    carouselImages,
+    hasUserSelectedOption,
+    selectedVariant?._id,
+    selectedVariant?.images,
+    mainImage,
+  ]);
 
   const handleQuantityChange = (action: "incr" | "decr") => {
     if (action === "incr") setQuantity((prev) => prev + 1);
@@ -150,9 +200,7 @@ const ProductDetails = () => {
       if (missing.length > 0) {
         toast.error(
           `Please select ${missing.join(", ")} before adding to cart.`,
-          {
-            duration: 1500,
-          }
+          { duration: 1500 }
         );
         return;
       }
@@ -188,26 +236,26 @@ const ProductDetails = () => {
   };
 
   const getCurrentIndex = () => {
-    if (!displayedImages.length) return 0;
-    const idx = displayedImages.findIndex(
+    if (!carouselImages.length) return 0;
+    const idx = carouselImages.findIndex(
       (img: any) => img.publicId === mainImage
     );
     return idx >= 0 ? idx : 0;
   };
 
   const goPrev = () => {
-    if (!displayedImages.length) return;
+    if (!carouselImages.length) return;
     const curr = getCurrentIndex();
     const nextIndex =
-      (curr - 1 + displayedImages.length) % displayedImages.length;
-    setMainImage(displayedImages[nextIndex].publicId);
+      (curr - 1 + carouselImages.length) % carouselImages.length;
+    setMainImage(carouselImages[nextIndex].publicId);
   };
 
   const goNext = () => {
-    if (!displayedImages.length) return;
+    if (!carouselImages.length) return;
     const curr = getCurrentIndex();
-    const nextIndex = (curr + 1) % displayedImages.length;
-    setMainImage(displayedImages[nextIndex].publicId);
+    const nextIndex = (curr + 1) % carouselImages.length;
+    setMainImage(carouselImages[nextIndex].publicId);
   };
 
   if (!selectedProduct) return null;
@@ -217,6 +265,7 @@ const ProductDetails = () => {
   return (
     <>
       <Navbar />
+      <LoadingOverlay show={loading} />
 
       <div className="p-6">
         <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg">
@@ -258,7 +307,7 @@ const ProductDetails = () => {
                       className="w-full h-auto object-cover"
                     />
 
-                    {displayedImages.length > 1 && (
+                    {carouselImages.length > 1 && (
                       <button
                         type="button"
                         onClick={goPrev}
@@ -269,7 +318,7 @@ const ProductDetails = () => {
                       </button>
                     )}
 
-                    {displayedImages.length > 1 && (
+                    {carouselImages.length > 1 && (
                       <button
                         type="button"
                         onClick={goNext}
@@ -283,7 +332,7 @@ const ProductDetails = () => {
 
                   {/* Thumbnails */}
                   <div className="flex overflow-x-auto gap-4">
-                    {displayedImages.map((image: any, index: number) => (
+                    {carouselImages.map((image: any, index: number) => (
                       <img
                         key={image.publicId ?? index}
                         src={cloudinaryImageUrl(image.publicId)}

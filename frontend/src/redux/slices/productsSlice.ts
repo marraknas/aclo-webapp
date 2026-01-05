@@ -145,16 +145,18 @@ export const fetchProductVariant = createAsyncThunk<
     color?: string;
     variant?: string;
     ovenMitt?: string;
+    stabiliser?: string;
     productVariantId?: string;
   },
   { rejectValue: AppError }
 >("products/fetchProductVariant", async (args, { rejectWithValue }) => {
-  const { productId, color, variant, ovenMitt, productVariantId } = args;
+  const { productId, color, variant, ovenMitt, stabiliser, productVariantId } =
+    args;
 
   try {
     const params = productVariantId
       ? { productVariantId }
-      : { color, variant, ovenMitt };
+      : { color, variant, ovenMitt, stabiliser };
     const response = await axios.get<ProductVariant>(
       `${API_URL as string}/api/products/${productId}/variant`,
       { params: params }
