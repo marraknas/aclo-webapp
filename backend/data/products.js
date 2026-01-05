@@ -45,11 +45,11 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 alt: "Stork",
             },
             {
-                publicId: "STORK1-wxljow",
+                publicId: "STORK1-min_yqhrri",
                 alt: "Stork",
             },
             {
-                publicId: "STORK2-jec3nh",
+                publicId: "STORK2-min_neeaea",
                 alt: "Stork",
             },
             {
