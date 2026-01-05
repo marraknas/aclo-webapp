@@ -210,182 +210,208 @@ const ProductDetails = () => {
     setMainImage(displayedImages[nextIndex].publicId);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
   if (!selectedProduct) return null;
 
-  const hasOptions =
-    !!selectedProduct.options &&
-    Object.keys(selectedProduct.options).length > 0;
-
-  const displayPrice = selectedVariant?.discountPrice || selectedVariant?.price;
+  const isProductReady = !!selectedProduct && selectedProduct._id === id;
 
   return (
     <>
       <Navbar />
+
       <div className="p-6">
-        {selectedProduct && (
-          <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg">
-            <div className="flex flex-col md:flex-row">
-              {/* Images */}
-              <div className="md:w-1/2">
-                {/* Main image */}
-                <div className="mb-4 relative">
-                  <img
-                    src={mainImage ? cloudinaryImageUrl(mainImage) : ""}
-                    alt={selectedProduct.name}
-                    className="w-full h-auto object-cover"
-                  />
+        <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg">
+          {error && <p className="mb-4 text-red-600">Error: {error}</p>}
 
-                  {/* Left arrow */}
-                  {displayedImages.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={goPrev}
-                      aria-label="Previous image"
-                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
-                    >
-                      ‹
-                    </button>
-                  )}
-
-                  {/* Right arrow */}
-                  {displayedImages.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={goNext}
-                      aria-label="Next image"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
-                    >
-                      ›
-                    </button>
-                  )}
-                </div>
-
-                {/* Thumbnails */}
-                <div className="flex overflow-x-auto gap-4">
-                  {displayedImages.map((image: any, index: number) => (
-                    <img
-                      key={image.publicId ?? index}
-                      src={cloudinaryImageUrl(image.publicId)}
-                      alt={image.alt || `Thumbnail ${index}`}
-                      className={`w-20 h-20 object-cover cursor-pointer border shrink-0 ${
-                        mainImage === image.publicId
-                          ? "border-black"
-                          : "border-gray-200"
-                      }`}
-                      onClick={() => setMainImage(image.publicId)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Right side - Details */}
-              <div className="md:w-1/2 md:ml-10">
-                <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-acloblue">
-                  {selectedProduct.name}
-                </h1>
-                {/* Price Display */}
-                <div className="mb-4">
-                  {selectedVariant?.discountPrice ? (
-                    <>
-                      <span className="text-xl font-medium text-acloblue mr-6">
-                        IDR {selectedVariant.discountPrice.toLocaleString()}
-                      </span>
-                      <span className="text-lg text-gray-500 line-through">
-                        IDR {selectedVariant.price.toLocaleString()}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-xl text-gray-800">
-                      IDR{" "}
-                      {displayPrice
-                        ? displayPrice.toLocaleString()
-                        : "Price Not Available"}
-                    </span>
-                  )}
-                </div>
-
-                {hasOptions &&
-                  Object.entries(selectedProduct.options!).map(
-                    ([key, values]) => (
-                      <div className="mb-4" key={key}>
-                        <p className="text-sm font-medium text-gray-900 capitalize mb-2">
-                          {key}:{" "}
-                          <span className="text-gray-500 font-normal">
-                            {searchParams.get(key)}
-                          </span>
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {values.map((value: string) => {
-                            // Check if this specific value is currently in the URL params
-                            const isSelected = searchParams.get(key) === value;
-
-                            return (
-                              <button
-                                key={value}
-                                onClick={() => handleOptionSelect(key, value)}
-                                className={`px-4 py-2 rounded-md border text-sm transition-all duration-200 ${
-                                  isSelected
-                                    ? "bg-acloblue text-white border-acloblue shadow-md"
-                                    : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                                }`}
-                              >
-                                {value}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )
-                  )}
-                <div className="mb-6">
-                  <p className="text-gray-700">Quantity:</p>
-                  <div className="flex items-center space-x-4 mt-2">
-                    <button
-                      onClick={() => handleQuantityChange("decr")}
-                      className="px-2.5 py-1 bg-gray-200 rounded text-lg hover:bg-gray-300"
-                    >
-                      -
-                    </button>
-                    <span className="text-lg">{quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange("incr")}
-                      className="px-2 py-1 bg-gray-200 rounded text-lg hover:bg-gray-300"
-                    >
-                      +
-                    </button>
+          {!isProductReady ? (
+            <div>
+              <div className="flex flex-col md:flex-row gap-10">
+                <div className="md:w-1/2">
+                  <div className="mb-4 w-full aspect-[4/3] bg-gray-100 animate-pulse rounded" />
+                  <div className="flex gap-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-20 h-20 bg-gray-100 animate-pulse rounded"
+                      />
+                    ))}
                   </div>
                 </div>
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isButtonDisabled}
-                  className={`bg-acloblue text-white py-2 px-6 rounded w-full mb-4 ${
-                    isButtonDisabled
-                      ? "cursor-not-allowed opacity-50"
-                      : "hover:bg-acloblue hover:opacity-50"
-                  }`}
-                >
-                  {isButtonDisabled ? "Processing..." : "ADD TO CART"}
-                </button>
-                <ProductDescription md={selectedProduct.description} />
+
+                <div className="md:w-1/2">
+                  <div className="h-8 w-3/4 bg-gray-100 animate-pulse rounded mb-4" />
+                  <div className="h-6 w-1/3 bg-gray-100 animate-pulse rounded mb-6" />
+                  <div className="h-10 w-full bg-gray-100 animate-pulse rounded mb-4" />
+                  <div className="h-40 w-full bg-gray-100 animate-pulse rounded" />
+                </div>
               </div>
             </div>
+          ) : (
+            <>
+              <div className="flex flex-col md:flex-row">
+                {/* Images */}
+                <div className="md:w-1/2">
+                  {/* Main image */}
+                  <div className="mb-4 relative">
+                    <img
+                      src={mainImage ? cloudinaryImageUrl(mainImage) : ""}
+                      alt={selectedProduct.name}
+                      className="w-full h-auto object-cover"
+                    />
 
-            {/* Similar products */}
-            <div className="mt-20">
-              <h2 className="text-2xl text-center font-medium mb-4">
-                You May Also Like
-              </h2>
-              <ProductGrid
-                products={similarProducts}
-                productVariants={similarProductVariants}
-                loading={loading}
-                error={error}
-              />
-            </div>
-          </div>
-        )}
+                    {displayedImages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={goPrev}
+                        aria-label="Previous image"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
+                      >
+                        ‹
+                      </button>
+                    )}
+
+                    {displayedImages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={goNext}
+                        aria-label="Next image"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
+                      >
+                        ›
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Thumbnails */}
+                  <div className="flex overflow-x-auto gap-4">
+                    {displayedImages.map((image: any, index: number) => (
+                      <img
+                        key={image.publicId ?? index}
+                        src={cloudinaryImageUrl(image.publicId)}
+                        alt={image.alt || `Thumbnail ${index}`}
+                        className={`w-20 h-20 object-cover cursor-pointer border shrink-0 ${
+                          mainImage === image.publicId
+                            ? "border-black"
+                            : "border-gray-200"
+                        }`}
+                        onClick={() => setMainImage(image.publicId)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right side - Details */}
+                <div className="md:w-1/2 md:ml-10">
+                  <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-acloblue">
+                    {selectedProduct.name}
+                  </h1>
+
+                  {/* Price Display */}
+                  <div className="mb-4">
+                    {selectedVariant?.discountPrice ? (
+                      <>
+                        <span className="text-xl font-medium text-acloblue mr-6">
+                          IDR {selectedVariant.discountPrice.toLocaleString()}
+                        </span>
+                        <span className="text-lg text-gray-500 line-through">
+                          IDR {selectedVariant.price.toLocaleString()}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xl text-gray-800">
+                        IDR{" "}
+                        {selectedVariant?.price ?? ""
+                          ? selectedVariant?.price?.toLocaleString()
+                          : "Price Not Available"}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Options */}
+                  {!!selectedProduct.options &&
+                    Object.entries(selectedProduct.options).map(
+                      ([key, values]) => (
+                        <div className="mb-4" key={key}>
+                          <p className="text-sm font-medium text-gray-900 capitalize mb-2">
+                            {key}:{" "}
+                            <span className="text-gray-500 font-normal">
+                              {searchParams.get(key)}
+                            </span>
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {values.map((value: string) => {
+                              const isSelected =
+                                searchParams.get(key) === value;
+                              return (
+                                <button
+                                  key={value}
+                                  onClick={() => handleOptionSelect(key, value)}
+                                  className={`px-4 py-2 rounded-md border text-sm transition-all duration-200 ${
+                                    isSelected
+                                      ? "bg-acloblue text-white border-acloblue shadow-md"
+                                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                                  }`}
+                                >
+                                  {value}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )
+                    )}
+
+                  {/* Quantity */}
+                  <div className="mb-6">
+                    <p className="text-gray-700">Quantity:</p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <button
+                        onClick={() => handleQuantityChange("decr")}
+                        className="px-2.5 py-1 bg-gray-200 rounded text-lg hover:bg-gray-300"
+                      >
+                        -
+                      </button>
+                      <span className="text-lg">{quantity}</span>
+                      <button
+                        onClick={() => handleQuantityChange("incr")}
+                        className="px-2 py-1 bg-gray-200 rounded text-lg hover:bg-gray-300"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={isButtonDisabled}
+                    className={`bg-acloblue text-white py-2 px-6 rounded w-full mb-4 ${
+                      isButtonDisabled
+                        ? "cursor-not-allowed opacity-50"
+                        : "hover:bg-acloblue hover:opacity-50"
+                    }`}
+                  >
+                    {isButtonDisabled ? "Processing..." : "ADD TO CART"}
+                  </button>
+
+                  <ProductDescription md={selectedProduct.description} />
+                </div>
+              </div>
+
+              {/* Similar products */}
+              <div className="mt-20">
+                <h2 className="text-2xl text-center font-medium mb-4">
+                  You May Also Like
+                </h2>
+
+                <ProductGrid
+                  products={similarProducts}
+                  productVariants={similarProductVariants}
+                  loading={loading}
+                  error={error}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   );
