@@ -11,9 +11,9 @@ export interface ProductVariant {
   // option picks for this variant
   color?: string;
   variant?: string;
+  stabiliser?: string;
   ovenMitt?: string;
   isDefault?: boolean;
-  // stabiliser intentionally not here (add-on)
   images: ProductImage[];
   createdAt?: string;
   updatedAt?: string;
