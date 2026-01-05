@@ -38,10 +38,14 @@ const productVariantSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
-        // stabiliser isn't included here because it will just be an add-on product
         variant: {
             type: String,
             required: false,
+        },
+        stabiliser: {
+            type: String,
+            required: false,
+            enum: ["Stabiliser", "No stabiliser"],
         },
         ovenMitt: {
             type: String,

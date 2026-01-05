@@ -15,65 +15,88 @@ const productVariants = [
         ],
     },
     {
-        // Stork - Natural
-        sku: "ST-NA",
+        sku: "ST-NA-WS",
         price: 2368000,
-        discountPrice: 1319000,
+        discountPrice: 1419000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Natural",
-        isDefault: true,
-        images: [
-            {
-                publicId: "STORK-NATURAL_qwjemt",
-                alt: "Stork",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "STORK-NATURAL_qwjemt", alt: "Stork" }],
     },
     {
-        // Stork - Cerulean
-        sku: "ST-CE",
+        sku: "ST-NA-NS",
+        price: 2249000,
+        discountPrice: 1399000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Natural",
+        stabiliser: "No stabiliser",
+        isDefault: true,
+        images: [{ publicId: "STORK-NATURAL_qwjemt", alt: "Stork" }],
+    },
+
+    {
+        sku: "ST-CE-WS",
         price: 2368000,
-        discountPrice: 1319000,
+        discountPrice: 1419000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Cerulean",
-        images: [
-            {
-                publicId: "STORK-CERULEAN_fslcwa",
-                alt: "Stork",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "STORK-CERULEAN_fslcwa", alt: "Stork" }],
     },
     {
-        // Stork - Silver
-        sku: "ST-SI",
+        sku: "ST-CE-NS",
+        price: 2249000,
+        discountPrice: 1399000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Cerulean",
+        stabiliser: "No stabiliser",
+        images: [{ publicId: "STORK-CERULEAN_fslcwa", alt: "Stork" }],
+    },
+
+    {
+        sku: "ST-SI-WS",
         price: 2368000,
-        discountPrice: 1319000,
+        discountPrice: 1419000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Silver",
-        images: [
-            {
-                publicId: "STORK-SILVER_vlde0z",
-                alt: "Stork",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "STORK-SILVER_vlde0z", alt: "Stork" }],
     },
     {
-        // Stork - Snow
-        sku: "ST-SN",
+        sku: "ST-SI-NS",
+        price: 2249000,
+        discountPrice: 1399000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Silver",
+        stabiliser: "No stabiliser",
+        images: [{ publicId: "STORK-SILVER_vlde0z", alt: "Stork" }],
+    },
+
+    {
+        sku: "ST-SN-WS",
         price: 2368000,
-        discountPrice: 1319000,
+        discountPrice: 1419000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Snow",
-        images: [
-            {
-                publicId: "STORK-SNOW_dmlzs9",
-                alt: "Stork",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "STORK-SNOW_dmlzs9", alt: "Stork" }],
+    },
+    {
+        sku: "ST-SN-NS",
+        price: 2249000,
+        discountPrice: 1399000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Snow",
+        stabiliser: "No stabiliser",
+        images: [{ publicId: "STORK-SNOW_dmlzs9", alt: "Stork" }],
     },
     {
         // Quill Utensils - No oven mitt
@@ -184,50 +207,67 @@ const productVariants = [
         ],
     },
     {
-        // Falcon - Natural
-        sku: "FL-NA",
+        sku: "FL-NA-WS",
         price: 3028000,
-        discountPrice: 1429000,
+        discountPrice: 1579000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Natural",
-        isDefault: true,
-        images: [
-            {
-                publicId: "FALCON-NATURAL_dhaxxh",
-                alt: "Falcon",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "FALCON-NATURAL_dhaxxh", alt: "Falcon" }],
     },
     {
-        // Falcon - Sunshine
-        sku: "FL-SU",
+        sku: "FL-NA-NS",
+        price: 2899000,
+        discountPrice: 1549000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Natural",
+        stabiliser: "No stabiliser",
+        isDefault: true,
+        images: [{ publicId: "FALCON-NATURAL_dhaxxh", alt: "Falcon" }],
+    },
+
+    {
+        sku: "FL-SU-WS",
         price: 3028000,
-        discountPrice: 1429000,
+        discountPrice: 1579000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Sunshine",
-        images: [
-            {
-                publicId: "FALCON-SUNSHINE_l6owdd",
-                alt: "Falcon",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "FALCON-SUNSHINE_l6owdd", alt: "Falcon" }],
     },
     {
-        // Falcon - Silver
-        sku: "FL-SI",
+        sku: "FL-SU-NS",
+        price: 2899000,
+        discountPrice: 1549000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Sunshine",
+        stabiliser: "No stabiliser",
+        images: [{ publicId: "FALCON-SUNSHINE_l6owdd", alt: "Falcon" }],
+    },
+
+    {
+        sku: "FL-SI-WS",
         price: 3028000,
-        discountPrice: 1429000,
+        discountPrice: 1579000,
         countInStock: 200,
         category: "Learning Tower",
         color: "Silver",
-        images: [
-            {
-                publicId: "FALCON-SILVER_qgb1pj",
-                alt: "Falcon",
-            },
-        ],
+        stabiliser: "Stabiliser",
+        images: [{ publicId: "FALCON-SILVER_qgb1pj", alt: "Falcon" }],
+    },
+    {
+        sku: "FL-SI-NS",
+        price: 2899000,
+        discountPrice: 1549000,
+        countInStock: 200,
+        category: "Learning Tower",
+        color: "Silver",
+        stabiliser: "No stabiliser",
+        images: [{ publicId: "FALCON-SILVER_qgb1pj", alt: "Falcon" }],
     },
 ];
 

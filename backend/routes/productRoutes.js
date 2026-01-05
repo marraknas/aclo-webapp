@@ -80,7 +80,8 @@ router.get("/similar/:id", async (req, res) => {
 router.get("/:id/variant", async (req, res) => {
     try {
         const { id } = req.params;
-        const { color, variant, ovenMitt, productVariantId } = req.query;
+        const { color, variant, ovenMitt, stabiliser, productVariantId } =
+            req.query;
 
         const q = { productId: id };
         if (productVariantId) {
@@ -91,6 +92,7 @@ router.get("/:id/variant", async (req, res) => {
             if (color != null) q.color = color;
             if (variant != null) q.variant = variant;
             if (ovenMitt != null) q.ovenMitt = ovenMitt;
+            if (stabiliser != null) q.stabiliser = stabiliser;
         }
 
         // fetch default variant if no params are given
