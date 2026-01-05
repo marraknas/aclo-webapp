@@ -38,7 +38,6 @@ export interface Product {
   name: string;
   category: ProductCategory;
   description: string;
-  descriptionMd: string;
   options?: ProductOptions;
   addOnProducts?: AddOnProduct[];
   images: ProductImage[];

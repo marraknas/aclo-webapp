@@ -2,9 +2,7 @@ const products = [
     {
         name: "STORK - Ultra-Slim & Foldable Learning Tower",
         category: "Learning Tower",
-        description:
-            "✨ STORK - The Ultra-Slim & Foldable Learning Tower ✨ Satu-satunya learning tower Montessori di Indonesia, yang dapat dilipat sampai ketebalan 10cm saja! Cocok untuk moms yang ingin menciptakan lingkungan Montessori di rumah dan mengutamakan ruang, keamanan, dan kesederhanaan.",
-        descriptionMd: `The only Montessori learning tower in Indonesia that folds down to just **10 cm**! Perfect for moms who want to create a Montessori environment at home and prioritise **space, safety, and simplicity**.
+        description: `The only Montessori learning tower in Indonesia that folds down to just **10 cm**! Perfect for moms who want to create a Montessori environment at home and prioritise **space, safety, and simplicity**.
 
 ### Key Features
 
@@ -46,6 +44,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "STORK-1_zlt3i8",
                 alt: "Stork",
             },
+            {
+                publicId: "STORK1-wxljow",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK2-jec3nh",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK3_dhvwzl",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK4_hulpdo",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK5_k1skiq",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK6-min_vni24a",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK7-min_xtaicr",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK8-min_oeydaw",
+                alt: "Stork",
+            },
+            {
+                publicId: "STORK9-min_x7y7hx",
+                alt: "Stork",
+            },
         ],
         rating: 4.81,
         numReviews: 32,
@@ -59,9 +93,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "FALCON - Strong & Foldable Learning Tower",
         category: "Learning Tower",
-        description:
-            "✨ FALCON - The Strong & Stylish Learning Tower ✨ Learning tower Montessori yang kuat namun hemat ruang. Ideal untuk ibu yang ingin rumah seperti lingkungan Montessori dan prioritas keamanan. Cocok untuk anak-anak.\nSpesifikasi 💡\nDimensi terbuka (tinggi x lebar x dalam): 90 x 44 x 44 cm\nKetebalan ketika dilipat: 14 cm (tanpa pijakan kaki); 22 cm (dengan pijakan kaki)\nBerat: 6 kg\nMaterial: Birch plywood\nKapasitas Maksimal: 100 kg.",
-        descriptionMd: `A sturdy yet space-saving Montessori learning tower. Ideal for moms who want to create a Montessori-like environment at home while prioritising safety. Perfect for little ones.
+        description: `A sturdy yet space-saving Montessori learning tower. Ideal for moms who want to create a Montessori-like environment at home while prioritising safety. Perfect for little ones.
 
 ### Key Features
 
@@ -104,6 +136,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "FALCON-1_gjqzmy",
                 alt: "Falcon",
             },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-1_p6k3ws",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-2_uhd1ph",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-3_mau7td",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-4_ov2h72",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-5_xix9gu",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-6_ulzbfq",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-7_qei9y4",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-8_qqmimt",
+                alt: "Falcon",
+            },
+            {
+                publicId: "Marketplace_-_FALCON_FALCON-10_g0bcr1",
+                alt: "Falcon",
+            },
         ],
         rating: 4.95,
         numReviews: 43,
@@ -117,9 +185,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "SPARROW - Mini Foldable Learning Tower",
         category: "Learning Tower",
-        description:
-            "✨ SPARROW - The Smallest & Compact Learning Tower ✨ Learning tower Montessori mini yang compact dan mudah dibawa-bawa. Cocok untuk moms yang ingin menciptakan lingkungan Montessori di rumah dan mengutamakan fungsi, mobilitas, dan kenyamanan.\nSpesifikasi 🎨\nDimensi terbuka (tinggi x lebar x dalam): 56 x 40 x 38 cm\nKetebalan ketika dilipat: 12.5 cm\nBerat: 3 kg\nMaterial: Birch plywood\nKapasitas Maksimal: 50 kg. Dikirim dalam kondisi BELUM dirakit.",
-        descriptionMd: `A compact, mini Montessori learning tower that’s easy to carry around. Perfect for moms who want to create a Montessori environment at home while prioritising **functionality, mobility, and comfort**.
+        description: `A compact, mini Montessori learning tower that’s easy to carry around. Perfect for moms who want to create a Montessori environment at home while prioritising **functionality, mobility, and comfort**.
 
 ### Key Features
 
@@ -159,6 +225,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "SPARROW-1_ykme2r",
                 alt: "Sparrow",
             },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_1_ku0cdv",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_2_cnrtjy",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_3_icbp6v",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_4_x54j0i",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_5_d4uuzu",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_6_t94bvh",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_7_xz32at",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW_8_cpl3xu",
+                alt: "Sparrow",
+            },
+            {
+                publicId: "Marketplace_-_SPARROW_SPARROW-10_rzo1cb",
+                alt: "Sparrow",
+            },
         ],
         rating: 4.5,
         numReviews: 9,
@@ -172,9 +274,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "QUILL - Premium Kid-size Mini Kitchen Utensils",
         category: "Utensils",
-        description:
-            "✨ QUILL - Premium Kid-size Mini Kitchen Utensils ✨Peralatan masak sungguhan untuk little chef di rumah! Dirancang dengan ukuran mini, aman, dan ergonomis — pas di tangan anak namun tetap bisa dipakai orang dewasa. Cocok untuk mendukung kemandirian, rasa percaya diri, dan rasa ingin tahu anak sejak dini.\nSpesifikasi\nTahan panas: hingga 150°C",
-        descriptionMd: `Real cooking tools for little chefs at home! Designed in a mini size that’s safe and ergonomic — comfortable for kids to hold, yet still usable for adults. Perfect for supporting your child’s independence, confidence, and curiosity from an early age.
+        description: `Real cooking tools for little chefs at home! Designed in a mini size that’s safe and ergonomic — comfortable for kids to hold, yet still usable for adults. Perfect for supporting your child’s independence, confidence, and curiosity from an early age.
 
 ### Key Features
 
@@ -224,6 +324,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "QUILL_xvxmet",
                 alt: "Quill",
             },
+            {
+                publicId: "QUILL_1_xiiiq3",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_2_rqjqdt",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_3_kxrdno",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_4_pdrys8",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_5_nddi2y",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_6_vql7no",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_7_mnmcw7",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_8_wnktxh",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_9_l09m17",
+                alt: "Quill",
+            },
         ],
         rating: 4.1,
         numReviews: 7,
@@ -237,9 +373,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "Mini Oven Mitt for Kids (QUILL)",
         category: "Utensils",
-        description:
-            "✨ Mini Oven Mitt for Little Helpers (complement to the QUILL kid-size kitchen utensils)Sarung tangan ini dirancang khusus untuk tangan kecil anak. Aman, ringan, dan tahan panas — sempurna untuk anak yang suka membantu di dapur atau bermain peran memasak di rumah.\nSpesifikasi\nDimensi: 17.5 x 11 x 1 cm\nMaterial: Polyester, kapas, dan heat-Insulating needled cotton",
-        descriptionMd: `This oven mitt is specially designed for small hands. Safe, lightweight, and heat-resistant — perfect for kids who love helping in the kitchen or doing pretend cooking at home.
+        description: `This oven mitt is specially designed for small hands. Safe, lightweight, and heat-resistant — perfect for kids who love helping in the kitchen or doing pretend cooking at home.
 
 ### Key Features
 
@@ -275,6 +409,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "QUILL_MITTENS_ouvpoz",
                 alt: "Quill Mittens",
             },
+            {
+                publicId: "QUILL_1_xiiiq3",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_2_rqjqdt",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_3_kxrdno",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_4_pdrys8",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_5_nddi2y",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_6_vql7no",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_7_mnmcw7",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_8_wnktxh",
+                alt: "Quill",
+            },
+            {
+                publicId: "QUILL_9_l09m17",
+                alt: "Quill",
+            },
         ],
         rating: 4.7,
         numReviews: 13,
@@ -288,9 +458,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "BEAK - Wooden Cutting Board & Knife for Kids",
         category: "Utensils",
-        description:
-            "✨ BEAK - Wooden Cutting Board & Knife for Kids ✨ Talenan & pisau kayu ACLO dirancang khusus untuk anak-anak belajar memotong makanan dengan aman. Cocok untuk tangan kecil, ukuran ideal untuk penggunaan anak. Bahan tahan lama dan ramah lingkungan, mendukung kepercayaan diri anak.\nSpesifikasi\nDimensi talenan (panjang x lebar x tebal): 15.5 x 9.5 x 1.2 cm\nDimensi pisau (panjang x tinggi x tebal): 12.5 x 2.5 x 1.2 cm",
-        descriptionMd: `ACLO’s wooden cutting board and knife set is specially designed for children to learn how to cut food safely. Perfect for small hands with an ideal, child-friendly size. Made with durable, eco-friendly materials to support your child’s confidence as they learn.
+        description: `ACLO’s wooden cutting board and knife set is specially designed for children to learn how to cut food safely. Perfect for small hands with an ideal, child-friendly size. Made with durable, eco-friendly materials to support your child’s confidence as they learn.
 
 ### Key Features
 
@@ -323,6 +491,42 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "BEAK_oyabro",
                 alt: "Beak",
             },
+            {
+                publicId: "BEAK_1_tbqpid",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_2_dujwro",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_3_inns9r",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_4_rxbegj",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_5_hdzap0",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_6_vh6bhr",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_7_u6s9hg",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_8_ykkdcq",
+                alt: "Beak",
+            },
+            {
+                publicId: "BEAK_9_spknjb",
+                alt: "Beak",
+            },
         ],
         dimensions: {
             length: 19,
@@ -334,9 +538,7 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
     {
         name: "TALON - Stabiliser for Learning Tower",
         category: "Accessories",
-        description:
-            "✨ TALON - Stabiliser for Learning Tower ✨ Kaki tambahan yang meningkatkan stabilitas & keamanan learning tower. Cocok untuk STORK & FALCON. Instalasi mudah & tahan lama.\nSpesifikasi\n Bahan: Birch Plywood\n Dimensi Stabiliser (lebar x tinggi x tebal):\nSTORK: 8.5 x 6.5 x 1.8 cm\nFALCON: 11.5 x 8.5 x 1.8 cm\nBerat: 500 gram",
-        descriptionMd: `An add-on stabiliser that improves the stability and safety of your learning tower. Compatible with **STORK** and **FALCON**. Easy to install and built to last.
+        description: `An add-on stabiliser that improves the stability and safety of your learning tower. Compatible with **STORK** and **FALCON**. Easy to install and built to last.
 
 ### Key Features
 

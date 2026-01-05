@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import Navbar from "../common/Navbar";
@@ -10,7 +10,6 @@ import {
   fetchProductDetails,
   fetchSimilarProducts,
   fetchProductVariant,
-  // fetchProductVariants,
   fetchSimilarProductVariants,
 } from "../../redux/slices/productsSlice";
 import { addToCart } from "../../redux/slices/cartSlice";
@@ -20,6 +19,7 @@ const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useAppDispatch();
+
   const {
     selectedProduct,
     selectedVariant,
@@ -28,68 +28,97 @@ const ProductDetails = () => {
     similarProducts,
     similarProductVariants,
   } = useAppSelector((state) => state.products);
+
   const { user, guestId } = useAppSelector((state) => state.auth);
 
-  // ui states
   const [mainImage, setMainImage] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false); // for disabling add to cart button during processing
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
-  // fetch product & variant
+  const hasUserSelectedOption = useMemo(() => {
+    if (!selectedProduct?.options) return false;
+
+    return Object.keys(selectedProduct.options).some((key) => {
+      const v = searchParams.get(key);
+      return v !== null && v !== "";
+    });
+  }, [selectedProduct, searchParams]);
+
+  const displayedImages = useMemo(() => {
+    const productImgs = selectedProduct?.images?.length
+      ? selectedProduct.images
+      : [];
+    const variantImgs = selectedVariant?.images?.length
+      ? selectedVariant.images
+      : [];
+
+    if (!hasUserSelectedOption) return productImgs;
+
+    const variantIds = new Set(variantImgs.map((img: any) => img.publicId));
+    const merged = [
+      ...variantImgs,
+      ...productImgs.filter((img: any) => !variantIds.has(img.publicId)),
+    ];
+
+    return merged.length ? merged : productImgs;
+  }, [selectedProduct, selectedVariant, hasUserSelectedOption]);
+
   useEffect(() => {
-    if (id) {
-      dispatch(fetchProductDetails({ id: id }));
-      dispatch(fetchSimilarProducts({ id: id }))
-        .unwrap()
-        .then((returnedSimilarProducts) => {
-          if (returnedSimilarProducts.length > 0) {
-            const productIds = returnedSimilarProducts.map((p) => p._id);
-            dispatch(fetchSimilarProductVariants({ productIds }));
-          }
-        })
-        .catch((err) => console.error("Failed to load similar products:", err));
-    }
+    if (!id) return;
+
+    dispatch(fetchProductDetails({ id }));
+
+    dispatch(fetchSimilarProducts({ id }))
+      .unwrap()
+      .then((returnedSimilarProducts) => {
+        if (returnedSimilarProducts?.length > 0) {
+          const productIds = returnedSimilarProducts.map((p: any) => p._id);
+          dispatch(fetchSimilarProductVariants({ productIds }));
+        }
+      })
+      .catch((err) => console.error("Failed to load similar products:", err));
   }, [dispatch, id]);
+
   useEffect(() => {
-    if (id) {
-      const color = searchParams.get("color") || undefined;
-      const variant = searchParams.get("variant") || undefined;
-      // if no parameters defined, default variant is fetched.
-      dispatch(
-        fetchProductVariant({
-          productId: id,
-          color,
-          variant,
-        })
-      );
-    }
+    if (!id) return;
+
+    const color = searchParams.get("color") || undefined;
+    const variant = searchParams.get("variant") || undefined;
+
+    dispatch(
+      fetchProductVariant({
+        productId: id,
+        color,
+        variant,
+      })
+    );
   }, [dispatch, id, searchParams]);
 
-  // when product changes, change main image
-  useEffect(() => {
-    // if (selectedProduct?.images?.[0]?.publicId) {
-    //   setMainImage(selectedProduct.images[0].publicId);
-    // }
-    // if (selectedProduct?.options) {
-    //   const initialOptions: Record<string, string> = {};
-    //   for (const [key, values] of Object.entries(selectedProduct.options)) {
-    //     if (values.length > 0) {
-    //       initialOptions[key] = values[0];
-    //     }
-    //   }
-    //   setSelectedOptions(initialOptions);
-    // } else {
-    //   setSelectedOptions({});
-    // }
-    // Fallback to product image if no variant image
-    if (selectedProduct?.images?.[0]?.publicId) {
-      setMainImage(selectedProduct.images[0].publicId);
-    }
-  }, [selectedProduct]);
+  const lastVariantIdRef = useRef<string | null>(null);
 
-  const handleQuantityChange = (action: string) => {
+  useEffect(() => {
+    if (!displayedImages.length) return;
+
+    const variantId = selectedVariant?._id ?? null;
+    const variantFirst = selectedVariant?.images?.[0]?.publicId;
+
+    if (variantId && variantId !== lastVariantIdRef.current && variantFirst) {
+      setMainImage(variantFirst);
+      lastVariantIdRef.current = variantId;
+      return;
+    }
+
+    const exists = displayedImages.some(
+      (img: any) => img.publicId === mainImage
+    );
+    if (!mainImage || !exists) {
+      setMainImage(displayedImages[0].publicId);
+    }
+  }, [displayedImages, mainImage, selectedVariant?._id]);
+
+  const handleQuantityChange = (action: "incr" | "decr") => {
     if (action === "incr") setQuantity((prev) => prev + 1);
-    if (action === "decr" && quantity > 1) setQuantity((prev) => prev - 1);
+    if (action === "decr") setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
   };
 
   const handleOptionSelect = (key: string, value: string) => {
@@ -101,6 +130,13 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     if (!id) {
       toast.error("Invalid product ID.");
+      return;
+    }
+
+    if (!selectedVariant?._id) {
+      toast.error("Please select a valid variant before adding to cart.", {
+        duration: 1500,
+      });
       return;
     }
 
@@ -117,15 +153,18 @@ const ProductDetails = () => {
         return;
       }
     }
+
     setIsButtonDisabled(true);
+
     const finalOptions: Record<string, string> = {};
     searchParams.forEach((value, key) => {
       finalOptions[key] = value;
     });
+
     dispatch(
       addToCart({
         productId: id,
-        productVariantId: selectedVariant!._id,
+        productVariantId: selectedVariant._id,
         quantity,
         options: finalOptions,
         guestId,
@@ -134,9 +173,7 @@ const ProductDetails = () => {
     )
       .unwrap()
       .then(() => {
-        toast.success("Product added to cart!", {
-          duration: 1000,
-        });
+        toast.success("Product added to cart!", { duration: 1000 });
       })
       .catch(() => {
         toast.error("Failed to add to cart.", { duration: 1000 });
@@ -146,16 +183,37 @@ const ProductDetails = () => {
       });
   };
 
+  const getCurrentIndex = () => {
+    if (!displayedImages.length) return 0;
+    const idx = displayedImages.findIndex(
+      (img: any) => img.publicId === mainImage
+    );
+    return idx >= 0 ? idx : 0;
+  };
+
+  const goPrev = () => {
+    if (!displayedImages.length) return;
+    const curr = getCurrentIndex();
+    const nextIndex =
+      (curr - 1 + displayedImages.length) % displayedImages.length;
+    setMainImage(displayedImages[nextIndex].publicId);
+  };
+
+  const goNext = () => {
+    if (!displayedImages.length) return;
+    const curr = getCurrentIndex();
+    const nextIndex = (curr + 1) % displayedImages.length;
+    setMainImage(displayedImages[nextIndex].publicId);
+  };
+
   if (loading) return <p>Loading...</p>;
-
   if (error) return <p>Error: {error}</p>;
-
   if (!selectedProduct) return null;
 
-  // check if the selected product has options
   const hasOptions =
     !!selectedProduct.options &&
     Object.keys(selectedProduct.options).length > 0;
+
   const displayPrice = selectedVariant?.discountPrice || selectedVariant?.price;
 
   return (
@@ -165,51 +223,59 @@ const ProductDetails = () => {
         {selectedProduct && (
           <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg">
             <div className="flex flex-col md:flex-row">
-              {/* Left thumbnails */}
-              <div className="hidden md:flex flex-col space-y-4 mr-6">
-                {selectedProduct.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={cloudinaryImageUrl(mainImage)}
-                    alt={image.alt || `Thumbnail ${index}`}
-                    className={`w-20 h-20 object-cover cursor-pointer border ${
-                      mainImage === image.publicId
-                        ? "border-black"
-                        : "border-gray-200"
-                    }`}
-                    onClick={() => setMainImage(image.publicId)}
-                  />
-                ))}
-              </div>
-              {/* Main Image */}
+              {/* Images */}
               <div className="md:w-1/2">
-                <div className="mb-4">
+                {/* Main image */}
+                <div className="mb-4 relative">
                   <img
-                    src={
-                      cloudinaryImageUrl(mainImage) ||
-                      selectedProduct.images[0]?.publicId
-                    }
-                    alt={selectedProduct.images[0]?.alt || selectedProduct.name}
+                    src={mainImage ? cloudinaryImageUrl(mainImage) : ""}
+                    alt={selectedProduct.name}
                     className="w-full h-auto object-cover"
                   />
+
+                  {/* Left arrow */}
+                  {displayedImages.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={goPrev}
+                      aria-label="Previous image"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
+                    >
+                      ‹
+                    </button>
+                  )}
+
+                  {/* Right arrow */}
+                  {displayedImages.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      aria-label="Next image"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow"
+                    >
+                      ›
+                    </button>
+                  )}
+                </div>
+
+                {/* Thumbnails */}
+                <div className="flex overflow-x-auto gap-4">
+                  {displayedImages.map((image: any, index: number) => (
+                    <img
+                      key={image.publicId ?? index}
+                      src={cloudinaryImageUrl(image.publicId)}
+                      alt={image.alt || `Thumbnail ${index}`}
+                      className={`w-20 h-20 object-cover cursor-pointer border shrink-0 ${
+                        mainImage === image.publicId
+                          ? "border-black"
+                          : "border-gray-200"
+                      }`}
+                      onClick={() => setMainImage(image.publicId)}
+                    />
+                  ))}
                 </div>
               </div>
-              {/* Mobile thumbnails */}
-              <div className="md:hidden flex overscroll-x-scroll space-x-4 mb-4 ">
-                {selectedProduct.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={cloudinaryImageUrl(mainImage)}
-                    alt={image.alt || `Thumbnail ${index}`}
-                    className={`w-20 h-20 object-cover cursor-pointer border ${
-                      mainImage === image.publicId
-                        ? "border-black"
-                        : "border-gray-200"
-                    }`}
-                    onClick={() => setMainImage(image.publicId)}
-                  />
-                ))}
-              </div>
+
               {/* Right side - Details */}
               <div className="md:w-1/2 md:ml-10">
                 <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-acloblue">
@@ -298,24 +364,7 @@ const ProductDetails = () => {
                 >
                   {isButtonDisabled ? "Processing..." : "ADD TO CART"}
                 </button>
-                <ProductDescription
-                  md={
-                    selectedProduct.descriptionMd || selectedProduct.description
-                  }
-                />
-                {/* <div className="mt-10 text-gray-700">
-                  <h3 className="text-xl font-bold mb-4">Characteristics:</h3>
-                  <table className="w-full text-left text-sm text-gray-600">
-                    <tbody>
-                      {selectedProduct.weight && (
-                        <tr>
-                          <td className="py-1">Weight</td>
-                          <td className="py-1">{selectedProduct.weight} kg</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div> */}
+                <ProductDescription md={selectedProduct.description} />
               </div>
             </div>
 

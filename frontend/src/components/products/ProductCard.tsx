@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 import type { Product } from "../../types/product";
 import type { ProductVariant } from "../../types/productVariant";
-import OptionSwatch from "./OptionSwatch";
+import ColorSwatch from "./ColorSwatch";
 
 type ProductCardProps = {
   product: Product;
@@ -97,7 +97,7 @@ const ProductCard = ({ product, variants }: ProductCardProps) => {
               <div key={key}>
                 <div className="flex flex-wrap justify-center gap-2">
                   {values.map((value) => (
-                    <OptionSwatch
+                    <ColorSwatch
                       key={value}
                       optionKey={key}
                       value={value}
