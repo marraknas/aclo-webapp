@@ -8,12 +8,6 @@ export interface PricingRule {
   amount: number; // if fixed: amount in your currency unit (e.g. IDR)
 }
 
-export interface AddOnProduct {
-  productId: string; // ObjectId as string in frontend
-  options?: Record<string, string>; // backend: Map<string, string>
-  pricing?: PricingRule;
-}
-
 export interface ProductDimensions {
   length?: number;
   width?: number;
@@ -39,7 +33,6 @@ export interface Product {
   category: ProductCategory;
   description: string;
   options?: ProductOptions;
-  addOnProducts?: AddOnProduct[];
   images: ProductImage[];
   isListed: boolean;
   rating: number;
@@ -58,7 +51,6 @@ export interface CreateProductPayload {
   name: string;
   description: string;
   options?: ProductOptions;
-  addOnProducts?: AddOnProduct[];
   images: ProductImage[];
   isListed?: boolean; // backend default false, so optional is fine
   metaTitle?: string;

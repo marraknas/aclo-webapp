@@ -38,29 +38,6 @@ const productSchema = new mongoose.Schema(
                 default: undefined,
             },
         },
-        addOnProducts: [
-            new mongoose.Schema(
-                {
-                    productId: {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: "Product",
-                    },
-                    options: { type: Map, of: String },
-                    pricing: new mongoose.Schema(
-                        {
-                            discountType: {
-                                type: String,
-                                enum: ["none", "fixed"],
-                                default: "none",
-                            },
-                            amount: { type: Number, default: 0 },
-                        },
-                        { _id: false }
-                    ),
-                },
-                { _id: false }
-            ),
-        ],
         images: {
             type: [
                 {

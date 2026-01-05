@@ -7,7 +7,6 @@ import { fetchProductVariants } from "../../redux/slices/productsSlice";
 import { API_URL } from "../../constants/api";
 import axios from "axios";
 import type {
-  AddOnProduct,
   ProductCategory,
   ProductDimensions,
   ProductImage,
@@ -33,7 +32,6 @@ type ProductData = {
   isListed: boolean;
   dimensions?: ProductDimensions;
   weight?: number;
-  addOnProducts?: AddOnProduct[];
   // options editing (we'll only expose color here like your current page)
 };
 const CATEGORIES: ProductCategory[] = [
@@ -59,7 +57,6 @@ const EditProductPage = () => {
     isListed: false,
     dimensions: undefined,
     weight: undefined,
-    addOnProducts: [],
   });
 
   const [productVariantData, setProductVariantData] =
@@ -95,7 +92,6 @@ const EditProductPage = () => {
         isListed: selectedProduct.isListed ?? false,
         dimensions: selectedProduct.dimensions,
         weight: selectedProduct.weight,
-        addOnProducts: selectedProduct.addOnProducts ?? [],
       });
     }
   }, [selectedProduct]);
