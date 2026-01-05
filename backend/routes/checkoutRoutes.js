@@ -148,9 +148,9 @@ router.post("/:id/submit-proof", protect, async (req, res) => {
                 session
             );
         });
-        if (createdOrder) {
-            sendEmail(req.user.email, `Order Confirmation #${createdOrder._id}`, `Your order has been placed successfully.`);
-        }
+        // if (createdOrder) {
+        //     sendEmail(req.user.email, `Order Confirmation #${createdOrder._id}`, `Your order has been placed successfully.`);
+        // }
         if (res.headersSent) return;
         return res.status(200).json(createdOrder);
     } catch (err) {

@@ -55,16 +55,16 @@ app.use("/api/reviews", reviewRoutes); //prepends /api/reviews to all the subscr
 app.use("/api/calculate-shipping", biteshipRoutes); // prepends /api/calculate-shipping for shipping cost calculation
 
 app.get("/api/test-email", async (req, res) => {
-  try {
-    const result = await sendEmail(
-      "sankarram2002ybis@gmail.com", // Replace with your actual email
-      "Test Button Clicked", 
-      "The button on the login page works!"
-    );
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const result = await sendEmail(
+            "peterhadiwijaya963@gmail.com", // Replace with your actual email
+            "Test Button Clicked",
+            "The button on the login page works!"
+        );
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Admin
