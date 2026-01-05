@@ -34,7 +34,12 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: { fontSize: "20px", padding: "20px 30px" },
+          }}
+        />
         <Routes>
           <Route path="/" element={<UserLayout />}>
             {/* User Layout */}

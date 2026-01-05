@@ -60,3 +60,22 @@ p {
 .btn-ghost:hover {
   background: rgba(255, 255, 255, 0.9);
 }
+
+/* Sonner toast base */
+[data-sonner-toaster] [data-sonner-toast] {
+  border-radius: 14px;
+}
+
+/* Success toast */
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Error toast */
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
