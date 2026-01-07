@@ -57,7 +57,7 @@ app.use("/api/calculate-shipping", biteshipRoutes); // prepends /api/calculate-s
 app.get("/api/test-email", async (req, res) => {
     try {
         const result = await sendEmail(
-            "peterhadiwijaya963@gmail.com", // Replace with your actual email
+            "peterhadiwijaya963@gmail.com", // Replace with your actual target email
             "Test Button Clicked",
             "The button on the login page works!"
         );
