@@ -29,6 +29,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Verified from "./pages/Verified";
 import Story from "./pages/Story";
 import Contact from "./pages/Contact";
+import LearnMore from "./pages/LearnMore";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
 
             <Route path="story" element={<Story />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="learn-more" element={<LearnMore />} />
             {/* anything after a colon is a dynamic route */}
             <Route path="shop" element={<ShopPage />} />
             <Route path="product/:id" element={<ProductDetails />} />
