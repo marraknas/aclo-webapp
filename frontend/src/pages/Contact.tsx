@@ -1,6 +1,5 @@
 import React from "react";
 import Navbar from "../components/common/Navbar";
-import Footer from "../components/common/Footer";
 import { cloudinaryImageUrl, assets } from "../constants/cloudinary";
 
 const Contact: React.FC = () => {
@@ -64,8 +63,6 @@ const Contact: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 };

@@ -50,7 +50,7 @@ const KeyFeaturesSection = () => {
 
         <div className="mt-10 flex justify-center">
           <Link
-            to="/story"
+            to="/learn-more"
             className="inline-flex items-center justify-center
                     bg-acloblue text-background font-light rounded-xl
                     text-sm sm:text-base md:text-lg

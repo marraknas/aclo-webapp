@@ -4,7 +4,6 @@ import { FiPhoneCall } from "react-icons/fi";
 import { IoLogoInstagram } from "react-icons/io";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
-import { CATEGORIES } from "../../constants/categories";
 import { assets, cloudinaryImageUrl } from "../../constants/cloudinary";
 
 const Footer = () => {
@@ -21,18 +20,27 @@ const Footer = () => {
         {/* Shop links */}
         <div>
           <h3 className="text-lg text-gray-800 mb-4"></h3>
-          <ul className="space-y-2 text-acloblue">
-            {CATEGORIES.map((category) => (
-              <li key={category}>
-                <Link
-                  // to={`/collections/${category.toLowerCase().replace(/\s+/g, "-")}`}
-                  to="#"
-                  className="text-acloblue transition-colors"
-                >
-                  {category}
-                </Link>
-              </li>
-            ))}
+          <ul className="space-y-2 text-gray-600">
+            <li>
+              <Link to="/" className="text-acloblue transition-colors">
+                HOME
+              </Link>
+            </li>
+            <li>
+              <Link to="/story" className="text-acloblue transition-colors">
+                STORY
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop" className="text-acloblue transition-colors">
+                SHOP
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="text-acloblue transition-colors">
+                CONTACT US
+              </Link>
+            </li>
           </ul>
         </div>
         {/* Support links */}
@@ -40,7 +48,10 @@ const Footer = () => {
           <h3 className="text-lg text-gray-800 mb-4"></h3>
           <ul className="space-y-2 text-gray-600">
             <li>
-              <Link to="#" className="text-acloblue transition-colors">
+              <Link
+                to="/learn-more"
+                className="text-acloblue transition-colors"
+              >
                 LEARN MORE
               </Link>
             </li>
