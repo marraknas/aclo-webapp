@@ -8,7 +8,6 @@ import Searchbar from "./Searchbar";
 import Cartdrawer from "../layout/CartDrawer";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import { CATEGORIES } from "../../constants/categories";
 import { useAppSelector } from "../../redux/hooks";
 import { assets, cloudinaryImageUrl } from "../../constants/cloudinary";
 
