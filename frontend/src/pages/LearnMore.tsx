@@ -54,7 +54,7 @@ const LearnMore: React.FC = () => {
             </p>
 
             <img
-              src={cloudinaryImageUrl(assets.LearnMore.learnMore_1.publicId)}
+              src={cloudinaryImageUrl(assets.learnMore.learnMore_1.publicId)}
               alt="Learning tower comparison"
               className="mt-8 w-full max-w-2xl h-auto object-cover"
               loading="lazy"
@@ -97,7 +97,7 @@ const LearnMore: React.FC = () => {
             </p>
 
             <img
-              src={cloudinaryImageUrl(assets.LearnMore.learnMore_2.publicId)}
+              src={cloudinaryImageUrl(assets.learnMore.learnMore_2.publicId)}
               alt="Why ACLO is best wooden foldable learning tower"
               className="mt-8 w-full max-w-2xl h-auto object-cover"
               loading="lazy"
@@ -113,23 +113,23 @@ const LearnMore: React.FC = () => {
             <DesignFeaturesCarousel
               images={[
                 {
-                  publicId: assets.LearnMore.learnMore_3.publicId,
+                  publicId: assets.learnMore.learnMore_3.publicId,
                   alt: "Stork design features",
                 },
                 {
-                  publicId: assets.LearnMore.learnMore_4.publicId,
+                  publicId: assets.learnMore.learnMore_4.publicId,
                   alt: "Falcon design features",
                 },
                 {
-                  publicId: assets.LearnMore.LearnMore_5.publicId,
+                  publicId: assets.learnMore.learnMore_5.publicId,
                   alt: "Sparrow design features",
                 },
                 {
-                  publicId: assets.LearnMore.LearnMore_6.publicId,
+                  publicId: assets.learnMore.learnMore_6.publicId,
                   alt: "Two adjustable heights",
                 },
                 {
-                  publicId: assets.LearnMore.LearnMore_7.publicId,
+                  publicId: assets.learnMore.learnMore_7.publicId,
                   alt: "Ultimate child safety features",
                 },
               ]}

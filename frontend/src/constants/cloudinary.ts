@@ -105,7 +105,7 @@ export const assets = {
     alt: "ACLO family moment in the kitchen",
   },
 
-  LearnMore: {
+  learnMore: {
     learnMore_1: {
       type: "image",
       publicId: "learnmore-1_ykwm7r",
@@ -122,15 +122,15 @@ export const assets = {
       type: "image",
       publicId: "learnmore-4_hfxsr9",
     },
-    LearnMore_5: {
+    learnMore_5: {
       type: "image",
       publicId: "learnmore-5_rdc7ne",
     },
-    LearnMore_6: {
+    learnMore_6: {
       type: "image",
       publicId: "learnmore-6_uji9rj",
     },
-    LearnMore_7: {
+    learnMore_7: {
       type: "image",
       publicId: "learnmore-7_e8ascy",
     },
