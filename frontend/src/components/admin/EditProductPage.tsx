@@ -12,6 +12,7 @@ import type {
   ProductImage,
 } from "../../types/product";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import MDEditor from "@uiw/react-md-editor";
 
 type ProductVariantData = {
   variantId: string; // required for variant-specific updates
@@ -266,14 +267,26 @@ const EditProductPage = () => {
         {/* Description */}
         <div className="mb-6">
           <label className="block font-semibold mb-2">Description</label>
-          <textarea
+          {/* <textarea
             name="description"
             value={productData.description}
             onChange={handleProductChange}
             className="w-full border border-gray-300 rounded-md p-2"
             rows={4}
             required
-          ></textarea>
+          ></textarea> */}
+          <div data-color-mode="light">
+            <MDEditor
+              value={productData.description}
+              onChange={(val) =>
+                setProductData((prev) => ({
+                  ...prev,
+                  description: val ?? "",
+                }))
+              }
+              height={220}
+            />
+          </div>
         </div>
         {/* Dimensions */}
         <div className="col-span-2">
