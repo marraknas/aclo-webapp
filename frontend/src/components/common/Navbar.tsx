@@ -124,7 +124,7 @@ const Navbar = () => {
         <div className="p-4">
           <h2 className="text-xl font-semibold mb-4">Menu</h2>
           <nav className="space-y-4">
-            {CATEGORIES.map((category) => (
+            {/* {CATEGORIES.map((category) => (
               <Link
                 key={category}
                 // to={`/collections/${category.toLowerCase().replace(/\s+/g, "-")}`}
@@ -134,7 +134,27 @@ const Navbar = () => {
               >
                 {category}
               </Link>
-            ))}
+            ))} */}
+            <ul>
+              <Link to="/" className="block hover:text-gray-600">
+                HOME
+              </Link>
+            </ul>
+            <ul>
+              <Link to="/story" className="block hover:text-gray-600">
+                STORY
+              </Link>
+            </ul>
+            <ul>
+              <Link to="/shop" className="block hover:text-gray-600">
+                SHOP
+              </Link>
+            </ul>
+            <ul>
+              <Link to="/contact" className="block hover:text-gray-600">
+                CONTACT US
+              </Link>
+            </ul>
           </nav>
         </div>
       </div>

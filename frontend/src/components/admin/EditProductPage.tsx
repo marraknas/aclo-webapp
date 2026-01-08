@@ -36,7 +36,6 @@ type ProductData = {
 };
 const CATEGORIES: ProductCategory[] = [
   "Learning Tower",
-  "Stool",
   "Utensils",
   "Accessories",
 ];
@@ -309,7 +308,7 @@ const EditProductPage = () => {
         </div>
         {/* Weight */}
         <div>
-          <label className="block font-semibold mb-1">Weight (kg)</label>
+          <label className="block font-semibold mb-1 mt-6">Weight (g)</label>
           <input
             type="number"
             name="weight"
@@ -334,7 +333,7 @@ const EditProductPage = () => {
         </div>
         {/* Product Images */}
         <div className="col-span-2">
-          <label className="block font-semibold mb-2">
+          <label className="block font-semibold mb-2 mt-6">
             Global Product Images
           </label>
           {uploading && <p>Uploading image...</p>}
@@ -361,11 +360,22 @@ const EditProductPage = () => {
         </h3>
         {/* Price */}
         <div className="mb-6">
-          <label className="block font-semibold mb-2">Price</label>
+          <label className="block font-semibold mb-2">Discounted Price</label>
           <input
             type="number"
             name="price"
             value={displayPrice}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+        {/* Price */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Original Price</label>
+          <input
+            type="number"
+            name="price"
+            value={productVariantData.price}
             onChange={handleVariantChange}
             className="w-full border border-gray-300 rounded-md p-2"
           />
@@ -389,7 +399,7 @@ const EditProductPage = () => {
         </div>
         {/* SKU */}
         <div className="mb-6">
-          <label className="block font-semibold mb-2">SKU</label>
+          <label className="block font-semibold mb-2 mt-6">SKU</label>
           <input
             type="text"
             name="sku"
@@ -462,7 +472,7 @@ const EditProductPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors"
+          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors mt-8"
         >
           Update Product
         </button>
