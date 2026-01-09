@@ -164,7 +164,7 @@ const productVariants = [
         isDefault: true,
         images: [
             {
-                publicId: "TALON_srzloj",
+                publicId: "TALON-STORK_ef0zag",
                 alt: "Talon",
             },
         ],
@@ -181,7 +181,7 @@ const productVariants = [
         variant: "Falcon",
         images: [
             {
-                publicId: "TALON_srzloj",
+                publicId: "TALON-FALCON_blem20",
                 alt: "Talon",
             },
         ],

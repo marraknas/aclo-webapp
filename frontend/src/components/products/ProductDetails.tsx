@@ -331,13 +331,14 @@ const ProductDetails = () => {
                 {/* Images */}
                 <div className="md:w-1/2">
                   {/* Main image */}
-                  <div className="mb-4 relative">
+                  <div className="mb-4 relative w-full aspect-square overflow-hidden rounded-lg bg-gray-50">
                     <img
                       src={
                         mainImage ? cloudinaryImageUrl(mainImage) : undefined
                       }
                       alt={displayName}
-                      className="w-full h-auto object-cover"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: "50% 50%" }}
                     />
 
                     {carouselImages.length > 1 && (

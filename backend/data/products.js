@@ -572,6 +572,30 @@ Yes. If you need express shipping, please WhatsApp **+62 821-2852-8968** before 
                 publicId: "TALON_srzloj",
                 alt: "Talon",
             },
+            {
+                publicId: "TALON-1_ijmlod",
+                alt: "Talon",
+            },
+            {
+                publicId: "TALON-2_b6cn6l",
+                alt: "Talon",
+            },
+            {
+                publicId: "TALON-3_y5qrgr",
+                alt: "Talon",
+            },
+            {
+                publicId: "TALON-4_q9dmeq",
+                alt: "Talon",
+            },
+            {
+                publicId: "TALON-5_l5yiky",
+                alt: "Talon",
+            },
+            {
+                publicId: "TALON-6_hswhzu",
+                alt: "Talon",
+            },
         ],
         rating: 5.0,
         numReviews: 1,
