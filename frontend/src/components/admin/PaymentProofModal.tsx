@@ -18,7 +18,7 @@ const PaymentProofModal = ({
   PaymentProof,
   onAccept,
   onReject,
-  loading
+  loading,
 }: PaymentProofModalProps) => {
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   if (!isOpen) return null;
@@ -37,81 +37,82 @@ const PaymentProofModal = ({
           <IoMdClose className="h-6 w-6 hover:text-gray-600 cursor-pointer" />
         </button>
 
-        <h2 className="text-2xl uppercase">
-          Payment Proof
-        </h2>
-                <img
-                  src={cloudinaryImageUrl(PaymentProof.publicId)}
-                  alt={PaymentProof.publicId}
-                  className="w-20 h-24 object-cover mr-4"
-                  onClick={() => setPreviewOpen(true)}
-                />
-                
-<div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Uploaded At
-                </label>
-                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-                  {PaymentProof.uploadedAt}
-                </p>
-              </div>
+        <h2 className="text-2xl uppercase">Payment Proof</h2>
+        <div
+          onClick={() => setPreviewOpen(true)}
+          className="relative w-20 h-24 my-3 cursor-pointer group overflow-hidden"
+        >
+          <img
+            src={cloudinaryImageUrl(PaymentProof.publicId)}
+            alt={PaymentProof.publicId}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Customer Note
-                </label>
-                <div className="bg-gray-50 px-4 py-3 rounded-lg min-h-[80px]">
-                  {PaymentProof.note ? (
-                    <p className="text-gray-900 whitespace-pre-wrap">{PaymentProof.note}</p>
-                  ) : (
-                    <p className="text-gray-400 italic">No note provided</p>
-                  )}
-                </div>
-              </div>
+        <div className="space-y-4">
+          <div>
+            <div className="block text-sm font-medium text-gray-700 mb-1">
+              Uploaded At
             </div>
-
-
-
-          <div className="flex gap-3 p-6">
-            <button
-              disabled={loading}
-              onClick={onReject}
-              className="flex-1 bg-red-500 text-white py-3 rounded hover:bg-red-600 disabled:bg-red-500/50 disabled:cursor-not-allowed transition"
-            >
-{loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-600 border-t-transparent"></div>
-                  Processing...
-                </span>
-              ) : (
-                "Reject"
-              )}
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              onClick={onAccept}
-              className="flex-1 bg-green-500 rounded hover:bg-green-600 text-white py-3 disabled:bg-green-500/50 disabled:cursor-not-allowed transition"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                  Processing...
-                </span>
-              ) : (
-                "Accept"
-              )}
-            </button>
+            <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+              {new Date(PaymentProof.uploadedAt).toLocaleString()}
+            </p>
           </div>
-          {previewOpen && PaymentProof && (
+
+          <div>
+            <div className="block text-sm font-medium text-gray-700 mb-1">
+              Customer Note
+            </div>
+            <div className="bg-gray-50 px-4 py-3 rounded-lg min-h-20">
+              {PaymentProof.note ? (
+                <p className="text-gray-900 whitespace-pre-wrap">
+                  {PaymentProof.note}
+                </p>
+              ) : (
+                <p className="text-gray-400 italic">No note provided</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <button
+            disabled={loading}
+            onClick={onReject}
+            className="flex-1 bg-red-500 text-white py-3 rounded cursor-pointer hover:bg-red-600 disabled:bg-red-500/50 disabled:cursor-not-allowed transition"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-600 border-t-transparent"></div>
+                Processing...
+              </span>
+            ) : (
+              "Reject"
+            )}
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            onClick={onAccept}
+            className="flex-1 bg-green-500 rounded cursor-pointer hover:bg-green-600 text-white py-3 disabled:bg-green-500/50 disabled:cursor-not-allowed transition"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                Processing...
+              </span>
+            ) : (
+              "Accept"
+            )}
+          </button>
+        </div>
+        {previewOpen && PaymentProof && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             onClick={() => setPreviewOpen(false)} // click backdrop to close
           >
-            <div
-              className="relative max-w-7xl max-h-[95vh] w-full h-full flex items-center justify-center"
-            >
+            <div className="relative max-w-7xl max-h-[85vh] w-full h-full flex items-center justify-center">
               <button
                 onClick={() => setPreviewOpen(false)}
                 className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"

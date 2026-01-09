@@ -22,7 +22,8 @@ const OrderManagement = () => {
   );
   const [paymentProofOpen, setPaymentProofOpen] = useState<boolean>(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [selectedPaymentProof, setSelectedPaymentProof] = useState<PaymentProof | null>(null);
+  const [selectedPaymentProof, setSelectedPaymentProof] =
+    useState<PaymentProof | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -46,26 +47,28 @@ const OrderManagement = () => {
     setSelectedPaymentProof(order.paymentProof);
     setSelectedOrderId(order._id);
     setPaymentProofOpen(true);
-  }
+  };
 
   const renderActionbuttons = (order: Order) => {
     // create a common button style
-    const baseBtn = "px-4 py-2 rounded flex items-center text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+    const baseBtn =
+      "px-4 py-2 rounded flex items-center text-sm font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
     const actionBtn = {
-      primary: "bg-blue-500 hover:bg-blue-600 text-white",
-      success: "bg-green-500 hover:bg-green-600 text-white",
-      // danger: "bg-red-500 hover:bg-red-600 text-white",
-      warning: "bg-yellow-400 hover:bg-yellow-500 text-gray-900",
-      // info: "bg-purple-500 hover:bg-purple-600 text-white",
-      neutral: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-    }
+      primary: "bg-indigo-600 text-white hover:bg-indigo-500",
+      success: "bg-emerald-600 text-white hover:bg-emerald-500",
+      successAlt: "bg-teal-600 text-white hover:bg-teal-500",
+      warning: "bg-amber-500 text-white hover:bg-amber-400",
+      info: "bg-sky-600 text-white hover:bg-sky-500",
+      neutral: "bg-slate-100 text-slate-700 hover:bg-slate-200",
+    };
     switch (order.status) {
-      case "pending": 
+      case "pending":
         return (
           <>
-            <button 
-              onClick={() => handleOpenPaymentProof(order)} 
-              className={`${baseBtn} ${actionBtn.warning}`}>
+            <button
+              onClick={() => handleOpenPaymentProof(order)}
+              className={`${baseBtn} ${actionBtn.warning}`}
+            >
               Payment Proof
             </button>
             <button
@@ -82,22 +85,32 @@ const OrderManagement = () => {
                 "Generate Label"
               )}
             </button>
-            <button className={`${baseBtn} ${actionBtn.neutral}`}>
+            <button
+              onClick={() => {
+                navigate(`/order/${order._id}`);
+              }}
+              className={`${baseBtn} ${actionBtn.neutral}`}
+            >
               Details
             </button>
           </>
-        )
+        );
       case "rejected":
         return (
           <>
             <button className={`${baseBtn} ${actionBtn.warning}`}>
               Mark as Pending
             </button>
-            <button className={`${baseBtn} ${actionBtn.neutral}`}>
+            <button
+              onClick={() => {
+                navigate(`/order/${order._id}`);
+              }}
+              className={`${baseBtn} ${actionBtn.neutral}`}
+            >
               Details
             </button>
           </>
-        )
+        );
       case "processing":
         return (
           <>
@@ -118,46 +131,72 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.success}`}>
               Add Tracking ID
             </button>
-            <button className={`${baseBtn} ${actionBtn.neutral}`}>
+            <button
+              onClick={() => {
+                navigate(`/order/${order._id}`);
+              }}
+              className={`${baseBtn} ${actionBtn.neutral}`}
+            >
               Details
             </button>
           </>
-        )
+        );
       case "shipping":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.primary}`}>Edit Tracking ID</button>
-            <button className={`${baseBtn} ${actionBtn.success}`}>Mark as Delivered</button>
-            <button className={`${baseBtn} ${actionBtn.neutral}`}>Details</button>
+            <button className={`${baseBtn} ${actionBtn.info}`}>
+              Edit Tracking ID
+            </button>
+            <button className={`${baseBtn} ${actionBtn.successAlt}`}>
+              Mark as Delivered
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/order/${order._id}`);
+              }}
+              className={`${baseBtn} ${actionBtn.neutral}`}
+            >
+              Details
+            </button>
           </>
-        )
+        );
       case "cancelled":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.warning}`}>View Cancellation Request</button>
-            <button className={`${baseBtn} ${actionBtn.neutral}`}>Details</button>
+            <button className={`${baseBtn} ${actionBtn.warning}`}>
+              View Cancellation Request
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/order/${order._id}`);
+              }}
+              className={`${baseBtn} ${actionBtn.neutral}`}
+            >
+              Details
+            </button>
           </>
-        )
+        );
     }
-  }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   return (
     <div className="max-w-8xl mx-auto p-6">
       {selectedPaymentProof && (
-        <PaymentProofModal 
-          isOpen={paymentProofOpen} 
+        <PaymentProofModal
+          isOpen={paymentProofOpen}
           onClose={() => {
             setPaymentProofOpen(false);
             setSelectedPaymentProof(null);
             setSelectedOrderId(null);
-          }} 
-          PaymentProof={selectedPaymentProof} 
-          onAccept={() => handleStatusChange(selectedOrderId, "processing")}
-          onReject={() => handleStatusChange(selectedOrderId, "rejected")}
-          loading={loading} />
-      )}  
+          }}
+          PaymentProof={selectedPaymentProof}
+          onAccept={() => handleStatusChange(selectedOrderId!, "processing")}
+          onReject={() => handleStatusChange(selectedOrderId!, "rejected")}
+          loading={loading}
+        />
+      )}
       <h2 className="text-2xl font-bold mb-8">Order Management</h2>
       <h3 className="text-xl font-bold mb-6">Pending Orders</h3>
       <h3 className="text-xl font-bold mb-6">All Orders</h3>
@@ -167,6 +206,7 @@ const OrderManagement = () => {
             <tr>
               <th className="py-3 px-4">Order ID</th>
               <th className="py-3 px-4">Customer</th>
+              <th className="py-3 px-4">Created At</th>
               <th className="py-3 px-4">Total Price (IDR)</th>
               <th className="py-3 px-4">Status</th>
               <th className="py-3 px-4">Actions</th>
@@ -175,10 +215,7 @@ const OrderManagement = () => {
           <tbody>
             {orders.length > 0 ? (
               orders.map((order) => (
-                <tr
-                  key={order._id}
-                  className="border-b hover:bg-gray-50 cursor-pointer"
-                >
+                <tr key={order._id} className="border-b">
                   <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
                     {order._id}
                   </td>
@@ -186,6 +223,9 @@ const OrderManagement = () => {
                     {typeof order.user === "string"
                       ? order.user
                       : order.user.name}
+                  </td>
+                  <td className="p-4">
+                    {new Date(order.updatedAt).toLocaleString()}
                   </td>
                   <td className="p-4">{order.totalPrice.toLocaleString()}</td>
                   <td className="p-4">
