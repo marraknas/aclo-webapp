@@ -115,7 +115,7 @@ const orderSchema = new mongoose.Schema(
             type: String,
             /*
 			pending = user submitted proof, merchant hasn't approved
-			rejected = merchant rejected payment proof - either email user / have merchant contact buyer
+			rejected = merchant rejected payment proof - either auto email user / merchant contact buyer
 			processing = proof was accepted, processing for delivery
 			shipping = merchant has passed items to courier
 			delivered = items have been delivered by courier
