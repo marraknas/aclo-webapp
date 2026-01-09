@@ -17,6 +17,7 @@
     "@paypal/react-paypal-js": "^8.9.2",
     "@reduxjs/toolkit": "^2.11.1",
     "@tailwindcss/vite": "^4.1.17",
+    "@uiw/react-md-editor": "^4.0.11",
     "axios": "^1.13.2",
     "embla-carousel": "^8.6.0",
     "embla-carousel-class-names": "8.6.0",

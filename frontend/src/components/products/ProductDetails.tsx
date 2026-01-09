@@ -47,6 +47,25 @@ const ProductDetails = () => {
     });
   }, [selectedProduct, searchParams]);
 
+  const hasAllRequiredOptionsSelected = useMemo(() => {
+    if (!selectedProduct?.options) return false;
+    return Object.keys(selectedProduct.options).every((key) => {
+      const v = searchParams.get(key);
+      return v !== null && v !== "";
+    });
+  }, [selectedProduct, searchParams]);
+
+  const displayName = useMemo(() => {
+    if (hasAllRequiredOptionsSelected && selectedVariant?.name) {
+      return selectedVariant.name;
+    }
+    return selectedProduct?.name ?? "";
+  }, [
+    hasAllRequiredOptionsSelected,
+    selectedVariant?.name,
+    selectedProduct?.name,
+  ]);
+
   const displayedImages = useMemo(() => {
     const productImgs = selectedProduct?.images?.length
       ? selectedProduct.images
@@ -312,13 +331,14 @@ const ProductDetails = () => {
                 {/* Images */}
                 <div className="md:w-1/2">
                   {/* Main image */}
-                  <div className="mb-4 relative">
+                  <div className="mb-4 relative w-full aspect-square overflow-hidden rounded-lg bg-gray-50">
                     <img
                       src={
                         mainImage ? cloudinaryImageUrl(mainImage) : undefined
                       }
-                      alt={selectedProduct.name}
-                      className="w-full h-auto object-cover"
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: "50% 50%" }}
                     />
 
                     {carouselImages.length > 1 && (
@@ -367,7 +387,7 @@ const ProductDetails = () => {
                 {/* Right side - Details */}
                 <div className="md:w-1/2 md:ml-10">
                   <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-acloblue">
-                    {selectedProduct.name}
+                    {displayName}
                   </h1>
 
                   {/* Price Display */}

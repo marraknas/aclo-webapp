@@ -4,6 +4,8 @@ export interface ProductVariant {
   _id: string;
   productId: string; // ref Product
   sku: string;
+  adminName: string;
+  name: string;
   price: number;
   discountPrice?: number;
   countInStock: number;
@@ -22,6 +24,7 @@ export interface ProductVariant {
 export interface CreateProductVariantPayload {
   productId: string;
   sku: string;
+  name: string;
   price: number;
   discountPrice?: number;
   countInStock?: number;
