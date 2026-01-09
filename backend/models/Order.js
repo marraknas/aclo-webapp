@@ -40,7 +40,6 @@ const orderItemSchema = new mongoose.Schema(
     { _id: false }
 );
 
-// NEED TO ADD SHIPPING METHOD
 const orderSchema = new mongoose.Schema(
     {
         user: {
@@ -120,7 +119,6 @@ const orderSchema = new mongoose.Schema(
 			processing = proof was accepted, processing for delivery
 			shipping = merchant has passed items to courier
 			delivered = items have been delivered by courier
-			completed = user has accepted item
 			cancelled = user requested to cancel purchase
 			*/
             enum: [
@@ -129,7 +127,6 @@ const orderSchema = new mongoose.Schema(
                 "processing",
                 "shipping",
                 "delivered",
-                "completed",
                 "cancelled",
             ],
             default: "pending",

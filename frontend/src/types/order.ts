@@ -41,7 +41,6 @@ export interface Order {
     | "processing"
     | "shipping"
     | "delivered"
-    | "completed"
     | "cancelled";
   createdAt: string;
   updatedAt: string;

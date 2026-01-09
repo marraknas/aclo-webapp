@@ -8,6 +8,7 @@ import {
 } from "../../redux/slices/adminOrderSlice";
 import type { Order } from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { getStatusBadge } from "../../constants/orderStatus";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
@@ -37,8 +38,10 @@ const OrderManagement = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Order Management</h2>
+    <div className="max-w-8xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-8">Order Management</h2>
+      <h3 className="text-xl font-bold mb-6">Pending Orders</h3>
+      <h3 className="text-xl font-bold mb-6">All Orders</h3>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <table className="min-w-full text-left text-gray-500">
           <thead className="bg-gray-100 text-xs uppercase text-gray-700">
@@ -58,7 +61,7 @@ const OrderManagement = () => {
                   className="border-b hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
-                    #{order._id}
+                    {order._id}
                   </td>
                   <td className="p-4">
                     {typeof order.user === "string"
@@ -67,32 +70,21 @@ const OrderManagement = () => {
                   </td>
                   <td className="p-4">{order.totalPrice.toLocaleString()}</td>
                   <td className="p-4">
-                    <select
-                      value={order.status}
-                      onChange={(e) => {
-                        handleStatusChange(
-                          order._id,
-                          e.target.value as Order["status"]
+                    <div className="flex flex-col items-start mt-4 sm:mt-0">
+                      {(() => {
+                        const badge = getStatusBadge(order.status);
+                        return (
+                          <span
+                            className={`${badge.className} inline-flex items-center rounded-full px-2 py-1 text-xs sm:text-sm font-medium`}
+                          >
+                            {badge.label}
+                          </span>
                         );
-                      }}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                    >
-                      <option value="Processing">Processing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
+                      })()}
+                    </div>
                   </td>
                   <td className="p-4">
                     <div className="flex gap-2">
-                      <button
-                        onClick={() =>
-                          handleStatusChange(order._id, "delivered")
-                        }
-                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                      >
-                        Mark as Delivered
-                      </button>
                       <button
                         onClick={() => handleGenerateLabel(order._id)}
                         disabled={generatingLabelForOrder === order._id}
@@ -111,6 +103,21 @@ const OrderManagement = () => {
                           "Generate Label"
                         )}
                       </button>
+                      <button
+                        onClick={() =>
+                          handleStatusChange(order._id, "delivered")
+                        }
+                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                      >
+                        Add Tracking ID
+                      </button>
+                      {/* generate label for pending & processing, add tracking ID is for processing auto convert to shipping, edit tracking ID for shipping, see payment proof for all, see payment proof for pending - modal shows reject/approve, mark as delivered for shipping, canclled is from user side, admin side shows accept/reject cancellation. user needs to beb warned that cancellation can be rejected.  */}
+                      {/* pending: see payment proof - accept/reject, generate label, Details
+                      rejected: mark as pending, details
+                      processing: generate label, add tracking id, details
+                      shipping: edit tracking id, mark as delivered, details
+                      delivered: details
+                      cancelled: view cancellation request - accept/reject, details */}
                     </div>
                   </td>
                 </tr>

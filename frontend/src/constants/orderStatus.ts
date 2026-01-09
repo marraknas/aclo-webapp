@@ -24,10 +24,6 @@ const STATUS_STYLES: Record<
     label: "Delivered",
     className: "bg-green-100 text-green-800 ring-1 ring-green-200",
   },
-  completed: {
-    label: "Completed",
-    className: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200",
-  },
   cancelled: {
     label: "Cancelled",
     className: "bg-gray-100 text-gray-700 ring-1 ring-gray-200",
