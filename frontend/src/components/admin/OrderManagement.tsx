@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useEffect, useState } from "react";
 import {
@@ -11,6 +11,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { getStatusBadge } from "../../constants/orderStatus";
 import PaymentProofModal from "./PaymentProofModal";
 import type { PaymentProof } from "../../types/checkout";
+import { FaEye } from "react-icons/fa6";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
@@ -52,29 +53,34 @@ const OrderManagement = () => {
   const renderActionbuttons = (order: Order) => {
     // create a common button style
     const baseBtn =
-      "px-4 py-2 rounded flex items-center text-sm font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
+      "px-4 py-2 rounded-md flex items-center text-sm font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
     const actionBtn = {
-      primary: "bg-indigo-600 text-white hover:bg-indigo-500",
+      // primary: "bg-indigo-600 text-white hover:bg-indigo-500",
+      primary: "bg-sky-600 text-white hover:bg-sky-500",
       success: "bg-emerald-600 text-white hover:bg-emerald-500",
       successAlt: "bg-teal-600 text-white hover:bg-teal-500",
       warning: "bg-amber-500 text-white hover:bg-amber-400",
-      info: "bg-sky-600 text-white hover:bg-sky-500",
-      neutral: "bg-slate-100 text-slate-700 hover:bg-slate-200",
+      neutral: "bg-slate-200 text-slate-700 hover:bg-slate-300",
+    };
+
+    const DetailsBtn = () => {
+      return (
+        <Link
+          to={`/order/${order._id}`}
+          className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 ml-auto"
+        >
+          <FaEye className="h-6 w-6" />
+        </Link>
+      );
     };
     switch (order.status) {
       case "pending":
         return (
           <>
             <button
-              onClick={() => handleOpenPaymentProof(order)}
-              className={`${baseBtn} ${actionBtn.warning}`}
-            >
-              Payment Proof
-            </button>
-            <button
               onClick={() => handleGenerateLabel(order._id)}
               disabled={generatingLabelForOrder === order._id}
-              className={`${baseBtn} ${actionBtn.primary}`}
+              className={`${baseBtn} ${actionBtn.neutral}`}
             >
               {generatingLabelForOrder === order._id ? (
                 <>
@@ -86,13 +92,12 @@ const OrderManagement = () => {
               )}
             </button>
             <button
-              onClick={() => {
-                navigate(`/order/${order._id}`);
-              }}
-              className={`${baseBtn} ${actionBtn.neutral}`}
+              onClick={() => handleOpenPaymentProof(order)}
+              className={`${baseBtn} ${actionBtn.warning}`}
             >
-              Details
+              Payment Proof
             </button>
+            <DetailsBtn />
           </>
         );
       case "rejected":
@@ -101,14 +106,7 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.warning}`}>
               Mark as Pending
             </button>
-            <button
-              onClick={() => {
-                navigate(`/order/${order._id}`);
-              }}
-              className={`${baseBtn} ${actionBtn.neutral}`}
-            >
-              Details
-            </button>
+            <DetailsBtn />
           </>
         );
       case "processing":
@@ -117,7 +115,7 @@ const OrderManagement = () => {
             <button
               onClick={() => handleGenerateLabel(order._id)}
               disabled={generatingLabelForOrder === order._id}
-              className={`${baseBtn} ${actionBtn.primary}`}
+              className={`${baseBtn} ${actionBtn.neutral}`}
             >
               {generatingLabelForOrder === order._id ? (
                 <>
@@ -129,35 +127,32 @@ const OrderManagement = () => {
               )}
             </button>
             <button className={`${baseBtn} ${actionBtn.success}`}>
-              Add Tracking ID
+              Add Tracking Link
             </button>
-            <button
-              onClick={() => {
-                navigate(`/order/${order._id}`);
-              }}
-              className={`${baseBtn} ${actionBtn.neutral}`}
-            >
-              Details
-            </button>
+            <DetailsBtn />
           </>
         );
       case "shipping":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.info}`}>
-              Edit Tracking ID
-            </button>
-            <button className={`${baseBtn} ${actionBtn.successAlt}`}>
-              Mark as Delivered
-            </button>
             <button
               onClick={() => {
-                navigate(`/order/${order._id}`);
+                handleStatusChange(order._id, "delivered");
               }}
-              className={`${baseBtn} ${actionBtn.neutral}`}
+              className={`${baseBtn} ${actionBtn.successAlt}`}
             >
-              Details
+              Mark as Delivered
             </button>
+            <button className={`${baseBtn} ${actionBtn.primary}`}>
+              Edit Tracking Link
+            </button>
+            <DetailsBtn />
+          </>
+        );
+      case "delivered":
+        return (
+          <>
+            <DetailsBtn />
           </>
         );
       case "cancelled":
@@ -166,14 +161,7 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.warning}`}>
               View Cancellation Request
             </button>
-            <button
-              onClick={() => {
-                navigate(`/order/${order._id}`);
-              }}
-              className={`${baseBtn} ${actionBtn.neutral}`}
-            >
-              Details
-            </button>
+            <DetailsBtn />
           </>
         );
     }
