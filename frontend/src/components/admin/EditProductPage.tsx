@@ -12,10 +12,12 @@ import type {
   ProductImage,
 } from "../../types/product";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import MDEditor from "@uiw/react-md-editor";
 
 type ProductVariantData = {
   variantId: string; // required for variant-specific updates
   sku: string;
+  name: string;
   price: number;
   discountPrice?: number;
   countInStock: number;
@@ -62,6 +64,7 @@ const EditProductPage = () => {
     useState<ProductVariantData>({
       variantId: "",
       sku: "",
+      name: "",
       price: 0,
       discountPrice: undefined,
       countInStock: 0,
@@ -107,6 +110,7 @@ const EditProductPage = () => {
       setProductVariantData({
         variantId: selectedVariant._id,
         sku: selectedVariant.sku,
+        name: selectedVariant.name,
         price: selectedVariant.price,
         discountPrice: selectedVariant.discountPrice,
         countInStock: selectedVariant.countInStock,
@@ -238,13 +242,9 @@ const EditProductPage = () => {
             Select a variant to edit
           </option>
           {availableVariants.map((v) => {
-            // Create a readable label for the dropdown
-            const labelParts = [v.sku];
-            if (v.color) labelParts.push(v.color);
-            if (v.variant) labelParts.push(v.variant);
             return (
               <option key={v._id} value={v._id}>
-                {labelParts.join(" - ")} (Stock: {v.countInStock})
+                {v.name} (Stock: {v.countInStock})
               </option>
             );
           })}
@@ -267,14 +267,26 @@ const EditProductPage = () => {
         {/* Description */}
         <div className="mb-6">
           <label className="block font-semibold mb-2">Description</label>
-          <textarea
+          {/* <textarea
             name="description"
             value={productData.description}
             onChange={handleProductChange}
             className="w-full border border-gray-300 rounded-md p-2"
             rows={4}
             required
-          ></textarea>
+          ></textarea> */}
+          <div data-color-mode="light">
+            <MDEditor
+              value={productData.description}
+              onChange={(val) =>
+                setProductData((prev) => ({
+                  ...prev,
+                  description: val ?? "",
+                }))
+              }
+              height={220}
+            />
+          </div>
         </div>
         {/* Dimensions */}
         <div className="col-span-2">
@@ -358,24 +370,24 @@ const EditProductPage = () => {
           Current Variant:{" "}
           <span className="text-blue-600">{productVariantData.sku}</span>
         </h3>
-        {/* Price */}
-        <div className="mb-6">
-          <label className="block font-semibold mb-2">Discounted Price</label>
-          <input
-            type="number"
-            name="price"
-            value={displayPrice}
-            onChange={handleVariantChange}
-            className="w-full border border-gray-300 rounded-md p-2"
-          />
-        </div>
-        {/* Price */}
+        {/* Original Price */}
         <div className="mb-6">
           <label className="block font-semibold mb-2">Original Price</label>
           <input
             type="number"
             name="price"
             value={productVariantData.price}
+            onChange={handleVariantChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+          />
+        </div>
+        {/* Discounted Price */}
+        <div className="mb-6">
+          <label className="block font-semibold mb-2">Discounted Price</label>
+          <input
+            type="number"
+            name="price"
+            value={displayPrice}
             onChange={handleVariantChange}
             className="w-full border border-gray-300 rounded-md p-2"
           />

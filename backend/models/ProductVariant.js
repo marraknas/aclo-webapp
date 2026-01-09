@@ -13,6 +13,11 @@ const productVariantSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
+        name: {
+            type: String,
+            required: true,
+            unique: true,
+        },
         price: {
             type: Number,
             required: true,

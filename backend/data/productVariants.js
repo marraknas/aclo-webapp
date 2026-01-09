@@ -2,6 +2,7 @@ const productVariants = [
     {
         // Quill mittens,
         sku: "QL-MT",
+        name: "Quill Mittens",
         price: 54000,
         discountPrice: 39000,
         countInStock: 199, // we seeded 1 order of quill mittens
@@ -16,6 +17,7 @@ const productVariants = [
     },
     {
         sku: "ST-NA-WS",
+        name: "Stork - Natural (With Stabiliser)",
         price: 2368000,
         discountPrice: 1419000,
         countInStock: 200,
@@ -26,6 +28,7 @@ const productVariants = [
     },
     {
         sku: "ST-NA-NS",
+        name: "Stork - Natural (No Stabiliser)",
         price: 2249000,
         discountPrice: 1399000,
         countInStock: 200,
@@ -38,6 +41,7 @@ const productVariants = [
 
     {
         sku: "ST-CE-WS",
+        name: "Stork - Cerulean (With Stabiliser)",
         price: 2368000,
         discountPrice: 1419000,
         countInStock: 200,
@@ -48,6 +52,7 @@ const productVariants = [
     },
     {
         sku: "ST-CE-NS",
+        name: "Stork - Cerulean (No Stabiliser)",
         price: 2249000,
         discountPrice: 1399000,
         countInStock: 200,
@@ -59,6 +64,7 @@ const productVariants = [
 
     {
         sku: "ST-SI-WS",
+        name: "Stork - Silver (With Stabiliser)",
         price: 2368000,
         discountPrice: 1419000,
         countInStock: 200,
@@ -69,6 +75,7 @@ const productVariants = [
     },
     {
         sku: "ST-SI-NS",
+        name: "Stork - Silver (No Stabiliser)",
         price: 2249000,
         discountPrice: 1399000,
         countInStock: 200,
@@ -80,6 +87,7 @@ const productVariants = [
 
     {
         sku: "ST-SN-WS",
+        name: "Stork - Snow (With Stabiliser)",
         price: 2368000,
         discountPrice: 1419000,
         countInStock: 200,
@@ -90,6 +98,7 @@ const productVariants = [
     },
     {
         sku: "ST-SN-NS",
+        name: "Stork - Snow (No Stabiliser)",
         price: 2249000,
         discountPrice: 1399000,
         countInStock: 200,
@@ -101,6 +110,7 @@ const productVariants = [
     {
         // Quill Utensils - No oven mitt
         sku: "QL-NM",
+        name: "Quill (No Mittens)",
         price: 179000,
         discountPrice: 103000,
         countInStock: 200,
@@ -117,6 +127,7 @@ const productVariants = [
     {
         // Quill Utensils - With oven mitt
         sku: "QL-WM",
+        name: "Quill (With Mittens)",
         price: 224000,
         discountPrice: 109000,
         countInStock: 200,
@@ -132,6 +143,7 @@ const productVariants = [
     {
         // Talon - Stork
         sku: "TA-ST",
+        name: "Talon - Stork",
         price: 119000,
         discountPrice: 69000,
         countInStock: 200,
@@ -148,6 +160,7 @@ const productVariants = [
     {
         // Talon - Falcon
         sku: "TA-FL",
+        name: "Talon - Falcon",
         price: 129000,
         discountPrice: 79000,
         countInStock: 200,
@@ -163,6 +176,7 @@ const productVariants = [
     {
         // Sparrow - Natural
         sku: "SP-NA",
+        name: "Sparrow - Natural",
         price: 1099000,
         discountPrice: 599000,
         countInStock: 200,
@@ -179,6 +193,7 @@ const productVariants = [
     {
         // Sparrow - Snow
         sku: "SP-SN",
+        name: "Sparrow - Snow",
         price: 1099000,
         discountPrice: 599000,
         countInStock: 200,
@@ -194,6 +209,7 @@ const productVariants = [
     {
         // Beak
         sku: "BE",
+        name: "Beak",
         price: 129000,
         discountPrice: 79000,
         countInStock: 200,
@@ -208,6 +224,7 @@ const productVariants = [
     },
     {
         sku: "FL-NA-WS",
+        name: "Falcon - Natural (With Stabiliser)",
         price: 3028000,
         discountPrice: 1579000,
         countInStock: 200,
@@ -218,6 +235,7 @@ const productVariants = [
     },
     {
         sku: "FL-NA-NS",
+        name: "Falcon - Natural (No Stabiliser)",
         price: 2899000,
         discountPrice: 1549000,
         countInStock: 200,
@@ -230,6 +248,7 @@ const productVariants = [
 
     {
         sku: "FL-SU-WS",
+        name: "Falcon - Sunshine (With Stabiliser)",
         price: 3028000,
         discountPrice: 1579000,
         countInStock: 200,
@@ -240,6 +259,7 @@ const productVariants = [
     },
     {
         sku: "FL-SU-NS",
+        name: "Falcon - Sunshine (No Stabiliser)",
         price: 2899000,
         discountPrice: 1549000,
         countInStock: 200,
@@ -251,6 +271,7 @@ const productVariants = [
 
     {
         sku: "FL-SI-WS",
+        name: "Falcon - Silver (With Stabiliser)",
         price: 3028000,
         discountPrice: 1579000,
         countInStock: 200,
@@ -261,6 +282,7 @@ const productVariants = [
     },
     {
         sku: "FL-SI-NS",
+        name: "Falcon - Silver (No Stabiliser)",
         price: 2899000,
         discountPrice: 1549000,
         countInStock: 200,
