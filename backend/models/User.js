@@ -27,10 +27,6 @@ const shippingAddressSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 	},
-	isDefault: {
-		type: Boolean,
-		default: false,
-	},
 }, { timestamps: true });
 
 const userSchema = new mongoose.Schema(

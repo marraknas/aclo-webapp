@@ -46,7 +46,7 @@ const ShippingDetailsModal = ({
       // Use first address in user document to prefill
       const addressToUse = user.shippingAddresses[0];
       
-      // Set selected address for radio button in selection view
+      // Set selected address in modal selection view
       setSelectedAddressInView(addressToUse._id);
       
       if (initialMode === "form") {
