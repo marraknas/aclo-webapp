@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 // import MidtransPayButton from "./MidtransPayButton";
 import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
@@ -37,31 +38,62 @@ const Checkout = () => {
     phone: "",
   });
 
+  // Track last calculated shipping to prevent duplicate API calls
+  const lastCalculatedRef = useRef<{
+    postalCode: string;
+    cartId: string;
+  } | null>(null);
+
+  // Only calculate shipping if postal code or cart changed
+  const shouldCalculateShipping = (postalCode: string, currentCartId: string): boolean => {
+    if (!lastCalculatedRef.current) return true;
+    
+    return (
+      lastCalculatedRef.current.postalCode !== postalCode ||
+      lastCalculatedRef.current.cartId !== currentCartId
+    );
+  };
+
   // Auto-fill shipping details + calculate shipping if user has saved addresses
   useEffect(() => {
     if (user?.shippingAddresses && user.shippingAddresses.length > 0 && cart?.products) {
-      const defaultAddress = user.shippingAddresses.find(addr => addr.isDefault)!;
+      const firstAddress = user.shippingAddresses[0];
       
       const details: ShippingDetails = {
-        name: defaultAddress.name,
-        address: defaultAddress.address,
-        city: defaultAddress.city,
-        postalCode: defaultAddress.postalCode,
-        phone: defaultAddress.phone,
+        name: firstAddress.name,
+        address: firstAddress.address,
+        city: firstAddress.city,
+        postalCode: firstAddress.postalCode,
+        phone: firstAddress.phone,
       };
       
       setShippingDetails(details);
       
-      dispatch(
-        calculateShippingCost({
-          destinationPostalCode: defaultAddress.postalCode,
-          cartItems: cart.products.map((p) => ({
-            productId: p.productId,
-            price: p.price,
-            quantity: p.quantity,
-          })),
-        })
-      );
+      if (shouldCalculateShipping(firstAddress.postalCode, cart._id)) {
+        dispatch(
+          calculateShippingCost({
+            destinationPostalCode: firstAddress.postalCode,
+            cartItems: cart.products.map((p) => ({
+              productId: p.productId,
+              price: p.price,
+              quantity: p.quantity,
+            })),
+          })
+        ).unwrap()
+          .then(() => {
+            lastCalculatedRef.current = {
+              postalCode: firstAddress.postalCode,
+              cartId: cart._id,
+            };
+          })
+          .catch((error: any) => {
+            dispatch(clearShipping());
+            toast.error(
+              error?.message || "Something went wrong. Please check your address and try again.",
+              { duration: 3000 }
+            );
+          });
+      }
     } else {
       // No saved addresses, show modal to add new address
       setModalMode("form");
@@ -90,6 +122,7 @@ const Checkout = () => {
   useEffect(() => {
     return () => {
       dispatch(clearShipping());
+      lastCalculatedRef.current = null;
     };
   }, [dispatch]);
 
@@ -99,6 +132,11 @@ const Checkout = () => {
     setShippingDetails(shippingDetails);
 
     if (!cart || !cart.products || cart.products.length === 0) {
+      return;
+    }
+
+    if (!shouldCalculateShipping(shippingDetails.postalCode, cart._id)) {
+      setShowShippingDetailsModal(false);
       return;
     }
 
@@ -113,9 +151,19 @@ const Checkout = () => {
           })),
         })
       ).unwrap();
+      
+      lastCalculatedRef.current = {
+        postalCode: shippingDetails.postalCode,
+        cartId: cart._id,
+      };
+      
       setShowShippingDetailsModal(false);
     } catch (error: any) {
-      alert(error.message || "Failed to update. Please try again.");
+      dispatch(clearShipping());
+      toast.error(
+        error?.message || "Something went wrong. Please check your address and try again.",
+        { duration: 3000 }
+      );
       console.error("Error in handleShippingDetails:", error);
     }
   };

@@ -104,8 +104,8 @@ const ShippingDetailsModal = ({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (user && saveAddress) {
-      if (isNewAddress) {
+    if (user) {
+      if (isNewAddress && saveAddress) {
         // Add new address
         const resultAction = await dispatch(addShippingAddress(shippingDetails));
         if (addShippingAddress.fulfilled.match(resultAction)) {
@@ -116,8 +116,8 @@ const ShippingDetailsModal = ({
             setSelectedAddressInView(newAddress._id);
           }
         }
-      } else if (editingAddressId) {
-        // Update existing address
+      } else if (!isNewAddress && editingAddressId) {
+        // Always update existing address when editing
         const resultAction = await dispatch(updateShippingAddress({
           addressId: editingAddressId,
           updates: shippingDetails,
@@ -139,43 +139,44 @@ const ShippingDetailsModal = ({
       role="dialog"
     >
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative w-full max-w-2xl rounded-xl bg-white p-6 shadow-lg border max-h-[80vh] overflow-y-auto">
+      <div className="relative w-full max-w-2xl rounded-xl bg-white shadow-lg border max-h-[80vh] overflow-hidden flex flex-col">
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
+          className="absolute right-6 top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 z-10"
         >
           <IoMdClose className="h-6 w-6 hover:text-gray-600 cursor-pointer" />
         </button>
 
+        <div className="overflow-y-auto px-6 py-6">
         {mode === "selection" ? (
 
           // Address Selection View - shows list of user's saved addresses
           <div>
-            <h2 className="text-2xl uppercase mb-4">My Addresses</h2>
+            <h2 className="text-2xl uppercase mb-6">My Addresses</h2>
             
             <div className="space-y-4 mb-6">
               {user?.shippingAddresses?.map((address) => (
                 <div
                   key={address._id}
-                  className="border rounded-lg p-4 hover:border-gray-400 transition cursor-pointer"
+                  className="border rounded-lg p-5 hover:border-gray-400 transition cursor-pointer"
                   onClick={() => {
                     setSelectedAddressInView(address._id);
                     handleSelectAddress(address);
                   }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className={`w-5 h-5 rounded-full border-2 mt-1 flex items-center justify-center ${selectedAddressInView === address._id ? 'border-acloblue' : 'border-gray-300'}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center flex-shrink-0 ${selectedAddressInView === address._id ? 'border-acloblue' : 'border-gray-300'}`}>
                         {selectedAddressInView === address._id && (
                           <div className="w-3 h-3 rounded-full bg-acloblue" />
                         )}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold">{address.name}</p>
-                          <p className="text-gray-600">{address.phone}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <p className="font-semibold text-base">{address.name}</p>
+                          <p className="text-gray-600 text-sm">{address.phone}</p>
                         </div>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 text-sm mb-1">
                           {address.address}
                         </p>
                         <p className="text-gray-600 text-sm">
@@ -188,7 +189,7 @@ const ShippingDetailsModal = ({
                         e.stopPropagation();
                         handleEditAddress(address);
                       }}
-                      className="text-acloblue hover:text-acloblue-dark text-sm font-medium"
+                      className="text-acloblue text-sm font-medium shrink-0"
                     >
                       Edit
                     </button>
@@ -199,7 +200,7 @@ const ShippingDetailsModal = ({
 
             <button
               onClick={handleAddNewAddress}
-              className="w-full flex-1 bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
+              className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition"
             >
               Add New Address
             </button>
@@ -311,17 +312,19 @@ const ShippingDetailsModal = ({
               </div>
 
               {/* Save Address Checkbox */}
-              <div className="mb-6">
-                <label className="flex items-center gap-2 text-gray-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={saveAddress}
-                    onChange={(e) => setSaveAddress(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer"
-                  />
-                  <span className="text-sm">Save this address to my account</span>
-                </label>
-              </div>
+              {isNewAddress && (
+                <div className="mb-6">
+                  <label className="flex items-center gap-2 text-gray-700 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={saveAddress}
+                      onChange={(e) => setSaveAddress(e.target.checked)}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                    <span className="text-sm">Save this address to my account</span>
+                  </label>
+                </div>
+              )}
 
               <div className="flex gap-3 mt-6">
                 <button
@@ -342,6 +345,7 @@ const ShippingDetailsModal = ({
             </form>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

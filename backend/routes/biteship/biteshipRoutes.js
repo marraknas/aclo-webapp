@@ -144,7 +144,7 @@ try {
     
     if (error.response?.data) {
         return res.status(error.response.status || 500).json({
-            message: error.response.data.message || "Failed to calculate shipping cost",
+            message: error.response.data.message || "Something went wrong. Please check your address and try again.",
             error: error.response.data,
         });
     }
