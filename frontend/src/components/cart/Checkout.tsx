@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 // import MidtransPayButton from "./MidtransPayButton";
 import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
+import LoadingOverlay from "../common/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   createCheckout,
@@ -26,7 +27,8 @@ const Checkout = () => {
 
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showShippingDetailsModal, setShowShippingDetailsModal] =
-    useState(true);
+    useState(false);
+  const [modalMode, setModalMode] = useState<"selection" | "form">("form");
   const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
     name: "",
     address: "",
@@ -34,6 +36,38 @@ const Checkout = () => {
     postalCode: "",
     phone: "",
   });
+
+  // Auto-fill shipping details + calculate shipping if user has saved addresses
+  useEffect(() => {
+    if (user?.shippingAddresses && user.shippingAddresses.length > 0 && cart?.products) {
+      const defaultAddress = user.shippingAddresses.find(addr => addr.isDefault)!;
+      
+      const details: ShippingDetails = {
+        name: defaultAddress.name,
+        address: defaultAddress.address,
+        city: defaultAddress.city,
+        postalCode: defaultAddress.postalCode,
+        phone: defaultAddress.phone,
+      };
+      
+      setShippingDetails(details);
+      
+      dispatch(
+        calculateShippingCost({
+          destinationPostalCode: defaultAddress.postalCode,
+          cartItems: cart.products.map((p) => ({
+            productId: p.productId,
+            price: p.price,
+            quantity: p.quantity,
+          })),
+        })
+      );
+    } else {
+      // No saved addresses, show modal to add new address
+      setModalMode("form");
+      setShowShippingDetailsModal(true);
+    }
+  }, [user, cart?.products, dispatch]);
 
   useEffect(() => {
     if (!cartId) {
@@ -128,14 +162,23 @@ const Checkout = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6 tracking-tighter">
-      <ShippingDetailsModal
-        isOpen={showShippingDetailsModal}
-        onClose={() => navigate("/")}
-        onSubmit={handleShippingDetailsSubmit}
-        userEmail={user?.email}
-        isCalculating={shippingLoading}
-      />
+    <>
+      {shippingLoading && <LoadingOverlay show/> }
+      
+      <div className="max-w-4xl mx-auto py-10 px-6 tracking-tighter">
+        <ShippingDetailsModal
+          isOpen={showShippingDetailsModal}
+          onClose={() => {
+            setShowShippingDetailsModal(false);
+            if (!user?.shippingAddresses || user.shippingAddresses.length === 0) {
+              navigate("/");
+            }
+          }}
+          onSubmit={handleShippingDetailsSubmit}
+          userEmail={user?.email}
+          isCalculating={shippingLoading}
+          initialMode={modalMode}
+        />
 
       {/* Order Summary Section */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
@@ -143,7 +186,10 @@ const Checkout = () => {
           <h2 className="text-2xl uppercase">Order Summary</h2>
           <button
             type="button"
-            onClick={() => setShowShippingDetailsModal(true)}
+            onClick={() => {
+              setModalMode("selection");
+              setShowShippingDetailsModal(true);
+            }}
             className="text-sm text-acloblue hover:underline"
           >
             Edit Shipping Details
@@ -258,6 +304,7 @@ const Checkout = () => {
         }}
       />
     </div>
+    </>
   );
 };
 

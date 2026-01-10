@@ -1,8 +1,21 @@
+export interface ShippingAddress {
+	_id: string;
+	name: string;
+	address: string;
+	city: string;
+	postalCode: string;
+	phone: string;
+	isDefault: boolean;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
 export interface User {
 	_id: string;
 	name: string;
 	email: string;
 	role: "customer" | "admin";
+	shippingAddresses?: ShippingAddress[];
 	createdAt?: string; // backend currently doesn't return these, but maybe for future improvements
 	updatedAt?: string;
 }

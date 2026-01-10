@@ -1,6 +1,38 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const shippingAddressSchema = new mongoose.Schema({
+	name: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+	address: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+	city: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+	postalCode: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+	phone: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+	isDefault: {
+		type: Boolean,
+		default: false,
+	},
+}, { timestamps: true });
+
 const userSchema = new mongoose.Schema(
 	{
 		name: {
@@ -25,6 +57,7 @@ const userSchema = new mongoose.Schema(
 			enum: ["customer", "admin"],
 			default: "customer",
 		},
+		shippingAddresses: [shippingAddressSchema],
 	},
 	{ timestamps: true }
 );

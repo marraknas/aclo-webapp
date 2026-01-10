@@ -82,14 +82,14 @@ try {
         });
     }
 
-    // Currently requesting major Indonesian couriers: JNE, TIKI, Grab, J&T, SiCepat, AnterAja
-    // to add more couriers in the future (eg Grab, Lalamove, DHL, etc):
+    // Currently requesting the following couriers: JNE, Grab
+    // To add more couriers in the future (eg JNT, Lalamove, DHL, etc):
     // - update the couriers field below with additional courier codes
     // - refer to biteship documentation: https://biteship.com/en/docs/api/couriers/overview
     const biteshipRequest = {
         origin_postal_code: originPostalCode,
         destination_postal_code: destinationPostalCode,
-          couriers: "jne,tiki,grab,jnt,sicepat,anteraja",
+          couriers: "jne,grab",
         items: biteshipItems,
     };
 

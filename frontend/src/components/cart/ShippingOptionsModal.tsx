@@ -1,5 +1,7 @@
 import type { ShippingOption } from "../../types/checkout";
 import { IoMdClose } from "react-icons/io";
+import jneLogo from "../../assets/jne-logo.png";
+import grabLogo from "../../assets/grab-logo.png";
 
 interface ShippingOptionsModalProps {
     isOpen: boolean;
@@ -63,6 +65,24 @@ const ShippingOptionsModal = ({
                 onClick={() => handleSelect(option)}
                 >
                 <div className="flex justify-between items-start">
+                    <div className="flex gap-4 flex-1">
+                        <div className="flex-shrink-0">
+                            {option.courierCode.toLowerCase() === 'jne' && (
+                            <img
+                                src={jneLogo}
+                                alt="JNE logo"
+                                className="w-8 h-8 object-contain"
+                            />
+                            )}
+                            {option.courierCode.toLowerCase() === 'grab' && (
+                            <img
+                                src={grabLogo}
+                                alt="Grab logo"
+                                className="w-8 h-8 object-contain"
+                            />
+                            )}
+                        </div>
+
                     <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-gray-900">
@@ -81,6 +101,8 @@ const ShippingOptionsModal = ({
                         </span>
                     </div>
                     </div>
+                    </div>
+
                     <div className="text-right ml-4">
                     <p className="text-xl font-semibold text-gray-900">
                         IDR {option.price.toLocaleString()}

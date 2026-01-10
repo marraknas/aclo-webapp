@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import type { User } from "../../types/user";
+import type { User, ShippingAddress } from "../../types/user";
 import type { LoginPayload, RegisterPayload } from "../../types/auth";
 import type { AppError } from "../../types/error";
 import { API_URL } from "../../constants/api";
@@ -86,6 +86,62 @@ export const registerUser = createAsyncThunk<
 	}
 });
 
+// Async Thunk for adding a shipping address
+export const addShippingAddress = createAsyncThunk<
+	User,
+	Omit<ShippingAddress, "_id" | "createdAt" | "updatedAt">,
+	{ rejectValue: AppError }
+>("auth/addShippingAddress", async (addressData, { rejectWithValue }) => {
+	try {
+		const token = localStorage.getItem("userToken");
+		const response = await axios.post(
+			`${API_URL as string}/api/users/profile/addresses`,
+			addressData,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+		
+		return response.data;
+	} catch (err) {
+		const error = err as AxiosError<AppError>;
+		if (error.response && error.response.data) {
+			return rejectWithValue(error.response.data);
+		}
+		return rejectWithValue({ message: "Failed to add shipping address" });
+	}
+});
+
+// Async Thunk for updating a shipping address
+export const updateShippingAddress = createAsyncThunk<
+	User,
+	{ addressId: string; updates: Partial<Omit<ShippingAddress, "_id" | "createdAt" | "updatedAt">> },
+	{ rejectValue: AppError }
+>("auth/updateShippingAddress", async ({ addressId, updates }, { rejectWithValue }) => {
+	try {
+		const token = localStorage.getItem("userToken");
+		const response = await axios.patch(
+			`${API_URL as string}/api/users/profile/addresses/${addressId}`,
+			updates,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+		
+		return response.data;
+	} catch (err) {
+		const error = err as AxiosError<AppError>;
+		if (error.response && error.response.data) {
+			return rejectWithValue(error.response.data);
+		}
+		return rejectWithValue({ message: "Failed to update shipping address" });
+	}
+});
+
 // Slice
 const authSlice = createSlice({
 	name: "auth",
@@ -130,6 +186,32 @@ const authSlice = createSlice({
 			.addCase(registerUser.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload?.message ?? "Registration failed";
+			})
+			.addCase(addShippingAddress.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(addShippingAddress.fulfilled, (state, action) => {
+				state.loading = false;
+				state.user = action.payload;
+				localStorage.setItem("userInfo", JSON.stringify(state.user));
+			})
+			.addCase(addShippingAddress.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload?.message ?? "Failed to add shipping address";
+			})
+			.addCase(updateShippingAddress.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(updateShippingAddress.fulfilled, (state, action) => {
+				state.loading = false;
+				state.user = action.payload;
+				localStorage.setItem("userInfo", JSON.stringify(state.user));
+			})
+			.addCase(updateShippingAddress.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload?.message ?? "Failed to update shipping address";
 			});
 	},
 });
