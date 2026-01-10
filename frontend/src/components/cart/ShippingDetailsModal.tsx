@@ -27,7 +27,7 @@ const ShippingDetailsModal = ({
   const [mode, setMode] = useState<"selection" | "form">("form");
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [isNewAddress, setIsNewAddress] = useState(false);
-  const [setAsDefault, setSetAsDefault] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(false);
   const [selectedAddressInView, setSelectedAddressInView] = useState<string>("");
   
   const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
@@ -43,14 +43,13 @@ const ShippingDetailsModal = ({
     if (user?.shippingAddresses && user.shippingAddresses.length > 0) {
       setMode(initialMode);
       
-      const defaultAddress = user.shippingAddresses.find(addr => addr.isDefault);
-      const addressToUse = defaultAddress || user.shippingAddresses[0];
+      // Use first address in user document to prefill
+      const addressToUse = user.shippingAddresses[0];
       
       // Set selected address for radio button in selection view
       setSelectedAddressInView(addressToUse._id);
       
       if (initialMode === "form") {
-        // Pre-fill default address for first-time flow
         setShippingDetails({
           name: addressToUse.name,
           address: addressToUse.address,
@@ -62,7 +61,6 @@ const ShippingDetailsModal = ({
     } else {
       setMode("form");
       setIsNewAddress(true);
-      setSetAsDefault(true);
     }
   }, [user, initialMode]);
 
@@ -80,7 +78,6 @@ const ShippingDetailsModal = ({
   const handleEditAddress = (address: ShippingAddress) => {
     setEditingAddressId(address._id);
     setIsNewAddress(false);
-    setSetAsDefault(address.isDefault);
     setShippingDetails({
       name: address.name,
       address: address.address,
@@ -94,9 +91,6 @@ const ShippingDetailsModal = ({
   const handleAddNewAddress = () => {
     setEditingAddressId(null);
     setIsNewAddress(true);
-    // Auto-check default checkbox for user's first address
-    const isFirstAddress = !user?.shippingAddresses || user.shippingAddresses.length === 0;
-    setSetAsDefault(isFirstAddress);
     setShippingDetails({
       name: "",
       address: "",
@@ -110,23 +104,27 @@ const ShippingDetailsModal = ({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (user) {
+    if (user && saveAddress) {
       if (isNewAddress) {
         // Add new address
-        const isFirstAddress = !user.shippingAddresses || user.shippingAddresses.length === 0;
-        await dispatch(addShippingAddress({
-          ...shippingDetails,
-          isDefault: isFirstAddress || setAsDefault,
-        }));
+        const resultAction = await dispatch(addShippingAddress(shippingDetails));
+        if (addShippingAddress.fulfilled.match(resultAction)) {
+          // Get the newly added address
+          const updatedUser = resultAction.payload;
+          if (updatedUser.shippingAddresses && updatedUser.shippingAddresses.length > 0) {
+            const newAddress = updatedUser.shippingAddresses[updatedUser.shippingAddresses.length - 1];
+            setSelectedAddressInView(newAddress._id);
+          }
+        }
       } else if (editingAddressId) {
         // Update existing address
-        await dispatch(updateShippingAddress({
+        const resultAction = await dispatch(updateShippingAddress({
           addressId: editingAddressId,
-          updates: {
-            ...shippingDetails,
-            isDefault: setAsDefault,
-          },
+          updates: shippingDetails,
         }));
+        if (updateShippingAddress.fulfilled.match(resultAction)) {
+          setSelectedAddressInView(editingAddressId);
+        }
       }
     }
     
@@ -183,11 +181,6 @@ const ShippingDetailsModal = ({
                         <p className="text-gray-600 text-sm">
                           {address.city}, {address.postalCode}
                         </p>
-                        {address.isDefault && (
-                          <span className="inline-block mt-2 px-2 py-1 text-xs border border-acloblue text-acloblue rounded">
-                            Default
-                          </span>
-                        )}
                       </div>
                     </div>
                     <button
@@ -317,26 +310,16 @@ const ShippingDetailsModal = ({
                 />
               </div>
 
-              {/* Set as Default Checkbox */}
+              {/* Save Address Checkbox */}
               <div className="mb-6">
-                <label className="flex items-center gap-2 text-gray-700 cursor-pointer relative group">
+                <label className="flex items-center gap-2 text-gray-700 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={setAsDefault}
-                    onChange={(e) => setSetAsDefault(e.target.checked)}
-                    disabled={
-                      !isNewAddress && 
-                      editingAddressId !== null && 
-                      user?.shippingAddresses?.find(addr => addr._id === editingAddressId)?.isDefault === true
-                    }
-                    className="w-4 h-4 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                    checked={saveAddress}
+                    onChange={(e) => setSaveAddress(e.target.checked)}
+                    className="w-4 h-4 cursor-pointer"
                   />
-                  <span className="text-sm">Set this address as default</span>
-                  {!isNewAddress && editingAddressId !== null && user?.shippingAddresses?.find(addr => addr._id === editingAddressId)?.isDefault === true && (
-                    <span className="absolute left-0 top-8 hidden group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
-                      Default address cannot be unselected. Select another address as default instead.
-                    </span>
-                  )}
+                  <span className="text-sm">Save this address to my account</span>
                 </label>
               </div>
 

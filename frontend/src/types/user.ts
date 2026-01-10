@@ -5,7 +5,6 @@ export interface ShippingAddress {
 	city: string;
 	postalCode: string;
 	phone: string;
-	isDefault: boolean;
 	createdAt?: string;
 	updatedAt?: string;
 }
