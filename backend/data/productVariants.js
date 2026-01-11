@@ -1,7 +1,7 @@
 const productVariants = [
     {
         // Quill mittens,
-        sku: "QL-MT",
+        sku: "MIT",
         adminName: "Quill Mittens",
         name: "Mini Oven Mitt for Kids (QUILL)",
         price: 54000,
@@ -17,7 +17,7 @@ const productVariants = [
         ],
     },
     {
-        sku: "ST-NA-WS",
+        sku: "STO-NAT-1",
         adminName: "Stork - Natural (With Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Natural (With Stabiliser)",
         price: 2368000,
@@ -29,7 +29,7 @@ const productVariants = [
         images: [{ publicId: "STORK-NATURAL_qwjemt", alt: "Stork" }],
     },
     {
-        sku: "ST-NA-NS",
+        sku: "STO-NAT-0",
         adminName: "Stork - Natural (No Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Natural (No Stabiliser)",
         price: 2249000,
@@ -43,7 +43,7 @@ const productVariants = [
     },
 
     {
-        sku: "ST-CE-WS",
+        sku: "STO-CER-1",
         adminName: "Stork - Cerulean (With Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Cerulean (With Stabiliser)",
         price: 2368000,
@@ -55,7 +55,7 @@ const productVariants = [
         images: [{ publicId: "STORK-CERULEAN_fslcwa", alt: "Stork" }],
     },
     {
-        sku: "ST-CE-NS",
+        sku: "STO-CER-0",
         adminName: "Stork - Cerulean (No Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Cerulean (No Stabiliser)",
         price: 2249000,
@@ -68,7 +68,7 @@ const productVariants = [
     },
 
     {
-        sku: "ST-SI-WS",
+        sku: "STO-SIL-1",
         adminName: "Stork - Silver (With Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Silver (With Stabiliser)",
         price: 2368000,
@@ -80,7 +80,7 @@ const productVariants = [
         images: [{ publicId: "STORK-SILVER_vlde0z", alt: "Stork" }],
     },
     {
-        sku: "ST-SI-NS",
+        sku: "STO-SIL-0",
         adminName: "Stork - Silver (No Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Silver (No Stabiliser)",
         price: 2249000,
@@ -93,7 +93,7 @@ const productVariants = [
     },
 
     {
-        sku: "ST-SN-WS",
+        sku: "STO-SNO-1",
         adminName: "Stork - Snow (With Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Snow (With Stabiliser)",
         price: 2368000,
@@ -105,7 +105,7 @@ const productVariants = [
         images: [{ publicId: "STORK-SNOW_dmlzs9", alt: "Stork" }],
     },
     {
-        sku: "ST-SN-NS",
+        sku: "STO-SNO-0",
         adminName: "Stork - Snow (No Stabiliser)",
         name: "STORK - Ultra-Slim & Foldable Learning Tower - Snow (No Stabiliser)",
         price: 2249000,
@@ -118,7 +118,7 @@ const productVariants = [
     },
     {
         // Quill Utensils - No oven mitt
-        sku: "QL-NM",
+        sku: "QUI-NO",
         adminName: "Quill (No Mittens)",
         name: "QUILL - Premium Kid-size Mini Kitchen Utensils (No Mittens)",
         price: 179000,
@@ -136,7 +136,7 @@ const productVariants = [
     },
     {
         // Quill Utensils - With oven mitt
-        sku: "QL-WM",
+        sku: "QUI-MIT",
         adminName: "Quill (With Mittens)",
         name: "QUILL - Premium Kid-size Mini Kitchen Utensils (With Mittens)",
         price: 224000,
@@ -153,7 +153,7 @@ const productVariants = [
     },
     {
         // Talon - Stork
-        sku: "TA-ST",
+        sku: "TAL-STO",
         adminName: "Talon - Stork",
         name: "TALON - Stabiliser for Learning Tower (Stork)",
         price: 119000,
@@ -171,7 +171,7 @@ const productVariants = [
     },
     {
         // Talon - Falcon
-        sku: "TA-FL",
+        sku: "TAL-FAL",
         adminName: "Talon - Falcon",
         name: "TALON - Stabiliser for Learning Tower (Falcon)",
         price: 129000,
@@ -188,7 +188,7 @@ const productVariants = [
     },
     {
         // Sparrow - Natural
-        sku: "SP-NA",
+        sku: "SPA-NAT-0",
         adminName: "Sparrow - Natural",
         name: "SPARROW - Mini Foldable Learning Tower - Natural",
         price: 1099000,
@@ -206,7 +206,7 @@ const productVariants = [
     },
     {
         // Sparrow - Snow
-        sku: "SP-SN",
+        sku: "SPA-SNO-0",
         adminName: "Sparrow - Snow",
         name: "SPARROW - Mini Foldable Learning Tower - Snow",
         price: 1099000,
@@ -223,7 +223,7 @@ const productVariants = [
     },
     {
         // Beak
-        sku: "BE",
+        sku: "BEAK",
         adminName: "Beak",
         name: "BEAK - Wooden Cutting Board & Knife for Kids",
         price: 129000,
@@ -239,7 +239,7 @@ const productVariants = [
         ],
     },
     {
-        sku: "FL-NA-WS",
+        sku: "FAL-NAT-1",
         adminName: "Falcon - Natural (With Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Natural (With Stabiliser)",
         price: 3028000,
@@ -251,7 +251,7 @@ const productVariants = [
         images: [{ publicId: "FALCON-NATURAL_dhaxxh", alt: "Falcon" }],
     },
     {
-        sku: "FL-NA-NS",
+        sku: "FAL-NAT-0",
         adminName: "Falcon - Natural (No Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Natural (No Stabiliser)",
         price: 2899000,
@@ -265,7 +265,7 @@ const productVariants = [
     },
 
     {
-        sku: "FL-SU-WS",
+        sku: "FAL-SUN-1",
         adminName: "Falcon - Sunshine (With Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Sunshine (With Stabiliser)",
         price: 3028000,
@@ -277,7 +277,7 @@ const productVariants = [
         images: [{ publicId: "FALCON-SUNSHINE_l6owdd", alt: "Falcon" }],
     },
     {
-        sku: "FL-SU-NS",
+        sku: "FAL-SUN-0",
         adminName: "Falcon - Sunshine (No Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Sunshine (No Stabiliser)",
         price: 2899000,
@@ -290,7 +290,7 @@ const productVariants = [
     },
 
     {
-        sku: "FL-SI-WS",
+        sku: "FAL-SIL-1",
         adminName: "Falcon - Silver (With Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Silver (With Stabiliser)",
         price: 3028000,
@@ -302,7 +302,7 @@ const productVariants = [
         images: [{ publicId: "FALCON-SILVER_qgb1pj", alt: "Falcon" }],
     },
     {
-        sku: "FL-SI-NS",
+        sku: "FAL-SIL-0",
         adminName: "Falcon - Silver (No Stabiliser)",
         name: "FALCON - Strong & Foldable Learning Tower - Silver (No Stabiliser)",
         price: 2899000,

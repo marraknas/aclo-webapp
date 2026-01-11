@@ -138,43 +138,43 @@ const seedData = async () => {
         // Insert productId mappings for all Product Variants
         const variantsWithProductId = productVariants.map((variant) => {
             const sku = variant.sku;
-            if (sku === "QL-MT") {
+            if (sku === "MIT") {
                 return {
                     ...variant,
                     productId: quillMittens._id,
                 };
             }
-            if (sku.startsWith("QL-") && sku !== "QL-MT") {
+            if (sku.startsWith("QUI-") && sku !== "MIT") {
                 return {
                     ...variant,
                     productId: quill._id,
                 };
             }
-            if (sku.startsWith("ST-")) {
+            if (sku.startsWith("STO-")) {
                 return {
                     ...variant,
                     productId: stork._id,
                 };
             }
-            if (sku.startsWith("FL-")) {
+            if (sku.startsWith("FAL-")) {
                 return {
                     ...variant,
                     productId: falcon._id,
                 };
             }
-            if (sku.startsWith("TA-")) {
+            if (sku.startsWith("TAL-")) {
                 return {
                     ...variant,
                     productId: talon._id,
                 };
             }
-            if (sku.startsWith("SP-")) {
+            if (sku.startsWith("SPA-")) {
                 return {
                     ...variant,
                     productId: sparrow._id,
                 };
             }
-            if (sku === "BE") {
+            if (sku === "BEAK") {
                 return {
                     ...variant,
                     productId: beak._id,
