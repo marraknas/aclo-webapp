@@ -140,7 +140,7 @@ const Checkout = () => {
       {/* Order Summary Section */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl uppercase">Order Summary</h2>
+          <h2 className="text-2xl uppercase text-acloblue">Order Summary</h2>
           <button
             type="button"
             onClick={() => setShowShippingDetailsModal(true)}
@@ -166,73 +166,94 @@ const Checkout = () => {
         )}
 
         {/* Products List */}
-        <div className="border-t border-gray-300 py-4 mb-4">
-          {cart.products.map((product, index) => (
-            <div
-              key={index}
-              className="flex items-start justify-between py-2 border-b border-gray-300"
-            >
-              <div className="flex items-start">
-                <img
-                  src={cloudinaryImageUrl(product.image)}
-                  alt={product.name}
-                  className="w-20 h-24 object-cover mr-4"
-                />
-                <div>
-                  <h3 className="text-md">{product.name}</h3>
-                  {product.options &&
-                    Object.keys(product.options).length > 0 && (
-                      <p className="text-gray-500 text-sm">
-                        {Object.entries(product.options)
-                          .map(([key, value]) => {
-                            const displayValue = String(value);
-                            const label =
-                              key.charAt(0).toUpperCase() + key.slice(1);
-                            return `${label}: ${displayValue}`;
-                          })
-                          .join(" | ")}
-                      </p>
-                    )}
+        <div className="mt-2 rounded-2xl border border-gray-100 overflow-hidden bg-white">
+          <div className="divide-y divide-gray-100">
+            {cart.products.map((product, index) => (
+              <div
+                key={index}
+                className="flex items-start justify-between gap-4 px-5 py-4"
+              >
+                <div className="flex items-start gap-4">
+                  <img
+                    src={cloudinaryImageUrl(product.image)}
+                    alt={product.name}
+                    className="w-20 h-24 object-cover rounded-xl border border-gray-100"
+                  />
+                  <div>
+                    <h3 className="text-[15px] font-medium text-gray-900">
+                      {product.name}
+                    </h3>
+
+                    {product.options &&
+                      Object.keys(product.options).length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {Object.entries(product.options).map(
+                            ([key, value]) => (
+                              <span
+                                key={key}
+                                className="text-xs px-2.5 py-1 rounded-full bg-acloblue/10 text-acloblue"
+                              >
+                                {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
+                                {String(value)}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      )}
+                  </div>
                 </div>
-              </div>
-              <p className="text-xl">IDR {product.price?.toLocaleString()}</p>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between items-center text-lg mb-4">
-          <p>Subtotal</p>
-          <p>IDR {cart.totalPrice?.toLocaleString()}</p>
-        </div>
-        <div className="flex justify-between items-center text-lg mb-4">
-          <p>Shipping</p>
-          <div className="text-right">
-            {selectedShipping ? (
-              <div>
-                <p className="text-xl">
-                  IDR {selectedShipping.price.toLocaleString()}
+
+                <p className="text-xl text-acloblue font-semibold">
+                  IDR {Number(product.price).toLocaleString("id-ID")}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setShowShippingModal(true)}
-                  className="text-sm text-acloblue hover:underline mt-1"
-                >
-                  View Shipping Options
-                </button>
               </div>
-            ) : (
-              <p className="text-gray-500 text-sm">N/A</p>
-            )}
+            ))}
           </div>
         </div>
-        <div className="flex justify-between items-center text-xl font-semibold mt-4 border-t border-gray-300 pt-4">
-          <p>Total</p>
-          <p>
-            IDR{" "}
-            {(
-              cart.totalPrice + (selectedShipping?.price || 0)
-            ).toLocaleString()}
-          </p>
+
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-5">
+          <div className="flex justify-between items-center">
+            <p className="text-gray-700">Subtotal</p>
+            <p className="text-lg font-medium text-gray-900">
+              IDR {Number(cart.totalPrice).toLocaleString("id-ID")}
+            </p>
+          </div>
+
+          <div className="mt-3 flex justify-between items-start">
+            <p className="text-gray-700">Shipping</p>
+            <div className="text-right">
+              {selectedShipping ? (
+                <>
+                  <p className="text-lg font-medium text-gray-900">
+                    IDR {Number(selectedShipping.price).toLocaleString("id-ID")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowShippingModal(true)}
+                    className="mt-1 text-sm text-acloblue hover:underline"
+                  >
+                    View options
+                  </button>
+                </>
+              ) : (
+                <span className="inline-flex items-center text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500">
+                  Select shipping
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <p className="text-lg font-semibold text-gray-900">Total</p>
+            <p className="text-2xl font-semibold text-acloblue">
+              IDR{" "}
+              {Number(
+                cart.totalPrice + (selectedShipping?.price || 0)
+              ).toLocaleString("id-ID")}
+            </p>
+          </div>
         </div>
+
         <div className="mt-6">
           <button
             type="button"
@@ -241,7 +262,7 @@ const Checkout = () => {
               if (id) navigate(`/payment/${id}`);
             }}
             disabled={!selectedShipping}
-            className="w-full bg-black text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition cursor-pointer"
+            className="w-full bg-acloblue text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:opacity-80 transition cursor-pointer"
           >
             Continue to Payment
           </button>
