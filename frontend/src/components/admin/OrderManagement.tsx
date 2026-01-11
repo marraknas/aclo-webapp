@@ -78,20 +78,6 @@ const OrderManagement = () => {
         return (
           <>
             <button
-              onClick={() => handleGenerateLabel(order._id)}
-              disabled={generatingLabelForOrder === order._id}
-              className={`${baseBtn} ${actionBtn.neutral}`}
-            >
-              {generatingLabelForOrder === order._id ? (
-                <>
-                  <AiOutlineLoading3Quarters className="animate-spin mr-2 h-4 w-4" />
-                  Generating...
-                </>
-              ) : (
-                "Generate Label"
-              )}
-            </button>
-            <button
               onClick={() => handleOpenPaymentProof(order)}
               className={`${baseBtn} ${actionBtn.warning}`}
             >
@@ -155,7 +141,7 @@ const OrderManagement = () => {
             <DetailsBtn />
           </>
         );
-      case "cancelled":
+      case "cancelling":
         return (
           <>
             <button className={`${baseBtn} ${actionBtn.warning}`}>
@@ -233,20 +219,6 @@ const OrderManagement = () => {
                   <td className="p-4">
                     <div className="flex flex-wrap gap-2">
                       {renderActionbuttons(order)}
-                      {/* generate label for pending & processing, 
-                      add tracking ID is for processing auto convert to shipping, 
-                      edit tracking ID for shipping, 
-                      see payment proof for pending - modal shows reject/approve, add payment proof inside the order details, 
-                      mark as delivered for shipping, 
-                      canclled is from user side, 
-                      admin side shows accept/reject cancellation. 
-                      user needs to be warned that cancellation can be rejected. */}
-                      {/* pending: see payment proof - accept/reject, generate label, Details
-                      rejected: mark as pending, details
-                      processing: generate label, add tracking id, details
-                      shipping: edit tracking id, mark as delivered, details
-                      delivered: details
-                      cancelled: view cancellation request - accept/reject, details */}
                     </div>
                   </td>
                 </tr>

@@ -37,11 +37,15 @@ export interface Order {
   paymentDetails?: any;
   status:
     | "pending"
-    | "rejected"
     | "processing"
     | "shipping"
+    | "cancelling"
+    | "rejected"
     | "delivered"
-    | "cancelled";
+    | "cancelled"
+    | "returned"
+    | "refunded"
+    | "exchanged";
   createdAt: string;
   updatedAt: string;
 }

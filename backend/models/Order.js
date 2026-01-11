@@ -113,21 +113,20 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            /*
-			pending = user submitted proof, merchant hasn't approved
-			rejected = merchant rejected payment proof - either auto email user / merchant contact buyer
-			processing = proof was accepted, processing for delivery
-			shipping = merchant has passed items to courier
-			delivered = items have been delivered by courier
-			cancelled = user requested to cancel purchase
-			*/
             enum: [
-                "pending",
-                "rejected",
-                "processing",
-                "shipping",
-                "delivered",
-                "cancelled",
+                // in prog orders
+                "pending", // order placed by buyer and pending payment proof approval
+                "processing", // payment proof approved, processing for delivery
+                "shipping", // seller has passed items to courier
+                "cancelling", // user is requesting to cancel order, if approved seller will refund
+                // resolved orders
+                "rejected", // payment proof invalid, auto-email buyer + merchant may contact buyer
+                "delivered", // item has been delivered by courier
+                "cancelled", // order cancelled and money refunded
+                // failed orders - admin manually change to these from Delivered
+                "returned", // item is returned and money refunded
+                "refunded", // buyer keeps item and money refunded
+                "exchanged", // item is returned and seller sends another item
             ],
             default: "pending",
         },
