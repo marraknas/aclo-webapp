@@ -117,6 +117,10 @@ const orderSchema = new mongoose.Schema(
             type: Date,
             required: false,
         },
+        trackingId: {
+            type: String,
+            default: "",
+        },
         deliveredAt: {
             type: Date,
             required: false,

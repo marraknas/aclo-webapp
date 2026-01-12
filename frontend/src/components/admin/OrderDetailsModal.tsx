@@ -83,13 +83,15 @@ const OrderDetailsModal = ({
       <div className="relative w-full max-w-5xl rounded-xl bg-white p-6 shadow-lg border max-h-[85vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500"
+          className="absolute right-6 top-6 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500"
           aria-label="Close"
         >
-          <IoMdClose className="h-6 w-6 hover:text-gray-600 cursor-pointer" />
+          <IoMdClose className="h-8 w-8 hover:text-gray-600 cursor-pointer" />
         </button>
 
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">Order Details</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6 pt-2 pl-2">
+          Order Details
+        </h2>
 
         {!orderDetails ? (
           <p>No Order details found</p>
@@ -171,20 +173,6 @@ const OrderDetailsModal = ({
               </div>
             </div>
 
-            {/* Note to Seller */}
-            <div className="mb-6 border-l-4 border-blue-400 bg-blue-50 px-4 py-3 rounded"> 
-              <h4 className="text-lg font-semibold mb-2">Note to Seller</h4> 
-              <div className="mt-2 bg-gray-50 px-4 py-3 rounded-lg min-h-16"> 
-                {orderDetails.noteToSeller ? ( 
-                  <p className="text-gray-900 whitespace-pre-wrap"> 
-                    {orderDetails.noteToSeller} 
-                  </p> 
-                ) : ( 
-                  <p className="text-gray-400 italic">No note provided</p> 
-                  )} 
-              </div> 
-            </div>
-
             {/* Product List */}
             <div className="overflow-x-auto">
               <h4 className="text-lg font-semibold mb-4">Products</h4>
@@ -228,6 +216,20 @@ const OrderDetailsModal = ({
               </table>
             </div>
 
+            {/* Note to Seller */}
+            <div className="mb-6 border-l-4 border-blue-400 bg-blue-50 px-4 py-3 rounded">
+              <h4 className="text-lg font-semibold mb-2">Note to Seller</h4>
+              <div className="mt-2 bg-gray-50 px-4 py-3 rounded-lg min-h-16">
+                {orderDetails.noteToSeller ? (
+                  <p className="text-gray-900 whitespace-pre-wrap">
+                    {orderDetails.noteToSeller}
+                  </p>
+                ) : (
+                  <p className="text-gray-400 italic">No note provided</p>
+                )}
+              </div>
+            </div>
+
             {/* Proof Preview */}
             {previewOpen && orderDetails.paymentProof?.publicId && (
               <div
@@ -237,7 +239,7 @@ const OrderDetailsModal = ({
                 <div className="relative max-w-7xl max-h-[85vh] w-full h-full flex items-center justify-center">
                   <button
                     onClick={() => setPreviewOpen(false)}
-                    className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+                    className="absolute -top-10 right-0 text-white text-sm px-4 py-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer"
                   >
                     Close
                   </button>
@@ -252,7 +254,7 @@ const OrderDetailsModal = ({
               </div>
             )}
             {/* Admin Remarks */}
-            <div className="mt-8 border-t pt-6">
+            <div className="mt-4">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <h4 className="text-lg font-semibold">Admin Remarks</h4>
 

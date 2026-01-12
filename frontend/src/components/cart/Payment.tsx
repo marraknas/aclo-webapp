@@ -213,7 +213,7 @@ const Payment = () => {
             >
               <button
                 onClick={() => setPreviewOpen(false)}
-                className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+                className="absolute -top-10 right-0 text-white text-sm px-4 py-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer"
               >
                 Close
               </button>
@@ -227,7 +227,9 @@ const Payment = () => {
           </div>
         )}
         <div className="mt-6 mb-4">
-          <div className="block font-semibold mb-2 mt-2">Note to seller (optional):</div>
+          <div className="block font-semibold mb-2 mt-2">
+            Note to seller (optional):
+          </div>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}

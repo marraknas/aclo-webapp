@@ -29,7 +29,8 @@ const OrderManagement = () => {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
     useState<PaymentProof | null>(null);
-  const [selectedCancelRequest, setSelectedCancelRequest] = useState<CancelRequest | null>(null);
+  const [selectedCancelRequest, setSelectedCancelRequest] =
+    useState<CancelRequest | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -66,12 +67,24 @@ const OrderManagement = () => {
     setPaymentProofOpen(true);
   };
 
+  const handleClosePaymentProof = () => {
+    setPaymentProofOpen(false);
+    setSelectedPaymentProof(null);
+    setSelectedOrderId(null);
+  };
+
   const handleOpenCancelRequest = (order: Order) => {
     if (!order.cancelRequest) return; // guard clause
 
     setSelectedCancelRequest(order.cancelRequest);
     setSelectedOrderId(order._id);
     setCancelRequestOpen(true);
+  };
+
+  const handleCloseCancelRequest = () => {
+    setCancelRequestOpen(false);
+    setSelectedCancelRequest(null);
+    setSelectedOrderId(null);
   };
 
   const renderActionbuttons = (order: Order) => {
@@ -84,7 +97,8 @@ const OrderManagement = () => {
       success: "bg-emerald-600 text-white hover:bg-emerald-500",
       milestone: "bg-teal-600 text-white hover:bg-teal-500",
       warning: "bg-amber-500 text-white hover:bg-amber-400",
-      danger: "bg-rose-600 text-white border-rose-600 hover:bg-rose-500",
+      dangerOutline:
+        "bg-white text-rose-700 border-2 border-rose-600 ring-1 ring-rose-200 hover:bg-rose-50 hover:border-rose-700 hover:ring-rose-300",
       infoOutline:
         "bg-white text-blue-700 border-2 border-blue-600 ring-1 ring-blue-200 hover:bg-blue-50 hover:border-blue-700 hover:ring-blue-300",
       neutralOutline:
@@ -107,7 +121,12 @@ const OrderManagement = () => {
       case "rejected":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.neutralOutline}`}>
+            <button
+              onClick={() => {
+                handleStatusChange(order._id, "pending");
+              }}
+              className={`${baseBtn} ${actionBtn.neutralOutline}`}
+            >
               Mark as Pending
             </button>
           </>
@@ -165,7 +184,7 @@ const OrderManagement = () => {
               onClick={() => {
                 handleStatusChange(order._id, "refunded");
               }}
-              className={`${baseBtn} ${actionBtn.danger}`}
+              className={`${baseBtn} ${actionBtn.dangerOutline}`}
             >
               Mark as Refunded
             </button>
@@ -182,8 +201,11 @@ const OrderManagement = () => {
       case "cancelling":
         return (
           <>
-            <button onClick={() => handleOpenCancelRequest(order)} className={`${baseBtn} ${actionBtn.warning}`}>
-              View Cancellation Request
+            <button
+              onClick={() => handleOpenCancelRequest(order)}
+              className={`${baseBtn} ${actionBtn.warning}`}
+            >
+              Cancellation Request
             </button>
           </>
         );
@@ -199,30 +221,34 @@ const OrderManagement = () => {
       {selectedPaymentProof && (
         <ActionModal
           isOpen={paymentProofOpen}
-          onClose={() => {
-            setPaymentProofOpen(false);
-            setSelectedPaymentProof(null);
-            setSelectedOrderId(null);
-          }}
+          onClose={handleClosePaymentProof}
           type="paymentProof"
           data={selectedPaymentProof}
-          onAccept={() => handleStatusChange(selectedOrderId!, "processing")}
-          onReject={() => handleStatusChange(selectedOrderId!, "rejected")}
+          onAccept={() => {
+            handleStatusChange(selectedOrderId!, "processing");
+            handleClosePaymentProof();
+          }}
+          onReject={() => {
+            handleStatusChange(selectedOrderId!, "rejected");
+            handleClosePaymentProof();
+          }}
           loading={loading}
         />
       )}
       {selectedCancelRequest && (
         <ActionModal
           isOpen={cancelRequestOpen}
-          onClose={() => {
-            setCancelRequestOpen(false);
-            setSelectedPaymentProof(null);
-            setSelectedOrderId(null);
-          }}
+          onClose={handleCloseCancelRequest}
           type="cancelRequest"
           data={selectedCancelRequest}
-          onAccept={() => handleStatusChange(selectedOrderId!, "cancelled")}
-          onReject={() => handleStatusChange(selectedOrderId!, "pending")}
+          onAccept={() => {
+            handleStatusChange(selectedOrderId!, "cancelled");
+            handleCloseCancelRequest();
+          }}
+          onReject={() => {
+            handleStatusChange(selectedOrderId!, "pending");
+            handleCloseCancelRequest();
+          }}
           loading={loading}
         />
       )}
@@ -292,7 +318,7 @@ const OrderManagement = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenOrderDetails(order._id)}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 ml-auto"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 cursor-pointer ml-auto"
                         title="View details"
                       >
                         <FaEye className="h-6 w-6" />

@@ -35,16 +35,25 @@ const ActionModal = ({
       <div className="relative w-full max-w-2xl rounded-xl bg-white p-6 shadow-lg border max-h-[80vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500"
+          className="absolute right-4 top-5 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500"
         >
-          <IoMdClose className="h-6 w-6 hover:text-gray-600 cursor-pointer" />
+          <IoMdClose className="h-8 w-8 hover:text-gray-600 cursor-pointer" />
         </button>
 
-        <h2 className="text-2xl uppercase">{type === "paymentProof" ? "Payment Proof" : "Cancellation Request"}</h2>
+        <h2 className="text-2xl uppercase">
+          {type === "paymentProof" ? "Payment Proof" : "Cancellation Request"}
+        </h2>
         {type === "paymentProof" && "publicId" in data && (
           <>
-            <div onClick={() => setPreviewOpen(true)} className="relative w-20 h-24 my-3 cursor-pointer group overflow-hidden">
-              <img src={cloudinaryImageUrl(data.publicId)} alt={data.publicId} className="w-full h-full object-cover" />
+            <div
+              onClick={() => setPreviewOpen(true)}
+              className="relative w-20 h-24 my-3 cursor-pointer group overflow-hidden"
+            >
+              <img
+                src={cloudinaryImageUrl(data.publicId)}
+                alt={data.publicId}
+                className="w-full h-full border-2 rounded-lg object-cover"
+              />
               <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="space-y-4">
@@ -60,14 +69,16 @@ const ActionModal = ({
           </>
         )}
 
-        {type==="cancelRequest" && "reason" in data && (
+        {type === "cancelRequest" && "reason" in data && (
           <>
             <div className="space-y-4">
               <div>
-                <div className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="block text-sm font-medium text-gray-700 mt-4 mb-1">
                   Reason
                 </div>
-                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{data.reason}</p>
+                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  {data.reason}
+                </p>
               </div>
               <div>
                 <div className="block text-sm font-medium text-gray-700 mb-1">
@@ -77,11 +88,9 @@ const ActionModal = ({
                   {new Date(data.createdAt).toLocaleString()}
                 </p>
               </div>
-
             </div>
           </>
         )}
-
 
         <div className="flex gap-3 mt-6">
           <button
@@ -122,7 +131,7 @@ const ActionModal = ({
             <div className="relative max-w-7xl max-h-[85vh] w-full h-full flex items-center justify-center">
               <button
                 onClick={() => setPreviewOpen(false)}
-                className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+                className="absolute -top-10 right-0 text-white text-sm px-4 py-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer"
               >
                 Close
               </button>

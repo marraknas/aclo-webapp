@@ -21,7 +21,12 @@ const orders = [
             uploadedAt: new Date(),
             status: "pending",
         },
-        noteToSeller: "",
+        noteToSeller:
+            "Please ensure that the packaging is water resistant in case of rain as I will not be home when the package arrives.",
+        cancelRequest: {
+            createdAt: new Date(),
+            reason: "I decided that I will not be needing the Learning Tower.",
+        },
 
         totalPrice: 621500,
         isPaid: false,
