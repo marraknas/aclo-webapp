@@ -18,6 +18,11 @@ export interface ShippingDetails {
   phone: string;
 }
 
+export interface CancelRequest {
+  reason: string;
+  createdAt: string;
+}
+
 export interface Order {
   _id: string;
   checkout: string; // checkoutId
@@ -26,6 +31,9 @@ export interface Order {
   shippingDetails: ShippingDetails;
   paymentMethod: string;
   paymentProof?: PaymentProof;
+  noteToSeller?: string;
+  cancelRequest?: CancelRequest;
+  adminRemarks?: string;
   shippingCost?: number;
   shippingMethod?: string;
   shippingCourier?: string;

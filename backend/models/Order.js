@@ -90,6 +90,21 @@ const orderSchema = new mongoose.Schema(
             },
             note: { type: String, default: "" },
         },
+        noteToSeller: {
+            type: String,
+            default: "",
+        },
+        cancelRequest: {
+            type: {
+                reason: { type: String, default: "" },
+                createdAt: { type: Date },
+            },
+            default: undefined,
+        },
+        adminRemarks: {
+            type: String,
+            default: "",
+        },
         totalPrice: {
             type: Number,
             required: true,

@@ -1,10 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useEffect, useState } from "react";
 import {
   fetchAllOrders,
   updateOrderStatus,
   generateShippingLabel,
+  fetchAdminOrderDetails,
+  updateAdminRemarks,
 } from "../../redux/slices/adminOrderSlice";
 import type { Order } from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -12,16 +14,17 @@ import { getStatusBadge } from "../../constants/orderStatus";
 import PaymentProofModal from "./PaymentProofModal";
 import type { PaymentProof } from "../../types/checkout";
 import { FaEye } from "react-icons/fa6";
+import OrderDetailsModal from "./OrderDetailsModal";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const { user } = useAppSelector((state) => state.auth);
-  const { orders, loading, error, generatingLabelForOrder } = useAppSelector(
-    (state) => state.adminOrders
-  );
+  const { orders, loading, error, generatingLabelForOrder, orderDetails } =
+    useAppSelector((state) => state.adminOrders);
   const [paymentProofOpen, setPaymentProofOpen] = useState<boolean>(false);
+  const [orderDetailsOpen, setOrderDetailsOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
     useState<PaymentProof | null>(null);
@@ -42,6 +45,17 @@ const OrderManagement = () => {
     dispatch(generateShippingLabel(orderId));
   };
 
+  const handleOpenOrderDetails = async (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setOrderDetailsOpen(true);
+    dispatch(fetchAdminOrderDetails({ id: orderId }));
+  };
+
+  const handleCloseOrderDetails = () => {
+    setOrderDetailsOpen(false);
+    setSelectedOrderId(null);
+  };
+
   const handleOpenPaymentProof = (order: Order) => {
     if (!order.paymentProof) return; // guard clause
 
@@ -58,19 +72,26 @@ const OrderManagement = () => {
       // primary: "bg-indigo-600 text-white hover:bg-indigo-500",
       primary: "bg-sky-600 text-white hover:bg-sky-500",
       success: "bg-emerald-600 text-white hover:bg-emerald-500",
-      successAlt: "bg-teal-600 text-white hover:bg-teal-500",
+      milestone: "bg-teal-600 text-white hover:bg-teal-500",
       warning: "bg-amber-500 text-white hover:bg-amber-400",
+      danger: "bg-rose-600 text-white border-rose-600 hover:bg-rose-500",
+      infoOutline:
+        "bg-white text-blue-700 border-2 border-blue-600 ring-1 ring-blue-200 hover:bg-blue-50 hover:border-blue-700 hover:ring-blue-300",
+      neutralOutline:
+        "bg-white text-slate-700 border-2 border-slate-600 ring-1 ring-slate-200 hover:bg-slate-100 hover:border-slate-700 hover:ring-slate-300",
       neutral: "bg-slate-200 text-slate-700 hover:bg-slate-300",
     };
 
     const DetailsBtn = () => {
       return (
-        <Link
-          to={`/order/${order._id}`}
+        <button
+          type="button"
+          onClick={() => handleOpenOrderDetails(order._id)}
           className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 ml-auto"
+          title="View details"
         >
           <FaEye className="h-6 w-6" />
-        </Link>
+        </button>
       );
     };
     switch (order.status) {
@@ -89,7 +110,7 @@ const OrderManagement = () => {
       case "rejected":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.warning}`}>
+            <button className={`${baseBtn} ${actionBtn.neutralOutline}`}>
               Mark as Pending
             </button>
             <DetailsBtn />
@@ -101,7 +122,7 @@ const OrderManagement = () => {
             <button
               onClick={() => handleGenerateLabel(order._id)}
               disabled={generatingLabelForOrder === order._id}
-              className={`${baseBtn} ${actionBtn.neutral}`}
+              className={`${baseBtn} ${actionBtn.infoOutline}`}
             >
               {generatingLabelForOrder === order._id ? (
                 <>
@@ -112,7 +133,7 @@ const OrderManagement = () => {
                 "Generate Label"
               )}
             </button>
-            <button className={`${baseBtn} ${actionBtn.success}`}>
+            <button className={`${baseBtn} ${actionBtn.milestone}`}>
               Add Tracking Link
             </button>
             <DetailsBtn />
@@ -125,7 +146,7 @@ const OrderManagement = () => {
               onClick={() => {
                 handleStatusChange(order._id, "delivered");
               }}
-              className={`${baseBtn} ${actionBtn.successAlt}`}
+              className={`${baseBtn} ${actionBtn.success}`}
             >
               Mark as Delivered
             </button>
@@ -138,6 +159,30 @@ const OrderManagement = () => {
       case "delivered":
         return (
           <>
+            <button
+              onClick={() => {
+                handleStatusChange(order._id, "returned");
+              }}
+              className={`${baseBtn} ${actionBtn.neutralOutline}`}
+            >
+              Mark as Returned
+            </button>
+            <button
+              onClick={() => {
+                handleStatusChange(order._id, "refunded");
+              }}
+              className={`${baseBtn} ${actionBtn.danger}`}
+            >
+              Mark as Refunded
+            </button>
+            <button
+              onClick={() => {
+                handleStatusChange(order._id, "exchanged");
+              }}
+              className={`${baseBtn} ${actionBtn.infoOutline}`}
+            >
+              Mark as Exchanged
+            </button>
             <DetailsBtn />
           </>
         );
@@ -147,6 +192,30 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.warning}`}>
               View Cancellation Request
             </button>
+            <DetailsBtn />
+          </>
+        );
+      case "cancelled":
+        return (
+          <>
+            <DetailsBtn />
+          </>
+        );
+      case "returned":
+        return (
+          <>
+            <DetailsBtn />
+          </>
+        );
+      case "refunded":
+        return (
+          <>
+            <DetailsBtn />
+          </>
+        );
+      case "exchanged":
+        return (
+          <>
             <DetailsBtn />
           </>
         );
@@ -169,6 +238,20 @@ const OrderManagement = () => {
           onAccept={() => handleStatusChange(selectedOrderId!, "processing")}
           onReject={() => handleStatusChange(selectedOrderId!, "rejected")}
           loading={loading}
+        />
+      )}
+      {orderDetails && (
+        <OrderDetailsModal
+          isOpen={orderDetailsOpen}
+          onClose={handleCloseOrderDetails}
+          orderDetails={orderDetails}
+          loading={loading}
+          onSaveAdminRemarks={async (orderId, adminRemarks) => {
+            await dispatch(
+              updateAdminRemarks({ id: orderId, adminRemarks })
+            ).unwrap();
+            // await dispatch(fetchAdminOrderDetails({ id: orderId })).unwrap();
+          }}
         />
       )}
       <h2 className="text-2xl font-bold mb-8">Order Management</h2>
