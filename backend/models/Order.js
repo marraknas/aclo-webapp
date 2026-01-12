@@ -88,7 +88,6 @@ const orderSchema = new mongoose.Schema(
                 enum: ["none", "pending", "approved", "rejected"],
                 default: "none",
             },
-            note: { type: String, default: "" },
         },
         noteToSeller: {
             type: String,

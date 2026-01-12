@@ -20,8 +20,8 @@ const orders = [
             publicId: "aclo/dev/payments/baskdpzqrt7gpqzzr5wm",
             uploadedAt: new Date(),
             status: "pending",
-            note: "",
         },
+        noteToSeller: "",
 
         totalPrice: 621500,
         isPaid: false,

@@ -20,7 +20,6 @@ export interface PaymentProof {
   publicId: string;
   uploadedAt: string;
   status: "none" | "pending" | "approved" | "rejected";
-  note: string;
 }
 
 export interface Checkout {
@@ -30,6 +29,7 @@ export interface Checkout {
   shippingDetails: ShippingDetails;
   paymentMethod: string;
   paymentProof?: PaymentProof;
+  noteToSeller?: string;
   totalPrice: number;
   isPaid: boolean; // keep this field but will alw stay false until midtrans implemented
   paidAt?: string;
