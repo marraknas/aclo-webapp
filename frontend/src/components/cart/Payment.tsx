@@ -227,7 +227,7 @@ const Payment = () => {
           </div>
         )}
         <div className="mt-6 mb-4">
-          <div className="block font-semibold mb-2 mt-2">Note (optional)</div>
+          <div className="block font-semibold mb-2 mt-2">Note to seller (optional):</div>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}

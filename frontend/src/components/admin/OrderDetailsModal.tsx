@@ -158,16 +158,6 @@ const OrderDetailsModal = ({
                         ).toLocaleString()}
                       </p>
                     )}
-
-                    <div className="mt-2 bg-gray-50 px-4 py-3 rounded-lg min-h-16">
-                      {orderDetails.paymentProof.note ? (
-                        <p className="text-gray-900 whitespace-pre-wrap">
-                          {orderDetails.paymentProof.note}
-                        </p>
-                      ) : (
-                        <p className="text-gray-400 italic">No note provided</p>
-                      )}
-                    </div>
                   </div>
                 )}
               </div>
@@ -179,6 +169,20 @@ const OrderDetailsModal = ({
                   {`${orderDetails.shippingDetails.address}, ${orderDetails.shippingDetails.city}, ${orderDetails.shippingDetails.postalCode}`}
                 </p>
               </div>
+            </div>
+
+            {/* Note to Seller */}
+            <div className="mb-6 border-l-4 border-blue-400 bg-blue-50 px-4 py-3 rounded"> 
+              <h4 className="text-lg font-semibold mb-2">Note to Seller</h4> 
+              <div className="mt-2 bg-gray-50 px-4 py-3 rounded-lg min-h-16"> 
+                {orderDetails.noteToSeller ? ( 
+                  <p className="text-gray-900 whitespace-pre-wrap"> 
+                    {orderDetails.noteToSeller} 
+                  </p> 
+                ) : ( 
+                  <p className="text-gray-400 italic">No note provided</p> 
+                  )} 
+              </div> 
             </div>
 
             {/* Product List */}
