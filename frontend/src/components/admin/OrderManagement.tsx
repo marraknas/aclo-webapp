@@ -8,10 +8,10 @@ import {
   fetchAdminOrderDetails,
   updateAdminRemarks,
 } from "../../redux/slices/adminOrderSlice";
-import type { Order } from "../../types/order";
+import type { CancelRequest, Order } from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { getStatusBadge } from "../../constants/orderStatus";
-import PaymentProofModal from "./PaymentProofModal";
+import ActionModal from "./ActionModal";
 import type { PaymentProof } from "../../types/checkout";
 import { FaEye } from "react-icons/fa6";
 import OrderDetailsModal from "./OrderDetailsModal";
@@ -24,10 +24,12 @@ const OrderManagement = () => {
   const { orders, loading, error, generatingLabelForOrder, orderDetails } =
     useAppSelector((state) => state.adminOrders);
   const [paymentProofOpen, setPaymentProofOpen] = useState<boolean>(false);
+  const [cancelRequestOpen, setCancelRequestOpen] = useState<boolean>(false);
   const [orderDetailsOpen, setOrderDetailsOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
     useState<PaymentProof | null>(null);
+  const [selectedCancelRequest, setSelectedCancelRequest] = useState<CancelRequest | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -64,6 +66,14 @@ const OrderManagement = () => {
     setPaymentProofOpen(true);
   };
 
+  const handleOpenCancelRequest = (order: Order) => {
+    if (!order.cancelRequest) return; // guard clause
+
+    setSelectedCancelRequest(order.cancelRequest);
+    setSelectedOrderId(order._id);
+    setCancelRequestOpen(true);
+  };
+
   const renderActionbuttons = (order: Order) => {
     // create a common button style
     const baseBtn =
@@ -82,18 +92,6 @@ const OrderManagement = () => {
       neutral: "bg-slate-200 text-slate-700 hover:bg-slate-300",
     };
 
-    const DetailsBtn = () => {
-      return (
-        <button
-          type="button"
-          onClick={() => handleOpenOrderDetails(order._id)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 ml-auto"
-          title="View details"
-        >
-          <FaEye className="h-6 w-6" />
-        </button>
-      );
-    };
     switch (order.status) {
       case "pending":
         return (
@@ -104,7 +102,6 @@ const OrderManagement = () => {
             >
               Payment Proof
             </button>
-            <DetailsBtn />
           </>
         );
       case "rejected":
@@ -113,7 +110,6 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.neutralOutline}`}>
               Mark as Pending
             </button>
-            <DetailsBtn />
           </>
         );
       case "processing":
@@ -136,7 +132,6 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.milestone}`}>
               Add Tracking Link
             </button>
-            <DetailsBtn />
           </>
         );
       case "shipping":
@@ -153,7 +148,6 @@ const OrderManagement = () => {
             <button className={`${baseBtn} ${actionBtn.primary}`}>
               Edit Tracking Link
             </button>
-            <DetailsBtn />
           </>
         );
       case "delivered":
@@ -183,42 +177,18 @@ const OrderManagement = () => {
             >
               Mark as Exchanged
             </button>
-            <DetailsBtn />
           </>
         );
       case "cancelling":
         return (
           <>
-            <button className={`${baseBtn} ${actionBtn.warning}`}>
+            <button onClick={() => handleOpenCancelRequest(order)} className={`${baseBtn} ${actionBtn.warning}`}>
               View Cancellation Request
             </button>
-            <DetailsBtn />
           </>
         );
-      case "cancelled":
-        return (
-          <>
-            <DetailsBtn />
-          </>
-        );
-      case "returned":
-        return (
-          <>
-            <DetailsBtn />
-          </>
-        );
-      case "refunded":
-        return (
-          <>
-            <DetailsBtn />
-          </>
-        );
-      case "exchanged":
-        return (
-          <>
-            <DetailsBtn />
-          </>
-        );
+      default:
+        return null;
     }
   };
 
@@ -227,16 +197,32 @@ const OrderManagement = () => {
   return (
     <div className="max-w-8xl mx-auto p-6">
       {selectedPaymentProof && (
-        <PaymentProofModal
+        <ActionModal
           isOpen={paymentProofOpen}
           onClose={() => {
             setPaymentProofOpen(false);
             setSelectedPaymentProof(null);
             setSelectedOrderId(null);
           }}
-          PaymentProof={selectedPaymentProof}
+          type="paymentProof"
+          data={selectedPaymentProof}
           onAccept={() => handleStatusChange(selectedOrderId!, "processing")}
           onReject={() => handleStatusChange(selectedOrderId!, "rejected")}
+          loading={loading}
+        />
+      )}
+      {selectedCancelRequest && (
+        <ActionModal
+          isOpen={cancelRequestOpen}
+          onClose={() => {
+            setCancelRequestOpen(false);
+            setSelectedPaymentProof(null);
+            setSelectedOrderId(null);
+          }}
+          type="cancelRequest"
+          data={selectedCancelRequest}
+          onAccept={() => handleStatusChange(selectedOrderId!, "cancelled")}
+          onReject={() => handleStatusChange(selectedOrderId!, "pending")}
           loading={loading}
         />
       )}
@@ -302,6 +288,15 @@ const OrderManagement = () => {
                   <td className="p-4">
                     <div className="flex flex-wrap gap-2">
                       {renderActionbuttons(order)}
+                      {/* Details button */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenOrderDetails(order._id)}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded hover:bg-gray-100 ml-auto"
+                        title="View details"
+                      >
+                        <FaEye className="h-6 w-6" />
+                      </button>
                     </div>
                   </td>
                 </tr>

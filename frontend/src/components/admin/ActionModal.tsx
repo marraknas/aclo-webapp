@@ -2,24 +2,27 @@ import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import type { PaymentProof } from "../../types/checkout";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import type { CancelRequest } from "../../types/order";
 
-interface PaymentProofModalProps {
+interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  PaymentProof: PaymentProof;
+  type: "paymentProof" | "cancelRequest";
+  data: PaymentProof | CancelRequest;
   onAccept: () => void;
   onReject: () => void;
   loading: boolean;
 }
 
-const PaymentProofModal = ({
+const ActionModal = ({
   isOpen,
   onClose,
-  PaymentProof,
+  type,
+  data,
   onAccept,
   onReject,
   loading,
-}: PaymentProofModalProps) => {
+}: ActionModalProps) => {
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   if (!isOpen) return null;
 
@@ -37,44 +40,48 @@ const PaymentProofModal = ({
           <IoMdClose className="h-6 w-6 hover:text-gray-600 cursor-pointer" />
         </button>
 
-        <h2 className="text-2xl uppercase">Payment Proof</h2>
-        <div
-          onClick={() => setPreviewOpen(true)}
-          className="relative w-20 h-24 my-3 cursor-pointer group overflow-hidden"
-        >
-          <img
-            src={cloudinaryImageUrl(PaymentProof.publicId)}
-            alt={PaymentProof.publicId}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-1">
-              Uploaded At
+        <h2 className="text-2xl uppercase">{type === "paymentProof" ? "Payment Proof" : "Cancellation Request"}</h2>
+        {type === "paymentProof" && "publicId" in data && (
+          <>
+            <div onClick={() => setPreviewOpen(true)} className="relative w-20 h-24 my-3 cursor-pointer group overflow-hidden">
+              <img src={cloudinaryImageUrl(data.publicId)} alt={data.publicId} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
-              {new Date(PaymentProof.uploadedAt).toLocaleString()}
-            </p>
-          </div>
-
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-1">
-              Customer Note
-            </div>
-            <div className="bg-gray-50 px-4 py-3 rounded-lg min-h-20">
-              {PaymentProof.note ? (
-                <p className="text-gray-900 whitespace-pre-wrap">
-                  {PaymentProof.note}
+            <div className="space-y-4">
+              <div>
+                <div className="block text-sm font-medium text-gray-700 mb-1">
+                  Uploaded At
+                </div>
+                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  {new Date(data.uploadedAt).toLocaleString()}
                 </p>
-              ) : (
-                <p className="text-gray-400 italic">No note provided</p>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
+
+        {type==="cancelRequest" && "reason" in data && (
+          <>
+            <div className="space-y-4">
+              <div>
+                <div className="block text-sm font-medium text-gray-700 mb-1">
+                  Reason
+                </div>
+                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">{data.reason}</p>
+              </div>
+              <div>
+                <div className="block text-sm font-medium text-gray-700 mb-1">
+                  Requested At
+                </div>
+                <p className="text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  {new Date(data.createdAt).toLocaleString()}
+                </p>
+              </div>
+
+            </div>
+          </>
+        )}
+
 
         <div className="flex gap-3 mt-6">
           <button
@@ -107,7 +114,7 @@ const PaymentProofModal = ({
             )}
           </button>
         </div>
-        {previewOpen && PaymentProof && (
+        {previewOpen && type === "paymentProof" && "publicId" in data && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             onClick={() => setPreviewOpen(false)} // click backdrop to close
@@ -121,7 +128,7 @@ const PaymentProofModal = ({
               </button>
 
               <img
-                src={cloudinaryImageUrl(PaymentProof.publicId)}
+                src={cloudinaryImageUrl(data.publicId)}
                 alt="Payment proof preview"
                 className="w-full h-full object-contain rounded-lg"
                 onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
@@ -134,4 +141,4 @@ const PaymentProofModal = ({
   );
 };
 
-export default PaymentProofModal;
+export default ActionModal;
