@@ -7,7 +7,7 @@ import {
   fetchProductVariants,
 } from "../../redux/slices/productsSlice";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
-import QuickPriceModal from "./QuickPriceModal";
+import ChangePriceModal from "./ChangePriceModal";
 
 const ProductManagement = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ const ProductManagement = () => {
   const [activeProductName, setActiveProductName] = useState("");
   const [activeVariants, setActiveVariants] = useState<any[]>([]);
 
-  const openQuickPrice = (
+  const openChangePrice = (
     variantId: string,
     productName: string,
     variants: any[]
@@ -33,7 +33,7 @@ const ProductManagement = () => {
     setPriceModalOpen(true);
   };
 
-  const closeQuickPrice = () => {
+  const closeChangePrice = () => {
     setPriceModalOpen(false);
     setActiveVariantId(null);
     setActiveVariants([]);
@@ -132,7 +132,7 @@ const ProductManagement = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          openQuickPrice(
+                          openChangePrice(
                             defaultVariant._id,
                             product.name,
                             allVariants
@@ -157,12 +157,12 @@ const ProductManagement = () => {
         </table>
       </div>
       {activeVariantId && (
-        <QuickPriceModal
+        <ChangePriceModal
           isOpen={priceModalOpen}
           productName={activeProductName}
           variants={activeVariants}
           initialVariantId={activeVariantId}
-          onClose={closeQuickPrice}
+          onClose={closeChangePrice}
           onSave={async ({ variantId, price, discountPrice }) => {
             console.log({ variantId, price, discountPrice });
           }}
