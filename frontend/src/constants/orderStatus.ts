@@ -1,7 +1,7 @@
-import type { Order } from "../types/order";
+import type { OrderStatus } from "../types/order";
 
 const STATUS_STYLES: Record<
-  Order["status"],
+  OrderStatus,
   { label: string; className: string }
 > = {
   // in prog orders
@@ -51,6 +51,6 @@ const STATUS_STYLES: Record<
   },
 };
 
-export const getStatusBadge = (status: Order["status"]) => {
+export const getStatusBadge = (status: OrderStatus) => {
   return STATUS_STYLES[status ?? "pending"];
 };

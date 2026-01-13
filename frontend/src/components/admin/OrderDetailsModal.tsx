@@ -6,7 +6,6 @@ import { getStatusBadge } from "../../constants/orderStatus";
 import { Link } from "react-router-dom";
 
 interface OrderDetailsModalProps {
-  isOpen: boolean;
   onClose: () => void;
   orderDetails: Order | null;
   loading: boolean;
@@ -14,7 +13,6 @@ interface OrderDetailsModalProps {
 }
 
 const OrderDetailsModal = ({
-  isOpen,
   onClose,
   orderDetails,
   loading,
@@ -69,8 +67,6 @@ const OrderDetailsModal = ({
       setSavingRemarks(false);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div

@@ -23,6 +23,8 @@ export interface CancelRequest {
   createdAt: string;
 }
 
+export type OrderStatus = | "pending" | "processing" | "shipping" | "cancelling" | "rejected" | "delivered" | "cancelled" | "returned" | "refunded" | "exchanged"
+
 export interface Order {
   _id: string;
   checkout: string; // checkoutId
@@ -44,17 +46,7 @@ export interface Order {
   trackingLink?: string;
   deliveredAt?: string;
   paymentDetails?: any;
-  status:
-    | "pending"
-    | "processing"
-    | "shipping"
-    | "cancelling"
-    | "rejected"
-    | "delivered"
-    | "cancelled"
-    | "returned"
-    | "refunded"
-    | "exchanged";
+  status: OrderStatus
   createdAt: string;
   updatedAt: string;
 }

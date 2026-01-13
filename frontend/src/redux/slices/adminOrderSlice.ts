@@ -5,7 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { API_URL, getAuthHeader } from "../../constants/api";
-import type { Order } from "../../types/order";
+import type { Order, OrderStatus } from "../../types/order";
 import type { AppError } from "../../types/error";
 
 interface AdminOrderState {
@@ -128,7 +128,7 @@ export const updateTrackingLink = createAsyncThunk<
 // async thunk to update order delivery status (admin only)
 export const updateOrderStatus = createAsyncThunk<
   Order,
-  { id: string; status: Order["status"] },
+  { id: string; status: OrderStatus },
   { rejectValue: AppError }
 >(
   "adminOrders/updateOrderStatus",

@@ -9,7 +9,7 @@ import {
   updateAdminRemarks,
   updateTrackingLink,
 } from "../../redux/slices/adminOrderSlice";
-import type { CancelRequest, Order } from "../../types/order";
+import type { CancelRequest, Order, OrderStatus } from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { getStatusBadge } from "../../constants/orderStatus";
 import ActionModal from "./ActionModal";
@@ -17,6 +17,7 @@ import type { PaymentProof } from "../../types/checkout";
 import { FaEye } from "react-icons/fa6";
 import OrderDetailsModal from "./OrderDetailsModal";
 import TrackingModal from "./TrackingModal";
+import ActionConfirmationModal from "./ActionConfirmationModal";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +37,7 @@ const OrderManagement = () => {
   const [cancelRequestOpen, setCancelRequestOpen] = useState<boolean>(false);
   const [orderDetailsOpen, setOrderDetailsOpen] = useState<boolean>(false);
   const [trackingModalOpen, setTrackingModalOpen] = useState<boolean>(false);
+  const [actionConfirmationModalOpen, setActionConfirmationModalOpen] = useState<boolean>(false);
   const [trackingAction, setTrackingAction] = useState<"add" | "edit">("add");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
@@ -44,6 +46,7 @@ const OrderManagement = () => {
     useState<CancelRequest | null>(null);
   const [selectedOrderTrackingLink, setSelectedOrderTrackingLink] =
     useState<string>("");
+  const [pendingAction, setPendingAction] = useState<{orderId: string, targetStatus: OrderStatus, title: string, message: string} | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -53,7 +56,7 @@ const OrderManagement = () => {
     }
   }, [dispatch, user, navigate]);
 
-  const handleStatusChange = (orderId: string, status: Order["status"]) => {
+  const handleStatusChange = (orderId: string, status: OrderStatus) => {
     dispatch(updateOrderStatus({ id: orderId, status }));
   };
 
@@ -120,7 +123,24 @@ const OrderManagement = () => {
     setSelectedOrderId(null);
   };
 
-  const renderActionbuttons = (order: Order) => {
+  const handleOpenActionConfirmation = (orderId: string, targetStatus: OrderStatus, title: string, message: string) => {
+    setPendingAction({orderId, targetStatus, title, message});
+    setActionConfirmationModalOpen(true);
+  }
+
+  const handleCloseActionConfirmation = () => {
+    setActionConfirmationModalOpen(false);
+    setPendingAction(null);
+  }
+
+  const handleConfirmationAction = () => {
+    if (pendingAction) {
+      handleStatusChange(pendingAction.orderId, pendingAction.targetStatus);
+      handleCloseActionConfirmation();
+    }
+  }
+
+  const renderActionButtons = (order: Order) => {
     // create a common button style
     const baseBtn =
       "px-4 py-2 rounded-md flex items-center text-sm font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
@@ -156,7 +176,12 @@ const OrderManagement = () => {
           <>
             <button
               onClick={() => {
-                handleStatusChange(order._id, "pending");
+                handleOpenActionConfirmation(
+                  order._id,
+                  "pending",
+                  "Mark as Pending",
+                  `Are you sure you want to mark this order as **Pending**?.`
+                )
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
             >
@@ -257,9 +282,8 @@ const OrderManagement = () => {
   if (error) return <p>Error: {error}</p>;
   return (
     <div className="max-w-8xl mx-auto p-6">
-      {selectedPaymentProof && (
+      {selectedPaymentProof && paymentProofOpen && (
         <ActionModal
-          isOpen={paymentProofOpen}
           onClose={handleClosePaymentProof}
           type="paymentProof"
           data={selectedPaymentProof}
@@ -274,9 +298,8 @@ const OrderManagement = () => {
           loading={loading}
         />
       )}
-      {selectedCancelRequest && (
+      {selectedCancelRequest && cancelRequestOpen && (
         <ActionModal
-          isOpen={cancelRequestOpen}
           onClose={handleCloseCancelRequest}
           type="cancelRequest"
           data={selectedCancelRequest}
@@ -291,9 +314,8 @@ const OrderManagement = () => {
           loading={loading}
         />
       )}
-      {orderDetails && (
+      {orderDetails && orderDetailsOpen && (
         <OrderDetailsModal
-          isOpen={orderDetailsOpen}
           onClose={handleCloseOrderDetails}
           orderDetails={orderDetails}
           loading={orderDetailsLoading}
@@ -301,7 +323,6 @@ const OrderManagement = () => {
             await dispatch(
               updateAdminRemarks({ id: orderId, adminRemarks })
             ).unwrap();
-            // await dispatch(fetchAdminOrderDetails({ id: orderId })).unwrap();
           }}
         />
       )}
@@ -318,6 +339,15 @@ const OrderManagement = () => {
             ).unwrap();
             handleCloseTrackingModal();
           }}
+        />
+      )}
+      {actionConfirmationModalOpen && pendingAction && (
+        <ActionConfirmationModal
+          onClose={handleCloseActionConfirmation}
+          onConfirm={handleConfirmationAction}
+          title={pendingAction.title}
+          message={pendingAction.message}
+          loading={loading}
         />
       )}
 
@@ -368,7 +398,7 @@ const OrderManagement = () => {
                   </td>
                   <td className="p-4">
                     <div className="flex flex-wrap gap-2">
-                      {renderActionbuttons(order)}
+                      {renderActionButtons(order)}
                       {/* Details button */}
                       <button
                         type="button"
