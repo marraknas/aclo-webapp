@@ -61,7 +61,7 @@ router.put("/:id/remarks", protect, admin, async (req, res) => {
 // @route PUT /api/admin/orders/:id/trackingLink
 // @desc Update order tracking Id
 // @access Private/Admin
-router.put("/:id/remarks", protect, admin, async (req, res) => {
+router.put("/:id/trackingLink", protect, admin, async (req, res) => {
     try {
         const { trackingLink } = req.body;
 

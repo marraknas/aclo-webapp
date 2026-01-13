@@ -18,6 +18,7 @@ import { FaEye } from "react-icons/fa6";
 import OrderDetailsModal from "./OrderDetailsModal";
 import TrackingModal from "./TrackingModal";
 import ActionConfirmationModal from "./ActionConfirmationModal";
+import RemarksModal from "./RemarksModal";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +38,7 @@ const OrderManagement = () => {
   const [cancelRequestOpen, setCancelRequestOpen] = useState<boolean>(false);
   const [orderDetailsOpen, setOrderDetailsOpen] = useState<boolean>(false);
   const [trackingModalOpen, setTrackingModalOpen] = useState<boolean>(false);
+  const [remarksModalOpen, setRemarksModalOpen] = useState<boolean>(false);
   const [actionConfirmationModalOpen, setActionConfirmationModalOpen] = useState<boolean>(false);
   const [trackingAction, setTrackingAction] = useState<"add" | "edit">("add");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -128,6 +130,16 @@ const OrderManagement = () => {
     setSelectedOrderTrackingLink("");
     setSelectedOrderId(null);
   };
+
+  const handleOpenRemarksModal = (order: Order) => {
+    setRemarksModalOpen(true);
+    setSelectedOrderId(order._id);
+  }
+
+  const handleCloseRemarksModal = () => {
+    setSelectedOrderId(null);
+    setRemarksModalOpen(false);
+  }
 
   const handleOpenActionConfirmationModal = (orderId: string, targetStatus: OrderStatus, title: string, message: string, onAfterConfirm?: () => void) => {
     setPendingAction({orderId, targetStatus, title, message, onAfterConfirm});
@@ -252,39 +264,48 @@ const OrderManagement = () => {
         return (
           <>
             <button
+              // onClick={() => {
+              //   handleOpenActionConfirmationModal(
+              //     order._id,
+              //     "returned",
+              //     "Mark as Returned",
+              //     `Are you sure you want to mark this order as **Returned**?`
+              //   )
+              // }}
               onClick={() => {
-                handleOpenActionConfirmationModal(
-                  order._id,
-                  "returned",
-                  "Mark as Returned",
-                  `Are you sure you want to mark this order as **Returned**?`
-                )
+                handleOpenRemarksModal(order);
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
             >
               Mark as Returned
             </button>
             <button
+              // onClick={() => {
+              //   handleOpenActionConfirmationModal(
+              //     order._id,
+              //     "refunded",
+              //     "Mark as Refunded",
+              //     `Are you sure you want to mark this order as **Refunded**?`,
+              //   )
+              // }}
               onClick={() => {
-                handleOpenActionConfirmationModal(
-                  order._id,
-                  "refunded",
-                  "Mark as Refunded",
-                  `Are you sure you want to mark this order as **Refunded**?`
-                )
+                handleOpenRemarksModal(order);
               }}
               className={`${baseBtn} ${actionBtn.dangerOutline}`}
             >
               Mark as Refunded
             </button>
             <button
+              // onClick={() => {
+              //   handleOpenActionConfirmationModal(
+              //     order._id,
+              //     "exchanged",
+              //     "Mark as Exchanged",
+              //     `Are you sure you want to mark this order as **Exchanged**?`
+              //   )
+              // }}
               onClick={() => {
-                handleOpenActionConfirmationModal(
-                  order._id,
-                  "exchanged",
-                  "Mark as Exchanged",
-                  `Are you sure you want to mark this order as **Exchanged**?`
-                )
+                handleOpenRemarksModal(order);
               }}
               className={`${baseBtn} ${actionBtn.infoOutline}`}
             >
@@ -385,6 +406,16 @@ const OrderManagement = () => {
               updateTrackingLink({ id: selectedOrderId, trackingLink })
             ).unwrap();
             handleCloseTrackingModal();
+          }}
+        />
+      )}
+      {remarksModalOpen && selectedOrderId && (
+        <RemarksModal 
+          orderId={selectedOrderId}
+          onClose={handleCloseRemarksModal}
+          onSave={async (orderId, adminRemarks) => {
+            await dispatch(updateAdminRemarks({id: orderId, adminRemarks: adminRemarks})).unwrap();
+            handleCloseRemarksModal();
           }}
         />
       )}
