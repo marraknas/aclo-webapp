@@ -129,8 +129,6 @@ const Checkout = () => {
   const handleShippingDetailsSubmit = async (
     shippingDetails: ShippingDetails
   ) => {
-    setShippingDetails(shippingDetails);
-
     if (!cart || !cart.products || cart.products.length === 0) {
       return;
     }
@@ -167,6 +165,8 @@ const Checkout = () => {
       console.error("Error in handleShippingDetails:", error);
       throw error;
     }
+    
+    setShippingDetails(shippingDetails);
   };
 
   const handleCreateCheckout = async () => {
