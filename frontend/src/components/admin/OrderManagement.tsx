@@ -58,7 +58,7 @@ const OrderManagement = () => {
                   className="border-b hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
-                    #{order._id}
+                    #{order.orderId}
                   </td>
                   <td className="p-4">
                     {typeof order.user === "string"

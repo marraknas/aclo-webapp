@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const { generateOrderId } = require("../utils/generateOrderId");
+
 const orderItemSchema = new mongoose.Schema(
     {
         productId: {
@@ -43,6 +45,11 @@ const orderItemSchema = new mongoose.Schema(
 // NEED TO ADD SHIPPING METHOD
 const orderSchema = new mongoose.Schema(
     {
+        orderId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -137,5 +144,10 @@ const orderSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+orderSchema.pre("validate", async function () {
+    if (this.orderId) return;
+    this.orderId = await generateOrderId();
+});
 
 module.exports = mongoose.model("Order", orderSchema);

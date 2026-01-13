@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const { generateOrderId } = require("../utils/generateOrderId");
+
 const checkoutItemSchema = new mongoose.Schema(
     {
         productId: {
@@ -38,6 +40,11 @@ const checkoutItemSchema = new mongoose.Schema(
 
 const checkoutSchema = new mongoose.Schema(
     {
+        orderId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -112,5 +119,10 @@ const checkoutSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+checkoutSchema.pre("validate", async function () {
+    if (this.orderId) return;
+    this.orderId = await generateOrderId();
+});
 
 module.exports = mongoose.model("Checkout", checkoutSchema);
