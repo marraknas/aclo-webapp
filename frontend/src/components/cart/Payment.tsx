@@ -7,6 +7,7 @@ import LoadingOverlay from "../common/LoadingOverlay";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 import { fetchCheckoutById } from "../../redux/slices/checkoutSlice";
 import { clearCart } from "../../redux/slices/cartSlice";
+import Navbar from "../common/Navbar";
 
 const REDIRECT_AFTER_MS = 2000;
 
@@ -135,121 +136,124 @@ const Payment = () => {
 
   if (error) return <p>Error: {error}</p>;
   return (
-    <div className="flex justify-center px-4 py-10">
-      <LoadingOverlay show={checkoutLoading} />
-      <div className="max-w-4xl border-black border-2 rounded-lg mx-auto py-10 px-6 tracking-tighter">
-        <div className="text-3xl uppercase mb-4 text-acloblue">
-          Payment Instructions
-        </div>
-        <div className="text-xl mb-2">
-          Your total purchase cost is{" "}
-          <span className="font-semibold">
-            IDR {(checkout?.totalPrice ?? 0).toLocaleString("id-ID")}
-          </span>
-          .
-        </div>
-        <div className="text-xl mb-6">
-          Please do a bank transfer to this account xxxxxxxxxxxxx and upload a
-          screenshot of the proof of transaction. If a proof of transaction is
-          not provided or is deemed invalid, we cannot process your order.
-        </div>
-        {uploading && <p>Uploading image...</p>}
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="bg-acloblue/80 text-white py-2 px-4 rounded hover:bg-acloblue cursor-pointer"
-        >
-          Choose file
-        </button>
-
-        <span className="ml-3 text-sm text-gray-600">
-          {uploadedFileName ? uploadedFileName : "No file selected"}
-        </span>
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
-        {screenshot && (
-          <div>
-            <p className="text-base text-gray-600 mt-2 mb-2">
-              Uploaded screenshot
-            </p>
-            <div className="relative inline-block group">
-              <img
-                src={cloudinaryImageUrl(screenshot)}
-                alt="Uploaded screenshot"
-                className="w-32 h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
-                onClick={() => setPreviewOpen(true)}
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteScreenshot();
-                }}
-                disabled={deleting}
-                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-200 text-black disabled:opacity-50"
-              >
-                x
-              </button>
-              {deleting && (
-                <div className="absolute inset-0 rounded-lg bg-black/30 flex items-center justify-center text-white text-xs">
-                  Deleting...
-                </div>
-              )}
-            </div>
+    <>
+      <Navbar />
+      <div className="flex justify-center px-4 py-10">
+        <LoadingOverlay show={checkoutLoading} />
+        <div className="max-w-4xl border-black border-2 rounded-lg mx-auto py-10 px-6 tracking-tighter">
+          <div className="text-3xl uppercase mb-4 text-acloblue">
+            Payment Instructions
           </div>
-        )}
-        {previewOpen && screenshot && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={() => setPreviewOpen(false)} // click backdrop to close
+          <div className="text-xl mb-2">
+            Your total purchase cost is{" "}
+            <span className="font-semibold">
+              IDR {(checkout?.totalPrice ?? 0).toLocaleString("id-ID")}
+            </span>
+            .
+          </div>
+          <div className="text-xl mb-6">
+            Please do a bank transfer to this account xxxxxxxxxxxxx and upload a
+            screenshot of the proof of transaction. If a proof of transaction is
+            not provided or is deemed invalid, we cannot process your order.
+          </div>
+          {uploading && <p>Uploading image...</p>}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-acloblue/80 text-white py-2 px-4 rounded hover:bg-acloblue cursor-pointer"
           >
-            <div
-              className="relative max-w-4xl w-full"
-              onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
-            >
-              <button
-                onClick={() => setPreviewOpen(false)}
-                className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
-              >
-                Close
-              </button>
+            Choose file
+          </button>
 
-              <img
-                src={cloudinaryImageUrl(screenshot)}
-                alt="Uploaded screenshot preview"
-                className="w-full max-h-[85vh] object-contain rounded-lg"
-              />
+          <span className="ml-3 text-sm text-gray-600">
+            {uploadedFileName ? uploadedFileName : "No file selected"}
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          {screenshot && (
+            <div>
+              <p className="text-base text-gray-600 mt-2 mb-2">
+                Uploaded screenshot
+              </p>
+              <div className="relative inline-block group">
+                <img
+                  src={cloudinaryImageUrl(screenshot)}
+                  alt="Uploaded screenshot"
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
+                  onClick={() => setPreviewOpen(true)}
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteScreenshot();
+                  }}
+                  disabled={deleting}
+                  className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-200 text-black disabled:opacity-50"
+                >
+                  x
+                </button>
+                {deleting && (
+                  <div className="absolute inset-0 rounded-lg bg-black/30 flex items-center justify-center text-white text-xs">
+                    Deleting...
+                  </div>
+                )}
+              </div>
             </div>
+          )}
+          {previewOpen && screenshot && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+              onClick={() => setPreviewOpen(false)} // click backdrop to close
+            >
+              <div
+                className="relative max-w-4xl w-full"
+                onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
+              >
+                <button
+                  onClick={() => setPreviewOpen(false)}
+                  className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+                >
+                  Close
+                </button>
+
+                <img
+                  src={cloudinaryImageUrl(screenshot)}
+                  alt="Uploaded screenshot preview"
+                  className="w-full max-h-[85vh] object-contain rounded-lg"
+                />
+              </div>
+            </div>
+          )}
+          <div className="mt-6 mb-4">
+            <div className="block font-semibold mb-2 mt-2">Note (optional)</div>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2"
+              rows={2}
+              required
+            ></textarea>
           </div>
-        )}
-        <div className="mt-6 mb-4">
-          <div className="block font-semibold mb-2 mt-2">Note (optional)</div>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2"
-            rows={2}
-            required
-          ></textarea>
+          <div className="text-base text-gray-500 mt-4 mb-2">
+            After payment, we will confirm your transaction and create your
+            order within 1-2 business days.
+          </div>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={screenshot.length === 0 || submitting || !checkout?._id}
+            className="w-full bg-acloblue/80 text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-acloblue transition cursor-pointer"
+          >
+            {submitting ? "Submitting..." : "Submit"}
+          </button>
         </div>
-        <div className="text-base text-gray-500 mt-4 mb-2">
-          After payment, we will confirm your transaction and create your order
-          within 1-2 business days.
-        </div>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={screenshot.length === 0 || submitting || !checkout?._id}
-          className="w-full bg-acloblue/80 text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-acloblue transition cursor-pointer"
-        >
-          {submitting ? "Submitting..." : "Submit"}
-        </button>
       </div>
-    </div>
+    </>
   );
 };
 
