@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { deleteProduct } from "../../redux/slices/adminProductSlice";
 import {
   fetchProducts,
   fetchProductVariants,
 } from "../../redux/slices/productsSlice";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import QuickPriceModal from "./QuickPriceModal";
 
 const ProductManagement = () => {
   const dispatch = useAppDispatch();
@@ -15,6 +16,36 @@ const ProductManagement = () => {
   const { products, productVariants, loading, error } = useAppSelector(
     (state) => state.products
   );
+
+  const [priceModalOpen, setPriceModalOpen] = useState(false);
+  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
+  const [activeProductName, setActiveProductName] = useState("");
+  const [activePrice, setActivePrice] = useState<number | undefined>(undefined);
+  const [activeDiscount, setActiveDiscount] = useState<
+    number | null | undefined
+  >(undefined);
+  const [activeVariants, setActiveVariants] = useState<any[]>([]);
+
+  const openQuickPrice = (
+    variantId: string,
+    productName: string,
+    variants: any[],
+    price?: number,
+    discountPrice?: number | null
+  ) => {
+    setActiveVariantId(variantId);
+    setActiveProductName(productName);
+    setActiveVariants(variants);
+    setActivePrice(price);
+    setActiveDiscount(discountPrice ?? null);
+    setPriceModalOpen(true);
+  };
+
+  const closeQuickPrice = () => {
+    setPriceModalOpen(false);
+    setActiveVariantId(null);
+    setActiveVariants([]);
+  };
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -101,9 +132,25 @@ const ProductManagement = () => {
                       </Link>
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        className="bg-red-500 text-white px-2 py-1 rounded mr-2 hover:bg-red-600"
                       >
                         Delete
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openQuickPrice(
+                            defaultVariant._id,
+                            product.name,
+                            allVariants,
+                            defaultVariant.price,
+                            defaultVariant.discountPrice ?? null
+                          );
+                        }}
+                        className="bg-acloblue text-white px-2 py-1 rounded mr-2 hover:opacity-90"
+                      >
+                        Quick Price
                       </button>
                     </td>
                   </tr>
@@ -119,6 +166,20 @@ const ProductManagement = () => {
           </tbody>
         </table>
       </div>
+      {activeVariantId && (
+        <QuickPriceModal
+          isOpen={priceModalOpen}
+          productName={activeProductName}
+          variants={activeVariants}
+          initialVariantId={activeVariantId}
+          onClose={closeQuickPrice}
+          onSave={async ({ variantId, price, discountPrice }) => {
+            console.log({ variantId, price, discountPrice });
+          }}
+
+          // TODO: actually update the price
+        />
+      )}
     </div>
   );
 };

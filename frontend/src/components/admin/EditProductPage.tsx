@@ -386,8 +386,8 @@ const EditProductPage = () => {
           <label className="block font-semibold mb-2">Discounted Price</label>
           <input
             type="number"
-            name="price"
-            value={displayPrice}
+            name="discountPrice"
+            value={productVariantData.discountPrice ?? ""}
             onChange={handleVariantChange}
             className="w-full border border-gray-300 rounded-md p-2"
           />
