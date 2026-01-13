@@ -5,10 +5,10 @@ import type { Order } from "../../types/order";
 import { getStatusBadge } from "../../constants/orderStatus";
 import { Link } from "react-router-dom";
 
-interface OrderDetailsProofModalProps {
+interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  orderDetails: Order;
+  orderDetails: Order | null;
   loading: boolean;
   onSaveAdminRemarks?: (orderId: string, adminRemarks: string) => Promise<void>;
 }
@@ -19,7 +19,7 @@ const OrderDetailsModal = ({
   orderDetails,
   loading,
   onSaveAdminRemarks,
-}: OrderDetailsProofModalProps) => {
+}: OrderDetailsModalProps) => {
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [isEditingRemarks, setIsEditingRemarks] = useState(false);
   const [remarksDraft, setRemarksDraft] = useState("");
@@ -71,7 +71,6 @@ const OrderDetailsModal = ({
   };
 
   if (!isOpen) return null;
-  if (loading) return <div>Loading..</div>;
 
   return (
     <div
@@ -93,7 +92,11 @@ const OrderDetailsModal = ({
           Order Details
         </h2>
 
-        {!orderDetails ? (
+        {loading ? (
+          <div className="p-6 rounded-lg border bg-gray-50 text-gray-700">
+            Loading Order Details...
+          </div>
+        ) : !orderDetails ? (
           <p>No Order details found</p>
         ) : (
           <div className="p-4 sm:p-6 rounded-lg border">

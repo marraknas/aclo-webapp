@@ -41,7 +41,7 @@ export interface Order {
   totalPrice: number;
   isPaid: boolean; // not used until midtrans
   paidAt?: string;
-  trackingId?: string;
+  trackingLink?: string;
   deliveredAt?: string;
   paymentDetails?: any;
   status:

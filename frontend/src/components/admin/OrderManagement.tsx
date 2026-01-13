@@ -7,6 +7,7 @@ import {
   generateShippingLabel,
   fetchAdminOrderDetails,
   updateAdminRemarks,
+  updateTrackingLink,
 } from "../../redux/slices/adminOrderSlice";
 import type { CancelRequest, Order } from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -15,22 +16,34 @@ import ActionModal from "./ActionModal";
 import type { PaymentProof } from "../../types/checkout";
 import { FaEye } from "react-icons/fa6";
 import OrderDetailsModal from "./OrderDetailsModal";
+import TrackingModal from "./TrackingModal";
 
 const OrderManagement = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const { user } = useAppSelector((state) => state.auth);
-  const { orders, loading, error, generatingLabelForOrder, orderDetails } =
-    useAppSelector((state) => state.adminOrders);
+  const {
+    orders,
+    loading,
+    orderDetailsLoading,
+    trackingLinkLoading,
+    error,
+    generatingLabelForOrder,
+    orderDetails,
+  } = useAppSelector((state) => state.adminOrders);
   const [paymentProofOpen, setPaymentProofOpen] = useState<boolean>(false);
   const [cancelRequestOpen, setCancelRequestOpen] = useState<boolean>(false);
-  const [orderDetailsOpen, setOrderDetailsOpen] = useState(false);
+  const [orderDetailsOpen, setOrderDetailsOpen] = useState<boolean>(false);
+  const [trackingModalOpen, setTrackingModalOpen] = useState<boolean>(false);
+  const [trackingAction, setTrackingAction] = useState<"add" | "edit">("add");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
     useState<PaymentProof | null>(null);
   const [selectedCancelRequest, setSelectedCancelRequest] =
     useState<CancelRequest | null>(null);
+  const [selectedOrderTrackingLink, setSelectedOrderTrackingLink] =
+    useState<string>("");
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -84,6 +97,26 @@ const OrderManagement = () => {
   const handleCloseCancelRequest = () => {
     setCancelRequestOpen(false);
     setSelectedCancelRequest(null);
+    setSelectedOrderId(null);
+  };
+
+  const handleOpenAddTracking = (order: Order) => {
+    setTrackingAction("add");
+    setSelectedOrderId(order._id);
+    setSelectedOrderTrackingLink(""); // add starts blank
+    setTrackingModalOpen(true);
+  };
+
+  const handleOpenEditTracking = (order: Order) => {
+    setTrackingAction("edit");
+    setSelectedOrderId(order._id);
+    setSelectedOrderTrackingLink(order.trackingLink ?? ""); // edit prefilled
+    setTrackingModalOpen(true);
+  };
+
+  const handleCloseTrackingModal = () => {
+    setTrackingModalOpen(false);
+    setSelectedOrderTrackingLink("");
     setSelectedOrderId(null);
   };
 
@@ -148,7 +181,10 @@ const OrderManagement = () => {
                 "Generate Label"
               )}
             </button>
-            <button className={`${baseBtn} ${actionBtn.milestone}`}>
+            <button
+              onClick={() => handleOpenAddTracking(order)}
+              className={`${baseBtn} ${actionBtn.milestone}`}
+            >
               Add Tracking Link
             </button>
           </>
@@ -164,7 +200,10 @@ const OrderManagement = () => {
             >
               Mark as Delivered
             </button>
-            <button className={`${baseBtn} ${actionBtn.primary}`}>
+            <button
+              onClick={() => handleOpenEditTracking(order)}
+              className={`${baseBtn} ${actionBtn.primary}`}
+            >
               Edit Tracking Link
             </button>
           </>
@@ -257,7 +296,7 @@ const OrderManagement = () => {
           isOpen={orderDetailsOpen}
           onClose={handleCloseOrderDetails}
           orderDetails={orderDetails}
-          loading={loading}
+          loading={orderDetailsLoading}
           onSaveAdminRemarks={async (orderId, adminRemarks) => {
             await dispatch(
               updateAdminRemarks({ id: orderId, adminRemarks })
@@ -266,6 +305,22 @@ const OrderManagement = () => {
           }}
         />
       )}
+      {trackingModalOpen && selectedOrderId && (
+        <TrackingModal
+          action={trackingAction}
+          initialValue={selectedOrderTrackingLink}
+          onClose={handleCloseTrackingModal}
+          onCancel={handleCloseTrackingModal}
+          loading={trackingLinkLoading}
+          onSaveTrackingLink={async (trackingLink) => {
+            await dispatch(
+              updateTrackingLink({ id: selectedOrderId, trackingLink })
+            ).unwrap();
+            handleCloseTrackingModal();
+          }}
+        />
+      )}
+
       <h2 className="text-2xl font-bold mb-8">Order Management</h2>
       <h3 className="text-xl font-bold mb-6">Pending Orders</h3>
       <h3 className="text-xl font-bold mb-6">All Orders</h3>

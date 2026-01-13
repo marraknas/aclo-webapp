@@ -12,7 +12,9 @@ interface AdminOrderState {
   orders: Order[];
   totalOrders: number;
   totalSales: number;
-  loading: boolean;
+  loading: boolean; // for Order Management page
+  orderDetailsLoading: boolean; // for Order Details modal
+  trackingLinkLoading: boolean; // for Tracking Link modal
   error: string | null;
   generatingLabelForOrder: string | null;
   orderDetails: Order | null;
@@ -23,6 +25,8 @@ const initialState: AdminOrderState = {
   totalOrders: 0,
   totalSales: 0,
   loading: false,
+  orderDetailsLoading: false,
+  trackingLinkLoading: false,
   error: null,
   generatingLabelForOrder: null,
   orderDetails: null,
@@ -92,6 +96,31 @@ export const updateAdminRemarks = createAsyncThunk<
         return rejectWithValue(error.response.data);
       }
       return rejectWithValue({ message: "Failed to update admin remarks" });
+    }
+  }
+);
+
+// async thunk to update order trackingLink (admin only)
+export const updateTrackingLink = createAsyncThunk<
+  Order,
+  { id: string; trackingLink: string },
+  { rejectValue: AppError }
+>(
+  "adminOrders/updateTrackingLink",
+  async ({ id, trackingLink }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put<Order>(
+        `${API_URL}/api/admin/orders/${id}/trackingLink`,
+        { trackingLink },
+        { headers: getAuthHeader() }
+      );
+      return response.data; // updated order
+    } catch (err) {
+      const error = err as AxiosError<AppError>;
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue({ message: "Failed to update trackingId" });
     }
   }
 );
@@ -196,7 +225,6 @@ const adminOrderSlice = createSlice({
       .addCase(
         fetchAllOrders.fulfilled,
         (state, action: PayloadAction<Order[]>) => {
-          state.loading = false;
           state.orders = action.payload;
           state.totalOrders = action.payload.length;
 
@@ -205,6 +233,7 @@ const adminOrderSlice = createSlice({
             return acc + order.totalPrice;
           }, 0);
           state.totalSales = totalSales;
+          state.loading = false;
         }
       )
       .addCase(fetchAllOrders.rejected, (state, action) => {
@@ -213,18 +242,18 @@ const adminOrderSlice = createSlice({
       })
       // fetch admin order details
       .addCase(fetchAdminOrderDetails.pending, (state) => {
-        state.loading = true;
+        state.orderDetailsLoading = true;
         state.error = null;
       })
       .addCase(
         fetchAdminOrderDetails.fulfilled,
         (state, action: PayloadAction<Order>) => {
-          state.loading = false;
+          state.orderDetailsLoading = false;
           state.orderDetails = action.payload;
         }
       )
       .addCase(fetchAdminOrderDetails.rejected, (state, action) => {
-        state.loading = false;
+        state.orderDetailsLoading = false;
         state.error =
           action.payload?.message || "Failed to fetch admin order details";
       })
@@ -236,7 +265,6 @@ const adminOrderSlice = createSlice({
       .addCase(
         updateAdminRemarks.fulfilled,
         (state, action: PayloadAction<Order>) => {
-          state.loading = false;
           const updatedOrder = action.payload;
           // update the list
           const orderIndex = state.orders.findIndex(
@@ -245,12 +273,37 @@ const adminOrderSlice = createSlice({
           if (orderIndex !== -1) {
             state.orders[orderIndex] = updatedOrder;
           }
+          state.loading = false;
         }
       )
       .addCase(updateAdminRemarks.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload?.message || "Failed to update admin remarks";
+      })
+      // update order trackingId
+      .addCase(updateTrackingLink.pending, (state) => {
+        state.trackingLinkLoading = true;
+        state.error = null;
+      })
+      .addCase(
+        updateTrackingLink.fulfilled,
+        (state, action: PayloadAction<Order>) => {
+          const updatedOrder = action.payload;
+          // update the list
+          const orderIndex = state.orders.findIndex(
+            (o) => o._id === updatedOrder._id
+          );
+          if (orderIndex !== -1) {
+            state.orders[orderIndex] = updatedOrder;
+          }
+          state.trackingLinkLoading = false;
+        }
+      )
+      .addCase(updateTrackingLink.rejected, (state, action) => {
+        state.trackingLinkLoading = false;
+        state.error =
+          action.payload?.message || "Failed to update order tracking link";
       })
       // update order status
       .addCase(updateOrderStatus.pending, (state) => {

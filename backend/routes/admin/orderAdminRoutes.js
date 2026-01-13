@@ -58,6 +58,26 @@ router.put("/:id/remarks", protect, admin, async (req, res) => {
     }
 });
 
+// @route PUT /api/admin/orders/:id/trackingLink
+// @desc Update order tracking Id
+// @access Private/Admin
+router.put("/:id/remarks", protect, admin, async (req, res) => {
+    try {
+        const { trackingLink } = req.body;
+
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ message: "Order Not Found" });
+
+        order.trackingLink = trackingLink ?? order.trackingLink;
+
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 // @route PUT /api/admin/orders/:id
 // @desc Update order status
 // @access Private/Admin
