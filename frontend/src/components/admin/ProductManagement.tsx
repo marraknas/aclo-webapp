@@ -140,7 +140,7 @@ const ProductManagement = () => {
                         }}
                         className="bg-acloblue text-white px-2 py-1 rounded mr-2 hover:opacity-90"
                       >
-                        Quick Price
+                        Change Price
                       </button>
                     </td>
                   </tr>

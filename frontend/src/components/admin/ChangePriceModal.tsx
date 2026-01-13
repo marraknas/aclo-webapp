@@ -10,7 +10,7 @@ type VariantOption = {
   isDefault?: boolean;
 };
 
-type QuickPriceModalProps = {
+type ChangePriceModalProps = {
   isOpen: boolean;
   productName: string;
 
@@ -29,14 +29,14 @@ const formatVariantLabel = (v: VariantOption) => {
   return `${v.sku} - ${v.adminName}`;
 };
 
-const QuickPriceModal = ({
+const ChangePriceModal = ({
   isOpen,
   productName,
   variants,
   initialVariantId,
   onClose,
   onSave,
-}: QuickPriceModalProps) => {
+}: ChangePriceModalProps) => {
   const [selectedVariantId, setSelectedVariantId] =
     useState<string>(initialVariantId);
 
@@ -210,4 +210,4 @@ const QuickPriceModal = ({
   );
 };
 
-export default QuickPriceModal;
+export default ChangePriceModal;
