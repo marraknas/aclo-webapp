@@ -23,6 +23,7 @@ const ShippingDetailsModal = ({
 }: ShippingDetailsModalProps) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const { shippingDetails: reduxShippingDetails } = useAppSelector((state) => state.checkout);
   
   const [mode, setMode] = useState<"selection" | "form">("form");
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
@@ -43,10 +44,15 @@ const ShippingDetailsModal = ({
     if (user?.shippingAddresses && user.shippingAddresses.length > 0) {
       setMode(initialMode);
       
-      // Use first address in user document to prefill
-      const addressToUse = user.shippingAddresses[0];
+      let matchingAddress = null;
+      if (reduxShippingDetails) {
+        matchingAddress = user.shippingAddresses.find(
+          addr => 
+            addr.postalCode === reduxShippingDetails.postalCode
+        );
+      }
       
-      // Set selected address in modal selection view
+      const addressToUse = matchingAddress || user.shippingAddresses[0]; // first address as fallback
       setSelectedAddressInView(addressToUse._id);
       
       if (initialMode === "form") {
@@ -62,7 +68,7 @@ const ShippingDetailsModal = ({
       setMode("form");
       setIsNewAddress(true);
     }
-  }, [user, initialMode]);
+  }, [user, initialMode, reduxShippingDetails]);
 
   const handleSelectAddress = async (address: ShippingAddress) => {
     try {

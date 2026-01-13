@@ -9,6 +9,7 @@ import type {
   CreateCheckoutPayload,
   ShippingCostRequest,
   ShippingCostResponse,
+  ShippingDetails,
   ShippingOption,
 } from "../../types/checkout";
 import type { AppError } from "../../types/error";
@@ -22,6 +23,7 @@ interface CheckoutState {
   selectedShipping: ShippingOption | null;
   shippingLoading: boolean;
   shippingError: string | null;
+  shippingDetails: ShippingDetails | null;
 }
 
 const initialState: CheckoutState = {
@@ -32,6 +34,7 @@ const initialState: CheckoutState = {
   selectedShipping: null,
   shippingLoading: false,
   shippingError: null,
+  shippingDetails: null,
 };
 
 // Async thunk to fetch checkout by Id
@@ -112,10 +115,14 @@ const checkoutSlice = createSlice({
     setSelectedShipping: (state, action: PayloadAction<ShippingOption>) => {
       state.selectedShipping = action.payload;
     },
+    setShippingDetails: (state, action: PayloadAction<ShippingDetails>) => {
+      state.shippingDetails = action.payload;
+    },
     clearShipping: (state) => {
       state.shippingOptions = [];
       state.selectedShipping = null;
       state.shippingError = null;
+      state.shippingDetails = null;
     },
   },
   extraReducers: (builder) => {
@@ -174,5 +181,5 @@ const checkoutSlice = createSlice({
   },
 });
 
-export const { setSelectedShipping, clearShipping } = checkoutSlice.actions;
+export const { setSelectedShipping, setShippingDetails, clearShipping } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

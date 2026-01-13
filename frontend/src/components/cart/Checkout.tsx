@@ -10,6 +10,7 @@ import {
   createCheckout,
   calculateShippingCost,
   setSelectedShipping,
+  setShippingDetails,
   clearShipping,
 } from "../../redux/slices/checkoutSlice";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
@@ -22,7 +23,7 @@ const Checkout = () => {
   const { cart, loading, error } = useAppSelector((state) => state.cart);
   const { cartId } = useParams<{ cartId: string }>();
   const { user } = useAppSelector((state) => state.auth);
-  const { shippingOptions, selectedShipping, shippingLoading } = useAppSelector(
+  const { shippingOptions, selectedShipping, shippingLoading, shippingDetails } = useAppSelector(
     (state) => state.checkout
   );
 
@@ -30,13 +31,6 @@ const Checkout = () => {
   const [showShippingDetailsModal, setShowShippingDetailsModal] =
     useState(false);
   const [modalMode, setModalMode] = useState<"selection" | "form">("form");
-  const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
-    name: "",
-    address: "",
-    city: "",
-    postalCode: "",
-    phone: "",
-  });
 
   // Track last calculated shipping to prevent duplicate API calls
   const lastCalculatedRef = useRef<{
@@ -56,6 +50,10 @@ const Checkout = () => {
 
   // Auto-fill shipping details + calculate shipping if user has saved addresses
   useEffect(() => {
+    if (shippingDetails && cart?.products) {
+      return;
+    }
+
     if (user?.shippingAddresses && user.shippingAddresses.length > 0 && cart?.products) {
       const firstAddress = user.shippingAddresses[0];
       
@@ -67,7 +65,7 @@ const Checkout = () => {
         phone: firstAddress.phone,
       };
       
-      setShippingDetails(details);
+      dispatch(setShippingDetails(details));
       
       if (shouldCalculateShipping(firstAddress.postalCode, cart._id)) {
         dispatch(
@@ -99,7 +97,7 @@ const Checkout = () => {
       setModalMode("form");
       setShowShippingDetailsModal(true);
     }
-  }, [user, cart?.products, dispatch]);
+  }, [user, cart?.products, shippingDetails, dispatch]);
 
   useEffect(() => {
     if (!cartId) {
@@ -118,13 +116,12 @@ const Checkout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartId, cart?._id, cart?.products?.length, loading, dispatch, navigate]);
 
-  // Clear shipping when component unmounts
+  // Clear ref when component unmounts
   useEffect(() => {
     return () => {
-      dispatch(clearShipping());
       lastCalculatedRef.current = null;
     };
-  }, [dispatch]);
+  }, []);
 
   const handleShippingDetailsSubmit = async (
     shippingDetails: ShippingDetails
@@ -155,7 +152,7 @@ const Checkout = () => {
         cartId: cart._id,
       };
       
-      setShippingDetails(shippingDetails);
+      dispatch(setShippingDetails(shippingDetails));
       setShowShippingDetailsModal(false);
     } catch (error: any) {
       toast.error(
@@ -174,6 +171,11 @@ const Checkout = () => {
 
     if (!selectedShipping) {
       alert("Please select a shipping method");
+      return;
+    }
+
+    if (!shippingDetails) {
+      alert("Please provide shipping details");
       return;
     }
 
@@ -218,7 +220,7 @@ const Checkout = () => {
           onClose={() => {
             setShowShippingDetailsModal(false);
             const hasNoSavedAddresses = !user?.shippingAddresses || user.shippingAddresses.length === 0;
-            const hasNoShippingDetails = !shippingDetails.postalCode;
+            const hasNoShippingDetails = !shippingDetails?.postalCode;
             
             if (hasNoSavedAddresses && hasNoShippingDetails) {
               navigate("/");
@@ -247,17 +249,17 @@ const Checkout = () => {
         </div>
 
         {/* Shipping Details Display */}
-        {shippingDetails.name && (
+        {shippingDetails?.name && (
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               Shipping To:
             </h3>
-            <p className="text-sm text-gray-800">{shippingDetails.name}</p>
-            <p className="text-sm text-gray-600">{shippingDetails.address}</p>
+            <p className="text-sm text-gray-800">{shippingDetails?.name}</p>
+            <p className="text-sm text-gray-600">{shippingDetails?.address}</p>
             <p className="text-sm text-gray-600">
-              {shippingDetails.city}, {shippingDetails.postalCode}
+              {shippingDetails?.city}, {shippingDetails?.postalCode}
             </p>
-            <p className="text-sm text-gray-600">{shippingDetails.phone}</p>
+            <p className="text-sm text-gray-600">{shippingDetails?.phone}</p>
           </div>
         )}
 
