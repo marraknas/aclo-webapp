@@ -39,7 +39,8 @@ const OrderManagement = () => {
   const [orderDetailsOpen, setOrderDetailsOpen] = useState<boolean>(false);
   const [trackingModalOpen, setTrackingModalOpen] = useState<boolean>(false);
   const [remarksModalOpen, setRemarksModalOpen] = useState<boolean>(false);
-  const [actionConfirmationModalOpen, setActionConfirmationModalOpen] = useState<boolean>(false);
+  const [actionConfirmationModalOpen, setActionConfirmationModalOpen] =
+    useState<boolean>(false);
   const [trackingAction, setTrackingAction] = useState<"add" | "edit">("add");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedPaymentProof, setSelectedPaymentProof] =
@@ -49,10 +50,10 @@ const OrderManagement = () => {
   const [selectedOrderTrackingLink, setSelectedOrderTrackingLink] =
     useState<string>("");
   const [pendingAction, setPendingAction] = useState<{
-    orderId: string, 
-    targetStatus: OrderStatus, 
-    title: string, 
-    message: string,
+    orderId: string;
+    targetStatus: OrderStatus;
+    title: string;
+    message: string;
     onAfterConfirm?: () => void;
   } | null>(null);
 
@@ -63,10 +64,6 @@ const OrderManagement = () => {
       dispatch(fetchAllOrders());
     }
   }, [dispatch, user, navigate]);
-
-  const handleStatusChange = (orderId: string, status: OrderStatus) => {
-    dispatch(updateOrderStatus({ id: orderId, status }));
-  };
 
   const handleGenerateLabel = (orderId: string) => {
     dispatch(generateShippingLabel(orderId));
@@ -134,32 +131,40 @@ const OrderManagement = () => {
   const handleOpenRemarksModal = (order: Order) => {
     setRemarksModalOpen(true);
     setSelectedOrderId(order._id);
-  }
+  };
 
   const handleCloseRemarksModal = () => {
     setSelectedOrderId(null);
     setRemarksModalOpen(false);
-  }
+  };
 
-  const handleOpenActionConfirmationModal = (orderId: string, targetStatus: OrderStatus, title: string, message: string, onAfterConfirm?: () => void) => {
-    setPendingAction({orderId, targetStatus, title, message, onAfterConfirm});
+  const handleOpenActionConfirmationModal = (
+    orderId: string,
+    targetStatus: OrderStatus,
+    title: string,
+    message: string,
+    onAfterConfirm?: () => void
+  ) => {
+    setPendingAction({ orderId, targetStatus, title, message, onAfterConfirm });
     setActionConfirmationModalOpen(true);
-  }
+  };
 
   const handleCloseActionConfirmation = () => {
     setActionConfirmationModalOpen(false);
     setPendingAction(null);
-  }
+  };
 
-  const handleConfirmActionConfirmation = () => {
-    if (pendingAction) {
-      handleStatusChange(pendingAction.orderId, pendingAction.targetStatus);
-      if (pendingAction.onAfterConfirm) {
-        pendingAction.onAfterConfirm();
-      }
-      handleCloseActionConfirmation();
-    }
-  }
+  const handleConfirmActionConfirmation = async () => {
+    if (!pendingAction) return;
+    await dispatch(
+      updateOrderStatus({
+        id: pendingAction.orderId,
+        status: pendingAction.targetStatus,
+      })
+    ).unwrap();
+    pendingAction.onAfterConfirm?.();
+    handleCloseActionConfirmation();
+  };
 
   const renderActionButtons = (order: Order) => {
     // create a common button style
@@ -202,7 +207,7 @@ const OrderManagement = () => {
                   "pending",
                   "Mark as Pending",
                   `Are you sure you want to mark this order as **Pending**?`
-                )
+                );
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
             >
@@ -246,7 +251,7 @@ const OrderManagement = () => {
                   "Mark as Delivered",
                   `Are you sure you want to mark this order as **Delivered**?\n
                   The user will be notified that the order has arrived.`
-                )
+                );
               }}
               className={`${baseBtn} ${actionBtn.success}`}
             >
@@ -264,48 +269,42 @@ const OrderManagement = () => {
         return (
           <>
             <button
-              // onClick={() => {
-              //   handleOpenActionConfirmationModal(
-              //     order._id,
-              //     "returned",
-              //     "Mark as Returned",
-              //     `Are you sure you want to mark this order as **Returned**?`
-              //   )
-              // }}
               onClick={() => {
-                handleOpenRemarksModal(order);
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "returned",
+                  "Mark as Returned",
+                  `Are you sure you want to mark this order as **Returned**?`,
+                  () => handleOpenRemarksModal(order)
+                );
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
             >
               Mark as Returned
             </button>
             <button
-              // onClick={() => {
-              //   handleOpenActionConfirmationModal(
-              //     order._id,
-              //     "refunded",
-              //     "Mark as Refunded",
-              //     `Are you sure you want to mark this order as **Refunded**?`,
-              //   )
-              // }}
               onClick={() => {
-                handleOpenRemarksModal(order);
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "refunded",
+                  "Mark as Refunded",
+                  `Are you sure you want to mark this order as **Refunded**?`,
+                  () => handleOpenRemarksModal(order)
+                );
               }}
               className={`${baseBtn} ${actionBtn.dangerOutline}`}
             >
               Mark as Refunded
             </button>
             <button
-              // onClick={() => {
-              //   handleOpenActionConfirmationModal(
-              //     order._id,
-              //     "exchanged",
-              //     "Mark as Exchanged",
-              //     `Are you sure you want to mark this order as **Exchanged**?`
-              //   )
-              // }}
               onClick={() => {
-                handleOpenRemarksModal(order);
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "exchanged",
+                  "Mark as Exchanged",
+                  `Are you sure you want to mark this order as **Exchanged**?`,
+                  () => handleOpenRemarksModal(order)
+                );
               }}
               className={`${baseBtn} ${actionBtn.infoOutline}`}
             >
@@ -338,22 +337,24 @@ const OrderManagement = () => {
           onClose={handleClosePaymentProof}
           type="paymentProof"
           data={selectedPaymentProof}
-          onAccept={() => handleOpenActionConfirmationModal(
-            selectedOrderId,
-            "processing",
-            "Accept Payment Proof",
-            `Are you sure you want to accept this payment proof?\n
-                  This will mark the order as **Processing**.`,
-            handleClosePaymentProof
-          )}
-          onReject={() => handleOpenActionConfirmationModal(
-            selectedOrderId,
-            "rejected",
-            "Reject Payment Proof",
-            `Are you sure you want to reject this payment proof?\n
-                  This will mark the order as **Rejected**.`,
-            handleClosePaymentProof
-          )}
+          onAccept={() =>
+            handleOpenActionConfirmationModal(
+              selectedOrderId,
+              "processing",
+              "Accept Payment Proof",
+              `Are you sure you want to accept this payment proof?\nThis will mark the order as **Processing**.`,
+              handleClosePaymentProof
+            )
+          }
+          onReject={() =>
+            handleOpenActionConfirmationModal(
+              selectedOrderId,
+              "rejected",
+              "Reject Payment Proof",
+              `Are you sure you want to reject this payment proof?\nThis will mark the order as **Rejected**.`,
+              handleClosePaymentProof
+            )
+          }
           loading={loading}
         />
       )}
@@ -362,22 +363,24 @@ const OrderManagement = () => {
           onClose={handleCloseCancelRequest}
           type="cancelRequest"
           data={selectedCancelRequest}
-          onAccept={() => handleOpenActionConfirmationModal(
-            selectedOrderId,
-            "cancelled",
-            "Accept Cancel Request",
-            `Are you sure you want to accept this cancel request?\n
-                  This will mark the order as **Cancelled**.`,
-            handleCloseCancelRequest
-          )}
-          onReject={() => handleOpenActionConfirmationModal(
-            selectedOrderId,
-            "pending",
-            "Reject Cancel Request",
-            `Are you sure you want to reject this cancel request?\n
-                  This will revert the order status to **Pending**.`,
-            handleCloseCancelRequest
-          )}
+          onAccept={() =>
+            handleOpenActionConfirmationModal(
+              selectedOrderId,
+              "cancelled",
+              "Accept Cancel Request",
+              `Are you sure you want to accept this cancel request?\nThis will mark the order as **Cancelled**.`,
+              handleCloseCancelRequest
+            )
+          }
+          onReject={() =>
+            handleOpenActionConfirmationModal(
+              selectedOrderId,
+              "pending",
+              "Reject Cancel Request",
+              `Are you sure you want to reject this cancel request?\nThis will revert the order status to **Pending**.`,
+              handleCloseCancelRequest
+            )
+          }
           loading={loading}
         />
       )}
@@ -410,11 +413,13 @@ const OrderManagement = () => {
         />
       )}
       {remarksModalOpen && selectedOrderId && (
-        <RemarksModal 
+        <RemarksModal
           orderId={selectedOrderId}
           onClose={handleCloseRemarksModal}
           onSave={async (orderId, adminRemarks) => {
-            await dispatch(updateAdminRemarks({id: orderId, adminRemarks: adminRemarks})).unwrap();
+            await dispatch(
+              updateAdminRemarks({ id: orderId, adminRemarks: adminRemarks })
+            ).unwrap();
             handleCloseRemarksModal();
           }}
         />

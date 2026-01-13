@@ -1,7 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 import ReactMarkdown from "react-markdown";
 
-// Modal for General action confirmation 
+// Modal for General action confirmation
 
 interface ActionConfirmationModalProps {
   onClose: () => void;
@@ -22,11 +22,10 @@ const ActionConfirmationModal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
 }: ActionConfirmationModalProps) => {
-
   const baseBtn =
     "px-4 py-2 rounded-md flex items-center text-sm font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
   const cancelBtn = `${baseBtn} bg-slate-200 text-slate-700 hover:bg-slate-300`;
-  const confirmBtn = `{baseBtn} bg-acloblue/80 text-white hover:bg-acloblue`;
+  const confirmBtn = `${baseBtn} bg-acloblue/80 text-white hover:bg-acloblue`;
 
   return (
     <div
@@ -42,16 +41,16 @@ const ActionConfirmationModal = ({
           <IoMdClose className="h-8 w-8 hover:text-gray-600 cursor-pointer" />
         </button>
 
-        <h2 className="text-2xl uppercase">{title}</h2>
+        <h2 className="text-2xl mb-4 uppercase">{title}</h2>
         <div className="text-gray-700 whitespace-pre-line">
           <ReactMarkdown>{message}</ReactMarkdown>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button disabled={loading} onClick={onClose} className={cancelBtn} >
+          <button disabled={loading} onClick={onClose} className={cancelBtn}>
             {cancelText}
           </button>
-          <button disabled={loading} onClick={onConfirm} className={confirmBtn} >
+          <button disabled={loading} onClick={onConfirm} className={confirmBtn}>
             {loading ? "Processing..." : confirmText}
           </button>
         </div>

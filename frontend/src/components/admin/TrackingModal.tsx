@@ -58,7 +58,7 @@ const TrackingModal = ({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50 cursor-pointer disabled:opacity-60"
           >
             Cancel
           </button>
@@ -66,7 +66,7 @@ const TrackingModal = ({
             type="button"
             onClick={handleSave}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-acloblue text-white text-sm hover:bg-black/90 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg bg-acloblue/80 text-white cursor-pointer hover:bg-acloblue text-sm disabled:opacity-60"
           >
             {loading ? "Saving..." : "Save"}
           </button>
