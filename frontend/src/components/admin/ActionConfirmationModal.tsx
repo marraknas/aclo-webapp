@@ -1,4 +1,5 @@
 import { IoMdClose } from "react-icons/io";
+import ReactMarkdown from "react-markdown";
 
 // Modal for General action confirmation 
 
@@ -29,7 +30,7 @@ const ActionConfirmationModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-6"
+      className="fixed inset-0 z-60 flex items-center justify-center px-6"
       role="dialog"
     >
       <div className="absolute inset-0 bg-black/30" />
@@ -42,7 +43,9 @@ const ActionConfirmationModal = ({
         </button>
 
         <h2 className="text-2xl uppercase">{title}</h2>
-        <p className="text-gray-700 whitespace-pre-line">{message}</p>
+        <div className="text-gray-700 whitespace-pre-line">
+          <ReactMarkdown>{message}</ReactMarkdown>
+        </div>
 
         <div className="flex justify-end gap-3 mt-6">
           <button disabled={loading} onClick={onClose} className={cancelBtn} >

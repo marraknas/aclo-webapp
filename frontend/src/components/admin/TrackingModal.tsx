@@ -24,6 +24,7 @@ const TrackingModal = ({
     setDraft(initialValue);
   }, [initialValue]);
 
+  // SEND EMAIL TO USER
   const handleSave = () => {
     if (!draft.trim()) return; // optional: prevent empty save
     onSaveTrackingLink(draft.trim());

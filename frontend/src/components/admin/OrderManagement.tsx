@@ -46,7 +46,13 @@ const OrderManagement = () => {
     useState<CancelRequest | null>(null);
   const [selectedOrderTrackingLink, setSelectedOrderTrackingLink] =
     useState<string>("");
-  const [pendingAction, setPendingAction] = useState<{orderId: string, targetStatus: OrderStatus, title: string, message: string} | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    orderId: string, 
+    targetStatus: OrderStatus, 
+    title: string, 
+    message: string,
+    onAfterConfirm?: () => void;
+  } | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -123,8 +129,8 @@ const OrderManagement = () => {
     setSelectedOrderId(null);
   };
 
-  const handleOpenActionConfirmation = (orderId: string, targetStatus: OrderStatus, title: string, message: string) => {
-    setPendingAction({orderId, targetStatus, title, message});
+  const handleOpenActionConfirmationModal = (orderId: string, targetStatus: OrderStatus, title: string, message: string, onAfterConfirm?: () => void) => {
+    setPendingAction({orderId, targetStatus, title, message, onAfterConfirm});
     setActionConfirmationModalOpen(true);
   }
 
@@ -133,9 +139,12 @@ const OrderManagement = () => {
     setPendingAction(null);
   }
 
-  const handleConfirmationAction = () => {
+  const handleConfirmActionConfirmation = () => {
     if (pendingAction) {
       handleStatusChange(pendingAction.orderId, pendingAction.targetStatus);
+      if (pendingAction.onAfterConfirm) {
+        pendingAction.onAfterConfirm();
+      }
       handleCloseActionConfirmation();
     }
   }
@@ -176,11 +185,11 @@ const OrderManagement = () => {
           <>
             <button
               onClick={() => {
-                handleOpenActionConfirmation(
+                handleOpenActionConfirmationModal(
                   order._id,
                   "pending",
                   "Mark as Pending",
-                  `Are you sure you want to mark this order as **Pending**?.`
+                  `Are you sure you want to mark this order as **Pending**?`
                 )
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
@@ -219,7 +228,13 @@ const OrderManagement = () => {
           <>
             <button
               onClick={() => {
-                handleStatusChange(order._id, "delivered");
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "delivered",
+                  "Mark as Delivered",
+                  `Are you sure you want to mark this order as **Delivered**?\n
+                  The user will be notified that the order has arrived.`
+                )
               }}
               className={`${baseBtn} ${actionBtn.success}`}
             >
@@ -238,7 +253,12 @@ const OrderManagement = () => {
           <>
             <button
               onClick={() => {
-                handleStatusChange(order._id, "returned");
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "returned",
+                  "Mark as Returned",
+                  `Are you sure you want to mark this order as **Returned**?`
+                )
               }}
               className={`${baseBtn} ${actionBtn.neutralOutline}`}
             >
@@ -246,7 +266,12 @@ const OrderManagement = () => {
             </button>
             <button
               onClick={() => {
-                handleStatusChange(order._id, "refunded");
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "refunded",
+                  "Mark as Refunded",
+                  `Are you sure you want to mark this order as **Refunded**?`
+                )
               }}
               className={`${baseBtn} ${actionBtn.dangerOutline}`}
             >
@@ -254,7 +279,12 @@ const OrderManagement = () => {
             </button>
             <button
               onClick={() => {
-                handleStatusChange(order._id, "exchanged");
+                handleOpenActionConfirmationModal(
+                  order._id,
+                  "exchanged",
+                  "Mark as Exchanged",
+                  `Are you sure you want to mark this order as **Exchanged**?`
+                )
               }}
               className={`${baseBtn} ${actionBtn.infoOutline}`}
             >
@@ -282,35 +312,51 @@ const OrderManagement = () => {
   if (error) return <p>Error: {error}</p>;
   return (
     <div className="max-w-8xl mx-auto p-6">
-      {selectedPaymentProof && paymentProofOpen && (
+      {selectedPaymentProof && paymentProofOpen && selectedOrderId && (
         <ActionModal
           onClose={handleClosePaymentProof}
           type="paymentProof"
           data={selectedPaymentProof}
-          onAccept={() => {
-            handleStatusChange(selectedOrderId!, "processing");
-            handleClosePaymentProof();
-          }}
-          onReject={() => {
-            handleStatusChange(selectedOrderId!, "rejected");
-            handleClosePaymentProof();
-          }}
+          onAccept={() => handleOpenActionConfirmationModal(
+            selectedOrderId,
+            "processing",
+            "Accept Payment Proof",
+            `Are you sure you want to accept this payment proof?\n
+                  This will mark the order as **Processing**.`,
+            handleClosePaymentProof
+          )}
+          onReject={() => handleOpenActionConfirmationModal(
+            selectedOrderId,
+            "rejected",
+            "Reject Payment Proof",
+            `Are you sure you want to reject this payment proof?\n
+                  This will mark the order as **Rejected**.`,
+            handleClosePaymentProof
+          )}
           loading={loading}
         />
       )}
-      {selectedCancelRequest && cancelRequestOpen && (
+      {selectedCancelRequest && cancelRequestOpen && selectedOrderId && (
         <ActionModal
           onClose={handleCloseCancelRequest}
           type="cancelRequest"
           data={selectedCancelRequest}
-          onAccept={() => {
-            handleStatusChange(selectedOrderId!, "cancelled");
-            handleCloseCancelRequest();
-          }}
-          onReject={() => {
-            handleStatusChange(selectedOrderId!, "pending");
-            handleCloseCancelRequest();
-          }}
+          onAccept={() => handleOpenActionConfirmationModal(
+            selectedOrderId,
+            "cancelled",
+            "Accept Cancel Request",
+            `Are you sure you want to accept this cancel request?\n
+                  This will mark the order as **Cancelled**.`,
+            handleCloseCancelRequest
+          )}
+          onReject={() => handleOpenActionConfirmationModal(
+            selectedOrderId,
+            "pending",
+            "Reject Cancel Request",
+            `Are you sure you want to reject this cancel request?\n
+                  This will revert the order status to **Pending**.`,
+            handleCloseCancelRequest
+          )}
           loading={loading}
         />
       )}
@@ -326,6 +372,7 @@ const OrderManagement = () => {
           }}
         />
       )}
+      {/* TODO: USE THE CONFIRMATION MODAL AFTER ADD TRACKING LINK HAS BEEN DEBUGGED */}
       {trackingModalOpen && selectedOrderId && (
         <TrackingModal
           action={trackingAction}
@@ -344,7 +391,7 @@ const OrderManagement = () => {
       {actionConfirmationModalOpen && pendingAction && (
         <ActionConfirmationModal
           onClose={handleCloseActionConfirmation}
-          onConfirm={handleConfirmationAction}
+          onConfirm={handleConfirmActionConfirmation}
           title={pendingAction.title}
           message={pendingAction.message}
           loading={loading}
