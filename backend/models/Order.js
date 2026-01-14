@@ -40,7 +40,6 @@ const orderItemSchema = new mongoose.Schema(
     { _id: false }
 );
 
-// NEED TO ADD SHIPPING METHOD
 const orderSchema = new mongoose.Schema(
     {
         user: {
@@ -89,7 +88,21 @@ const orderSchema = new mongoose.Schema(
                 enum: ["none", "pending", "approved", "rejected"],
                 default: "none",
             },
-            note: { type: String, default: "" },
+        },
+        noteToSeller: {
+            type: String,
+            default: "",
+        },
+        cancelRequest: {
+            type: {
+                reason: { type: String, default: "" },
+                createdAt: { type: Date },
+            },
+            default: undefined,
+        },
+        adminRemarks: {
+            type: String,
+            default: "",
         },
         totalPrice: {
             type: Number,
@@ -104,6 +117,10 @@ const orderSchema = new mongoose.Schema(
             type: Date,
             required: false,
         },
+        trackingLink: {
+            type: String,
+            default: "",
+        },
         deliveredAt: {
             type: Date,
             required: false,
@@ -114,23 +131,20 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            /*
-			pending = user submitted proof, merchant hasn't approved
-			rejected = merchant rejected payment proof - either email user / have merchant contact buyer
-			processing = proof was accepted, processing for delivery
-			shipping = merchant has passed items to courier
-			delivered = items have been delivered by courier
-			completed = user has accepted item
-			cancelled = user requested to cancel purchase
-			*/
             enum: [
-                "pending",
-                "rejected",
-                "processing",
-                "shipping",
-                "delivered",
-                "completed",
-                "cancelled",
+                // in prog orders
+                "pending", // order placed by buyer and pending payment proof approval
+                "processing", // payment proof approved, processing for delivery
+                "shipping", // seller has passed items to courier
+                "cancelling", // user is requesting to cancel order, if approved seller will refund
+                // resolved orders
+                "rejected", // payment proof invalid, auto-email buyer + merchant may contact buyer
+                "delivered", // item has been delivered by courier
+                "cancelled", // order cancelled and money refunded
+                // failed orders - admin manually change to these from Delivered
+                "returned", // item is returned and money refunded
+                "refunded", // buyer keeps item and money refunded
+                "exchanged", // item is returned and seller sends another item
             ],
             default: "pending",
         },

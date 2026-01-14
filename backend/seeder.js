@@ -197,22 +197,58 @@ const seedData = async () => {
         const { product: sparrowProduct, variant: sparrowVariant } =
             getVariantAndProduct(insertedProducts, insertedVariants, "sparrow");
 
-        const checkoutPayload = injectCheckoutItemIds(checkoutTemp, {
-            product: sparrowProduct,
-            variant: sparrowVariant,
-        });
+        // Create multiple checkout-order pairs with different statuses + dates
+        const STATUSES = [
+            "pending",
+            "processing",
+            "shipping",
+            "cancelling",
+            "rejected",
+            "delivered",
+            "cancelled",
+            "returned",
+            "refunded",
+            "exchanged",
+        ];
 
-        const createdCheckout = await Checkout.create({
-            ...checkoutPayload,
-            user: userId, // inject user
-        });
+        const paidStatuses = new Set([
+            "processing",
+            "shipping",
+            "cancelling",
+            "delivered",
+            "cancelled",
+            "returned",
+            "refunded",
+            "exchanged",
+        ]);
 
-        const orderPayload = buildOrderFromCheckout(orderTemp, createdCheckout);
+        for (let i = 0; i < STATUSES.length; i++) {
+            const status = STATUSES[i];
 
-        await Order.create({
-            ...orderPayload,
-            user: userId, // inject user
-        });
+            const checkoutPayload = injectCheckoutItemIds(checkoutTemp, {
+                product: sparrowProduct,
+                variant: sparrowVariant,
+            });
+
+            const createdCheckout = await Checkout.create({
+                ...checkoutPayload,
+                user: userId, // inject user
+            });
+
+            const orderPayload = buildOrderFromCheckout(
+                orderTemp,
+                createdCheckout
+            );
+
+            const isPaid = paidStatuses.has(status);
+
+            await Order.create({
+                ...orderPayload,
+                user: userId, // inject user
+                status,
+                isPaid,
+            });
+        }
 
         await Review.insertMany(reviews);
 
