@@ -203,11 +203,12 @@ const OrderDetailsModal = ({
                         </div>
                       </td>
                       <td className="py-2 px-4 text-center">
-                        IDR {item.price.toLocaleString()}
+                        IDR {item.price.toLocaleString("id-ID")}
                       </td>
                       <td className="py-2 px-4 text-center">{item.quantity}</td>
                       <td className="py-2 px-4 text-center">
-                        IDR {(item.quantity * item.price).toLocaleString()}
+                        IDR{" "}
+                        {(item.quantity * item.price).toLocaleString("id-ID")}
                       </td>
                     </tr>
                   ))}

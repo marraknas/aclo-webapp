@@ -157,7 +157,14 @@ const OrderManagement = () => {
     onAfterConfirm?: () => void,
     customConfirm?: () => Promise<void>
   ) => {
-    setPendingAction({ orderId, targetStatus, title, message, onAfterConfirm, customConfirm });
+    setPendingAction({
+      orderId,
+      targetStatus,
+      title,
+      message,
+      onAfterConfirm,
+      customConfirm,
+    });
     setActionConfirmationModalOpen(true);
   };
 
@@ -168,13 +175,15 @@ const OrderManagement = () => {
 
   const handleConfirmActionConfirmation = async () => {
     if (!pendingAction) return;
-    if (pendingAction.customConfirm) { 
-      await pendingAction.customConfirm(); 
-    } else { 
-      await dispatch(updateOrderStatus({ 
-        id: pendingAction.orderId, 
-        status: pendingAction.targetStatus, 
-      })).unwrap(); 
+    if (pendingAction.customConfirm) {
+      await pendingAction.customConfirm();
+    } else {
+      await dispatch(
+        updateOrderStatus({
+          id: pendingAction.orderId,
+          status: pendingAction.targetStatus,
+        })
+      ).unwrap();
     }
     pendingAction.onAfterConfirm?.();
     handleCloseActionConfirmation();
@@ -429,7 +438,8 @@ const OrderManagement = () => {
               "Save Tracking Link",
               message,
               handleCloseTrackingModal, // after confirm cleanup
-              async () => {             // custom confirm logic
+              async () => {
+                // custom confirm logic
                 await dispatch(
                   updateTrackingLink({ id: selectedOrderId, trackingLink })
                 ).unwrap();
@@ -440,7 +450,7 @@ const OrderManagement = () => {
                   })
                 ).unwrap();
               }
-            )
+            );
           }}
         />
       )}
@@ -450,7 +460,10 @@ const OrderManagement = () => {
           onClose={handleCloseRemarksModal}
           onSave={async (adminRemarks) => {
             await dispatch(
-              updateAdminRemarks({ id: selectedOrderId, adminRemarks: adminRemarks })
+              updateAdminRemarks({
+                id: selectedOrderId,
+                adminRemarks: adminRemarks,
+              })
             ).unwrap();
             handleCloseRemarksModal();
             dispatch(fetchAllOrders({ category: activeTab, page, limit }));
@@ -522,7 +535,9 @@ const OrderManagement = () => {
                   <td className="p-4">
                     {new Date(order.createdAt).toLocaleString()}
                   </td>
-                  <td className="p-4">{order.totalPrice.toLocaleString()}</td>
+                  <td className="p-4">
+                    {order.totalPrice.toLocaleString("id-ID")}
+                  </td>
                   <td className="p-4">
                     <div className="flex flex-col items-start mt-4 sm:mt-0">
                       {(() => {
