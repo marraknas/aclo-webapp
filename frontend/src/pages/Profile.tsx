@@ -2,8 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import MyOrdersPage from "./MyOrdersPage";
 import { useEffect } from "react";
-import { logout } from "../redux/slices/authSlice";
-import { clearCart } from "../redux/slices/cartSlice";
+import { logoutAndReset } from "../utils/logoutReset";
 
 const Profile = () => {
 	const { user } = useAppSelector((state) => state.auth);
@@ -22,8 +21,7 @@ const Profile = () => {
 	}
 
 	const handleLogout = () => {
-		dispatch(logout());
-		dispatch(clearCart());
+		dispatch(logoutAndReset());
 		navigate("/login");
 	};
 

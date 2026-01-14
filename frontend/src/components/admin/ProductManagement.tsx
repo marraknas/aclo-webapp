@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { deleteProduct } from "../../redux/slices/adminProductSlice";
 import {
   fetchProducts,
   fetchProductVariants,
 } from "../../redux/slices/productsSlice";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
+import ChangePriceModal from "./ChangePriceModal";
+import type { ProductVariant } from "../../types/productVariant";
 
 const ProductManagement = () => {
   const dispatch = useAppDispatch();
@@ -15,6 +17,28 @@ const ProductManagement = () => {
   const { products, productVariants, loading, error } = useAppSelector(
     (state) => state.products
   );
+
+  const [priceModalOpen, setPriceModalOpen] = useState(false);
+  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
+  const [activeProductName, setActiveProductName] = useState("");
+  const [activeVariants, setActiveVariants] = useState<ProductVariant[]>([]);
+
+  const openChangePrice = (
+    variantId: string,
+    productName: string,
+    variants: ProductVariant[]
+  ) => {
+    setActiveVariantId(variantId);
+    setActiveProductName(productName);
+    setActiveVariants(variants);
+    setPriceModalOpen(true);
+  };
+
+  const closeChangePrice = () => {
+    setPriceModalOpen(false);
+    setActiveVariantId(null);
+    setActiveVariants([]);
+  };
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -101,9 +125,23 @@ const ProductManagement = () => {
                       </Link>
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        className="bg-red-500 text-white px-2 py-1 rounded mr-2 hover:bg-red-600"
                       >
                         Delete
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openChangePrice(
+                            defaultVariant._id,
+                            product.name,
+                            allVariants
+                          );
+                        }}
+                        className="bg-acloblue text-white px-2 py-1 rounded mr-2 hover:opacity-90"
+                      >
+                        Change Price
                       </button>
                     </td>
                   </tr>
@@ -119,6 +157,20 @@ const ProductManagement = () => {
           </tbody>
         </table>
       </div>
+      {activeVariantId && (
+        <ChangePriceModal
+          isOpen={priceModalOpen}
+          productName={activeProductName}
+          variants={activeVariants}
+          initialVariantId={activeVariantId}
+          onClose={closeChangePrice}
+          onSave={async ({ variantId, price, discountPrice }) => {
+            console.log({ variantId, price, discountPrice });
+          }}
+
+          // TODO: actually update the price
+        />
+      )}
     </div>
   );
 };

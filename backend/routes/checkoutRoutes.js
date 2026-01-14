@@ -116,8 +116,8 @@ router.post("/:id/submit-proof", protect, async (req, res) => {
                 publicId,
                 uploadedAt: new Date(),
                 status: "pending",
-                note: note ?? "",
             };
+            checkout.noteToSeller = note ?? "";
 
             createdOrder = await Order.create(
                 [
@@ -134,6 +134,7 @@ router.post("/:id/submit-proof", protect, async (req, res) => {
 
                         paymentMethod: checkout.paymentMethod,
                         paymentProof: checkout.paymentProof,
+                        noteToSeller: checkout.noteToSeller,
                         totalPrice: checkout.totalPrice,
                         status: "pending",
                     },

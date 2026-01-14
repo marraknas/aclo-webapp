@@ -24,8 +24,8 @@ const checkouts = [
             publicId: "aclo/dev/payments/baskdpzqrt7gpqzzr5wm",
             uploadedAt: new Date(),
             status: "pending",
-            note: "",
         },
+        noteToSeller: "",
 
         shippingCost: 22500,
         shippingMethod: "Same Day",

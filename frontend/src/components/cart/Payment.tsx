@@ -165,94 +165,96 @@ const Payment = () => {
             Choose file
           </button>
 
-          <span className="ml-3 text-sm text-gray-600">
-            {uploadedFileName ? uploadedFileName : "No file selected"}
-          </span>
-          <input
-            ref={fileInputRef}
-            type="file"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          {screenshot && (
-            <div>
-              <p className="text-base text-gray-600 mt-2 mb-2">
-                Uploaded screenshot
-              </p>
-              <div className="relative inline-block group">
-                <img
-                  src={cloudinaryImageUrl(screenshot)}
-                  alt="Uploaded screenshot"
-                  className="w-32 h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
-                  onClick={() => setPreviewOpen(true)}
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteScreenshot();
-                  }}
-                  disabled={deleting}
-                  className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-200 text-black disabled:opacity-50"
-                >
-                  x
-                </button>
-                {deleting && (
-                  <div className="absolute inset-0 rounded-lg bg-black/30 flex items-center justify-center text-white text-xs">
-                    Deleting...
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          {previewOpen && screenshot && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-              onClick={() => setPreviewOpen(false)} // click backdrop to close
-            >
-              <div
-                className="relative max-w-4xl w-full"
-                onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
+        <span className="ml-3 text-sm text-gray-600">
+          {uploadedFileName ? uploadedFileName : "No file selected"}
+        </span>
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+        {screenshot && (
+          <div>
+            <p className="text-base text-gray-600 mt-2 mb-2">
+              Uploaded screenshot
+            </p>
+            <div className="relative inline-block group">
+              <img
+                src={cloudinaryImageUrl(screenshot)}
+                alt="Uploaded screenshot"
+                className="w-32 h-32 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90"
+                onClick={() => setPreviewOpen(true)}
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteScreenshot();
+                }}
+                disabled={deleting}
+                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition bg-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-200 text-black disabled:opacity-50"
               >
-                <button
-                  onClick={() => setPreviewOpen(false)}
-                  className="absolute -top-10 right-0 text-white text-sm px-3 py-1 rounded bg-white/10 hover:bg-white/20"
-                >
-                  Close
-                </button>
-
-                <img
-                  src={cloudinaryImageUrl(screenshot)}
-                  alt="Uploaded screenshot preview"
-                  className="w-full max-h-[85vh] object-contain rounded-lg"
-                />
-              </div>
+                x
+              </button>
+              {deleting && (
+                <div className="absolute inset-0 rounded-lg bg-black/30 flex items-center justify-center text-white text-xs">
+                  Deleting...
+                </div>
+              )}
             </div>
-          )}
-          <div className="mt-6 mb-4">
-            <div className="block font-semibold mb-2 mt-2">Note (optional)</div>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2"
-              rows={2}
-              required
-            ></textarea>
           </div>
-          <div className="text-base text-gray-500 mt-4 mb-2">
-            After payment, we will confirm your transaction and create your
-            order within 1-2 business days.
-          </div>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={screenshot.length === 0 || submitting || !checkout?._id}
-            className="w-full bg-acloblue/80 text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-acloblue transition cursor-pointer"
+        )}
+        {previewOpen && screenshot && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setPreviewOpen(false)} // click backdrop to close
           >
-            {submitting ? "Submitting..." : "Submit"}
-          </button>
+            <div
+              className="relative max-w-4xl w-full"
+              onClick={(e) => e.stopPropagation()} // prevent closing when clicking the image
+            >
+              <button
+                onClick={() => setPreviewOpen(false)}
+                className="absolute -top-10 right-0 text-white text-sm px-4 py-2 rounded bg-white/10 hover:bg-white/20 cursor-pointer"
+              >
+                Close
+              </button>
+
+              <img
+                src={cloudinaryImageUrl(screenshot)}
+                alt="Uploaded screenshot preview"
+                className="w-full max-h-[85vh] object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        )}
+        <div className="mt-6 mb-4">
+          <div className="block font-semibold mb-2 mt-2">
+            Note to seller (optional):
+          </div>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full border border-gray-300 rounded-md p-2"
+            rows={2}
+            required
+          ></textarea>
         </div>
+        <div className="text-base text-gray-500 mt-4 mb-2">
+          After payment, we will confirm your transaction and create your order
+          within 1-2 business days.
+        </div>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={screenshot.length === 0 || submitting || !checkout?._id}
+          className="w-full bg-acloblue/80 text-white py-3 rounded disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-acloblue transition cursor-pointer"
+        >
+          {submitting ? "Submitting..." : "Submit"}
+        </button>
       </div>
+    </div>
     </>
   );
 };

@@ -36,6 +36,7 @@ router.post("/register", async (req, res) => {
 						name: user.name,
 						email: user.email,
 						role: user.role,
+						shippingAddresses: [],
 					},
 					token,
 				});
@@ -81,6 +82,7 @@ router.post("/login", async (req, res) => {
 						name: user.name,
 						email: user.email,
 						role: user.role,
+						shippingAddresses: user.shippingAddresses || [],
 					},
 					token,
 				});
@@ -97,6 +99,77 @@ router.post("/login", async (req, res) => {
 // @access Private
 router.get("/profile", protect, async (req, res) => {
 	res.json(req.user);
+});
+
+// @route POST /api/users/profile/addresses
+// @desc Add a new shipping address to user's profile
+// @access Private
+router.post("/profile/addresses", protect, async (req, res) => {
+	try {
+		const { name, address, city, postalCode, phone } = req.body;
+
+		const user = await User.findById(req.user._id);
+		if (!user) return res.status(400).json({ message: "User does not exist" });
+
+		user.shippingAddresses.push({
+			name,
+			address,
+			city,
+			postalCode,
+			phone,
+		});
+
+		await user.save();
+
+		res.status(201).json({
+			_id: user._id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+			shippingAddresses: user.shippingAddresses,
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server Error" });
+	}
+});
+
+// @route PATCH /api/users/profile/addresses/:addressId
+// @desc Update a shipping address
+// @access Private
+router.patch("/profile/addresses/:addressId", protect, async (req, res) => {
+	try {
+		const { addressId } = req.params;
+		const { name, address, city, postalCode, phone } = req.body;
+
+		const user = await User.findById(req.user._id);
+		if (!user) { return res.status(404).json({ message: "User does not exist" }); }
+
+		const addressToUpdate = user.shippingAddresses.id(addressId);
+		
+		if (!addressToUpdate) {
+			return res.status(404).json({ message: "Address not found" });
+		}
+
+		if (name) addressToUpdate.name = name;
+		if (address) addressToUpdate.address = address;
+		if (city) addressToUpdate.city = city;
+		if (postalCode) addressToUpdate.postalCode = postalCode;
+		if (phone) addressToUpdate.phone = phone;
+
+		await user.save();
+
+		res.json({
+			_id: user._id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+			shippingAddresses: user.shippingAddresses,
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server Error" });
+	}
 });
 
 module.exports = router;

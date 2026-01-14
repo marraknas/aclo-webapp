@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 // import MidtransPayButton from "./MidtransPayButton";
 import ShippingOptionsModal from "./ShippingOptionsModal";
 import ShippingDetailsModal from "./ShippingDetailsModal";
+import LoadingOverlay from "../common/LoadingOverlay";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   createCheckout,
   calculateShippingCost,
   setSelectedShipping,
+  setShippingDetails,
   clearShipping,
 } from "../../redux/slices/checkoutSlice";
 import type { Checkout, ShippingDetails } from "../../types/checkout";
@@ -21,20 +24,88 @@ const Checkout = () => {
   const { cart, loading, error } = useAppSelector((state) => state.cart);
   const { cartId } = useParams<{ cartId: string }>();
   const { user } = useAppSelector((state) => state.auth);
-  const { shippingOptions, selectedShipping, shippingLoading } = useAppSelector(
+  const { shippingOptions, selectedShipping, shippingLoading, shippingDetails } = useAppSelector(
     (state) => state.checkout
   );
 
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showShippingDetailsModal, setShowShippingDetailsModal] =
-    useState(true);
-  const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
-    name: "",
-    address: "",
-    city: "",
-    postalCode: "",
-    phone: "",
-  });
+    useState(false);
+  const [modalMode, setModalMode] = useState<"selection" | "form">("form");
+
+  // Track last calculated shipping to prevent duplicate API calls
+  const lastCalculatedRef = useRef<{
+    postalCode: string;
+    cartId: string;
+    totalPrice: number;
+  } | null>(null);
+
+  // Only calculate shipping if postal code or cart changed
+  const shouldCalculateShipping = (postalCode: string, currentCartId: string, totalPrice: number): boolean => {
+    if (!lastCalculatedRef.current) return true;
+    
+    return (
+      lastCalculatedRef.current.postalCode !== postalCode ||
+      lastCalculatedRef.current.cartId !== currentCartId ||
+      lastCalculatedRef.current.totalPrice !== totalPrice
+    );
+  };
+
+  // Auto-fill shipping details + calculate shipping if user has saved addresses
+  useEffect(() => {
+    if (!cart?.products || cart.products.length === 0) {
+      return;
+    }
+
+    let detailsToUse: ShippingDetails | null = null;
+    
+    if (shippingDetails?.postalCode) {
+      detailsToUse = shippingDetails;
+    } else if (user?.shippingAddresses && user.shippingAddresses.length > 0) {
+      const firstAddress = user.shippingAddresses[0];
+      detailsToUse = {
+        name: firstAddress.name,
+        address: firstAddress.address,
+        city: firstAddress.city,
+        postalCode: firstAddress.postalCode,
+        phone: firstAddress.phone,
+      };
+      dispatch(setShippingDetails(detailsToUse));
+    }
+
+    if (detailsToUse) {
+      if (shouldCalculateShipping(detailsToUse.postalCode, cart._id, cart.totalPrice)) {
+        dispatch(
+          calculateShippingCost({
+            destinationPostalCode: detailsToUse.postalCode,
+            cartItems: cart.products.map((p) => ({
+              productId: p.productId,
+              price: p.price,
+              quantity: p.quantity,
+            })),
+          })
+        ).unwrap()
+          .then(() => {
+            lastCalculatedRef.current = {
+              postalCode: detailsToUse!.postalCode,
+              cartId: cart._id,
+              totalPrice: cart.totalPrice,
+            };
+          })
+          .catch((error: any) => {
+            dispatch(clearShipping());
+            toast.error(
+              error?.message || "Something went wrong. Please check your address and try again.",
+              { duration: 3000 }
+            );
+          });
+      }
+    } else {
+      // No saved addresses and no existing details, show modal to add new address
+      setModalMode("form");
+      setShowShippingDetailsModal(true);
+    }
+  }, [user, cart?.products, cart?._id, cart?.totalPrice, shippingDetails, dispatch]);
 
   useEffect(() => {
     if (!cartId) {
@@ -53,19 +124,23 @@ const Checkout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartId, cart?._id, cart?.products?.length, loading, dispatch, navigate]);
 
-  // Clear shipping when component unmounts
+  // Clear ref when component unmounts
   useEffect(() => {
     return () => {
-      dispatch(clearShipping());
+      lastCalculatedRef.current = null;
     };
-  }, [dispatch]);
+  }, []);
 
   const handleShippingDetailsSubmit = async (
     shippingDetails: ShippingDetails
   ) => {
-    setShippingDetails(shippingDetails);
-
     if (!cart || !cart.products || cart.products.length === 0) {
+      return;
+    }
+
+    if (!shouldCalculateShipping(shippingDetails.postalCode, cart._id, cart.totalPrice)) {
+      dispatch(setShippingDetails(shippingDetails));
+      setShowShippingDetailsModal(false);
       return;
     }
 
@@ -80,10 +155,22 @@ const Checkout = () => {
           })),
         })
       ).unwrap();
+      
+      lastCalculatedRef.current = {
+        postalCode: shippingDetails.postalCode,
+        cartId: cart._id,
+        totalPrice: cart.totalPrice,
+      };
+      
+      dispatch(setShippingDetails(shippingDetails));
       setShowShippingDetailsModal(false);
     } catch (error: any) {
-      alert(error.message || "Failed to update. Please try again.");
+      toast.error(
+        error?.message || "Something went wrong. Please check your address and try again.",
+        { duration: 3000 }
+      );
       console.error("Error in handleShippingDetails:", error);
+      throw error;
     }
   };
 
@@ -94,6 +181,11 @@ const Checkout = () => {
 
     if (!selectedShipping) {
       alert("Please select a shipping method");
+      return;
+    }
+
+    if (!shippingDetails) {
+      alert("Please provide shipping details");
       return;
     }
 
@@ -130,45 +222,59 @@ const Checkout = () => {
 
   return (
     <>
+      {shippingLoading && <LoadingOverlay show/> }
+      
       <Navbar />
       <div className="max-w-4xl mx-auto py-10 px-6 tracking-tighter">
         <ShippingDetailsModal
           isOpen={showShippingDetailsModal}
-          onClose={() => navigate("/")}
+          onClose={() => {
+            setShowShippingDetailsModal(false);
+            const hasNoSavedAddresses = !user?.shippingAddresses || user.shippingAddresses.length === 0;
+            const hasNoShippingDetails = !shippingDetails?.postalCode;
+            
+            if (hasNoSavedAddresses && hasNoShippingDetails) {
+              navigate("/");
+            }
+          }}
           onSubmit={handleShippingDetailsSubmit}
           userEmail={user?.email}
           isCalculating={shippingLoading}
+          initialMode={modalMode}
         />
 
-        {/* Order Summary Section */}
-        <div className="bg-white rounded-lg p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl uppercase text-acloblue">Order Summary</h2>
-            <button
-              type="button"
-              onClick={() => setShowShippingDetailsModal(true)}
-              className="text-sm text-acloblue hover:underline"
-            >
-              Edit Shipping Details
-            </button>
+      {/* Order Summary Section */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl uppercase text-acloblue">Order Summary</h2>
+          <button
+            type="button"
+            onClick={() => {
+              setModalMode("selection");
+              setShowShippingDetailsModal(true);
+            }}
+            className="text-sm text-acloblue hover:underline"
+          >
+            Edit Shipping Details
+          </button>
+        </div>
+
+        {/* Shipping Details Display */}
+        {shippingDetails?.name && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              Shipping To:
+            </h3>
+            <p className="text-sm text-gray-800">{shippingDetails?.name}</p>
+            <p className="text-sm text-gray-600">{shippingDetails?.address}</p>
+            <p className="text-sm text-gray-600">
+              {shippingDetails?.city}, {shippingDetails?.postalCode}
+            </p>
+            <p className="text-sm text-gray-600">{shippingDetails?.phone}</p>
           </div>
+        )}
 
-          {/* Shipping Details Display */}
-          {shippingDetails.name && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                Shipping To:
-              </h3>
-              <p className="text-sm text-gray-800">{shippingDetails.name}</p>
-              <p className="text-sm text-gray-600">{shippingDetails.address}</p>
-              <p className="text-sm text-gray-600">
-                {shippingDetails.city}, {shippingDetails.postalCode}
-              </p>
-              <p className="text-sm text-gray-600">{shippingDetails.phone}</p>
-            </div>
-          )}
-
-          {/* Products List */}
+        {/* Products List */}
           <div className="mt-2 rounded-2xl border border-gray-100 overflow-hidden bg-white">
             <div className="divide-y divide-gray-100">
               {cart.products.map((product, index) => (
