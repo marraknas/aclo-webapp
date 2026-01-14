@@ -146,10 +146,39 @@ const OrderConfirmation = () => {
               </div>
             ))}
           </div>
-          <div className="mb-6 rounded-xl bg-acloblue/5 border border-acloblue/10 p-4 text-gray-700">
-            We’ll confirm your order after we verify your payment. We'll notify
-            you once it’s approved, and again when your tracking number is
-            available.
+          <div className="mb-6 rounded-2xl border border-acloblue/10 bg-acloblue/5 p-5">
+            <p className="text-sm font-semibold text-acloblue uppercase tracking-wide">
+              What happens next
+            </p>
+
+            <ol className="mt-3 space-y-3">
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  1
+                </span>
+                <p className="text-sm text-gray-700">
+                  We review your payment proof.
+                </p>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  2
+                </span>
+                <p className="text-sm text-gray-700">
+                  Once approved, your order is confirmed and we’ll notify you.
+                </p>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  3
+                </span>
+                <p className="text-sm text-gray-700">
+                  When your parcel is shipped, we’ll send your tracking number.
+                </p>
+              </li>
+            </ol>
           </div>
           {/* Payment and Delivery Info */}
           <div className="grid grid-cols-2 gap-8">
