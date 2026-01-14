@@ -35,7 +35,7 @@ export type OrderStatus =
   | "refunded"
   | "exchanged";
 
-export type OrdersCategory = "all" | "pending_action" | "resolved" | "failed";
+export type OrdersCategory = "all" | "pending_action" | "resolved" | "failed" | "ongoing";
 
 export type FetchOrdersParams = {
   category?: OrdersCategory;

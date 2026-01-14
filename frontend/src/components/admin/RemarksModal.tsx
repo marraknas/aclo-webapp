@@ -3,10 +3,10 @@ import { useState } from "react";
 interface RemarksModalProps {
   orderId: string;
   onClose: () => void;
-  onSave: (orderId: string, adminRemarks: string) => Promise<void>;
+  onSave: (adminRemarks: string) => Promise<void>;
 }
 
-const RemarksModal = ({ orderId, onClose, onSave }: RemarksModalProps) => {
+const RemarksModal = ({ onClose, onSave }: RemarksModalProps) => {
   const [draft, setDraft] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -15,7 +15,7 @@ const RemarksModal = ({ orderId, onClose, onSave }: RemarksModalProps) => {
     try {
       setSaving(true);
       setError("");
-      await onSave(orderId, draft);
+      await onSave(draft);
       onClose(); // close after successful save
     } catch (e: any) {
       setError(e?.message ?? "Failed to save remarks.");

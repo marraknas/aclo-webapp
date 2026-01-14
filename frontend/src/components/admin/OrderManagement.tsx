@@ -65,6 +65,7 @@ const OrderManagement = () => {
     title: string;
     message: string;
     onAfterConfirm?: () => void;
+    customConfirm?: () => Promise<void>;
   } | null>(null);
 
   useEffect(() => {
@@ -153,9 +154,10 @@ const OrderManagement = () => {
     targetStatus: OrderStatus,
     title: string,
     message: string,
-    onAfterConfirm?: () => void
+    onAfterConfirm?: () => void,
+    customConfirm?: () => Promise<void>
   ) => {
-    setPendingAction({ orderId, targetStatus, title, message, onAfterConfirm });
+    setPendingAction({ orderId, targetStatus, title, message, onAfterConfirm, customConfirm });
     setActionConfirmationModalOpen(true);
   };
 
@@ -166,12 +168,14 @@ const OrderManagement = () => {
 
   const handleConfirmActionConfirmation = async () => {
     if (!pendingAction) return;
-    await dispatch(
-      updateOrderStatus({
-        id: pendingAction.orderId,
-        status: pendingAction.targetStatus,
-      })
-    ).unwrap();
+    if (pendingAction.customConfirm) { 
+      await pendingAction.customConfirm(); 
+    } else { 
+      await dispatch(updateOrderStatus({ 
+        id: pendingAction.orderId, 
+        status: pendingAction.targetStatus, 
+      })).unwrap(); 
+    }
     pendingAction.onAfterConfirm?.();
     handleCloseActionConfirmation();
 
@@ -408,7 +412,6 @@ const OrderManagement = () => {
           }}
         />
       )}
-      {/* TODO: USE THE CONFIRMATION MODAL AFTER ADD TRACKING LINK HAS BEEN DEBUGGED */}
       {trackingModalOpen && selectedOrderId && (
         <TrackingModal
           action={trackingAction}
@@ -416,12 +419,29 @@ const OrderManagement = () => {
           onClose={handleCloseTrackingModal}
           onCancel={handleCloseTrackingModal}
           loading={trackingLinkLoading}
-          onSaveTrackingLink={async (trackingLink) => {
-            await dispatch(
-              updateTrackingLink({ id: selectedOrderId, trackingLink })
-            ).unwrap();
-            handleCloseTrackingModal();
-            dispatch(fetchAllOrders({ category: activeTab, page, limit }));
+          onSave={(trackingLink) => {
+            const message =
+              trackingAction === "add"
+                ? `Are you sure you want to save this tracking link?\nThis will mark the order as **Shipping**.`
+                : `Are you sure you want to save this tracking link?\nUser will be notified of the updated tracking link`;
+            handleOpenActionConfirmationModal(
+              selectedOrderId,
+              "shipping",
+              "Save Tracking Link",
+              message,
+              handleCloseTrackingModal, // after confirm cleanup
+              async () => {             // custom confirm logic
+                await dispatch(
+                  updateTrackingLink({ id: selectedOrderId, trackingLink })
+                ).unwrap();
+                await dispatch(
+                  updateOrderStatus({
+                    id: selectedOrderId,
+                    status: "shipping",
+                  })
+                ).unwrap();
+              }
+            )
           }}
         />
       )}
@@ -429,9 +449,9 @@ const OrderManagement = () => {
         <RemarksModal
           orderId={selectedOrderId}
           onClose={handleCloseRemarksModal}
-          onSave={async (orderId, adminRemarks) => {
+          onSave={async (adminRemarks) => {
             await dispatch(
-              updateAdminRemarks({ id: orderId, adminRemarks: adminRemarks })
+              updateAdminRemarks({ id: selectedOrderId, adminRemarks: adminRemarks })
             ).unwrap();
             handleCloseRemarksModal();
             dispatch(fetchAllOrders({ category: activeTab, page, limit }));
@@ -453,6 +473,7 @@ const OrderManagement = () => {
         {(
           [
             ["pending_action", "Pending Action"],
+            ["ongoing", "Ongoing"],
             ["resolved", "Resolved"],
             ["failed", "Failed"],
             ["all", "All Orders"],

@@ -14,7 +14,8 @@ router.get("/", protect, admin, async (req, res) => {
     try {
         const { category = "all", status, page = 1, limit = 25 } = req.query;
         const categoryMap = {
-            pending_action: ["pending", "cancelling"],
+            pending_action: ["pending", "cancelling", "processing"],
+            ongoing: ["shipping"],
             resolved: ["rejected", "delivered", "cancelled"],
             failed: ["returned", "refunded", "exchanged"],
             all: null,

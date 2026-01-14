@@ -5,7 +5,7 @@ interface TrackingModalProps {
   initialValue: string;
   onClose: () => void;
   action: "edit" | "add";
-  onSaveTrackingLink: (value: string) => void;
+  onSave: (value: string) => void;
   onCancel: () => void;
   loading: boolean;
 }
@@ -14,12 +14,11 @@ const TrackingModal = ({
   initialValue,
   onClose,
   action,
-  onSaveTrackingLink,
+  onSave,
   onCancel,
   loading,
 }: TrackingModalProps) => {
   const [draft, setDraft] = useState(initialValue);
-
   useEffect(() => {
     setDraft(initialValue);
   }, [initialValue]);
@@ -27,7 +26,7 @@ const TrackingModal = ({
   // SEND EMAIL TO USER
   const handleSave = () => {
     if (!draft.trim()) return; // optional: prevent empty save
-    onSaveTrackingLink(draft.trim());
+    onSave(draft.trim());
   };
 
   return (
