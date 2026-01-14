@@ -265,8 +265,7 @@ const OrderManagement = () => {
                   order._id,
                   "delivered",
                   "Mark as Delivered",
-                  `Are you sure you want to mark this order as **Delivered**?\n
-                  The user will be notified that the order has arrived.`
+                  `Are you sure you want to mark this order as **Delivered**?\nThe user will be notified that the order has arrived.`
                 );
               }}
               className={`${baseBtn} ${actionBtn.success}`}
