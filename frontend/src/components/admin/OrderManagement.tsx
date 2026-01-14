@@ -9,7 +9,12 @@ import {
   updateAdminRemarks,
   updateTrackingLink,
 } from "../../redux/slices/adminOrderSlice";
-import type { CancelRequest, Order, OrderStatus } from "../../types/order";
+import type {
+  OrdersCategory,
+  CancelRequest,
+  Order,
+  OrderStatus,
+} from "../../types/order";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { getStatusBadge } from "../../constants/orderStatus";
 import ActionModal from "./ActionModal";
@@ -33,7 +38,12 @@ const OrderManagement = () => {
     error,
     generatingLabelForOrder,
     orderDetails,
+    totalPages,
   } = useAppSelector((state) => state.adminOrders);
+  const [activeTab, setActiveTab] = useState<OrdersCategory>("pending_action");
+  const [page, setPage] = useState(1);
+  const limit = 25;
+
   const [paymentProofOpen, setPaymentProofOpen] = useState<boolean>(false);
   const [cancelRequestOpen, setCancelRequestOpen] = useState<boolean>(false);
   const [orderDetailsOpen, setOrderDetailsOpen] = useState<boolean>(false);
@@ -61,9 +71,9 @@ const OrderManagement = () => {
     if (!user || user.role !== "admin") {
       navigate("/");
     } else {
-      dispatch(fetchAllOrders());
+      dispatch(fetchAllOrders({ category: activeTab, page, limit }));
     }
-  }, [dispatch, user, navigate]);
+  }, [dispatch, user, activeTab, navigate, page]);
 
   const handleGenerateLabel = (orderId: string) => {
     dispatch(generateShippingLabel(orderId));
@@ -164,6 +174,8 @@ const OrderManagement = () => {
     ).unwrap();
     pendingAction.onAfterConfirm?.();
     handleCloseActionConfirmation();
+
+    dispatch(fetchAllOrders({ category: activeTab, page, limit }));
   };
 
   const renderActionButtons = (order: Order) => {
@@ -409,6 +421,7 @@ const OrderManagement = () => {
               updateTrackingLink({ id: selectedOrderId, trackingLink })
             ).unwrap();
             handleCloseTrackingModal();
+            dispatch(fetchAllOrders({ category: activeTab, page, limit }));
           }}
         />
       )}
@@ -421,6 +434,7 @@ const OrderManagement = () => {
               updateAdminRemarks({ id: orderId, adminRemarks: adminRemarks })
             ).unwrap();
             handleCloseRemarksModal();
+            dispatch(fetchAllOrders({ category: activeTab, page, limit }));
           }}
         />
       )}
@@ -435,8 +449,32 @@ const OrderManagement = () => {
       )}
 
       <h2 className="text-2xl font-bold mb-8">Order Management</h2>
-      <h3 className="text-xl font-bold mb-6">Pending Orders</h3>
-      <h3 className="text-xl font-bold mb-6">All Orders</h3>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {(
+          [
+            ["pending_action", "Pending Action"],
+            ["resolved", "Resolved"],
+            ["failed", "Failed"],
+            ["all", "All Orders"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => {
+              setActiveTab(key);
+              setPage(1);
+            }}
+            className={`px-4 py-2 rounded-md border text-sm font-medium transition
+        ${
+          activeTab === key
+            ? "bg-slate-900 text-white border-slate-900"
+            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+        }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="overflow-x-auto shadow-md sm:rounded-lg">
         <table className="min-w-full text-left text-gray-500">
           <thead className="bg-gray-100 text-xs uppercase text-gray-700">
@@ -462,7 +500,7 @@ const OrderManagement = () => {
                       : order.user.name}
                   </td>
                   <td className="p-4">
-                    {new Date(order.updatedAt).toLocaleString()}
+                    {new Date(order.createdAt).toLocaleString()}
                   </td>
                   <td className="p-4">{order.totalPrice.toLocaleString()}</td>
                   <td className="p-4">
@@ -504,6 +542,27 @@ const OrderManagement = () => {
             )}
           </tbody>
         </table>
+      </div>
+      <div className="flex items-center justify-end gap-3 mt-4">
+        <button
+          disabled={loading || page <= 1}
+          onClick={() => setPage((p) => p - 1)}
+          className="px-3 py-2 border rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        <span className="text-sm text-slate-600">
+          Page {page} / {totalPages}
+        </span>
+
+        <button
+          disabled={loading || page >= totalPages}
+          onClick={() => setPage((p) => p + 1)}
+          className="px-3 py-2 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

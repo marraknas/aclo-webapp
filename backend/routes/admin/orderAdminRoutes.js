@@ -7,13 +7,55 @@ const {
 
 const router = express.Router();
 
-// @route GET /api/admin/orders
+// @route GET /api/admin/orders?category=pending_action&page=1&limit=25
 // @desc Get all orders (Admin only)
 // @access Private/Admin
 router.get("/", protect, admin, async (req, res) => {
     try {
-        const orders = await Order.find({}).populate("user", "name email");
-        res.json(orders);
+        const { category = "all", status, page = 1, limit = 25 } = req.query;
+        const categoryMap = {
+            pending_action: ["pending", "cancelling"],
+            resolved: ["rejected", "delivered", "cancelled"],
+            failed: ["returned", "refunded", "exchanged"],
+            all: null,
+        };
+
+        const filter = {};
+
+        if (status) {
+            const statuses = String(status)
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+
+            filter.status = { $in: statuses };
+        } else if (category !== "all" && categoryMap[category]) {
+            filter.status = { $in: categoryMap[category] };
+        }
+
+        const pageNum = Number(page);
+        const limitNum = Number(limit);
+        const skip = (pageNum - 1) * limitNum;
+
+        const [orders, total] = await Promise.all([
+            Order.find(filter)
+                .populate("user", "name email")
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(limitNum),
+            Order.countDocuments(filter),
+        ]);
+
+        res.json({
+            orders,
+            page: pageNum,
+            limit: limitNum,
+            total,
+            totalPages: Math.ceil(total / limitNum),
+        });
+
+        // const orders = await Order.find({}).populate("user", "name email");
+        // res.json(orders);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Server Error" });

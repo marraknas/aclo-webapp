@@ -5,13 +5,21 @@ import {
 } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { API_URL, getAuthHeader } from "../../constants/api";
-import type { Order, OrderStatus } from "../../types/order";
+import type {
+  FetchOrdersResponse,
+  FetchOrdersParams,
+  Order,
+  OrderStatus,
+} from "../../types/order";
 import type { AppError } from "../../types/error";
 
 interface AdminOrderState {
   orders: Order[];
   totalOrders: number;
   totalSales: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   loading: boolean; // for Order Management page
   orderDetailsLoading: boolean; // for Order Details modal
   trackingLinkLoading: boolean; // for Tracking Link modal
@@ -24,6 +32,9 @@ const initialState: AdminOrderState = {
   orders: [],
   totalOrders: 0,
   totalSales: 0,
+  page: 1,
+  limit: 25,
+  totalPages: 1,
   loading: false,
   orderDetailsLoading: false,
   trackingLinkLoading: false,
@@ -34,14 +45,30 @@ const initialState: AdminOrderState = {
 
 // async thunk to fetch all orders (admin only)
 export const fetchAllOrders = createAsyncThunk<
-  Order[],
-  void,
+  FetchOrdersResponse,
+  FetchOrdersParams | void,
   { rejectValue: AppError }
->("adminOrders/fetchAllOrders", async (_, { rejectWithValue }) => {
+>("adminOrders/fetchAllOrders", async (params, { rejectWithValue }) => {
   try {
-    const response = await axios.get<Order[]>(`${API_URL}/api/admin/orders`, {
-      headers: getAuthHeader(),
-    });
+    const {
+      category = "all",
+      status,
+      page = 1,
+      limit = 25,
+    } = (params ?? {}) as FetchOrdersParams;
+    const statusParam = Array.isArray(status) ? status.join(",") : status;
+    const response = await axios.get<FetchOrdersResponse>(
+      `${API_URL}/api/admin/orders`,
+      {
+        headers: getAuthHeader(),
+        params: {
+          category,
+          page,
+          limit,
+          ...(statusParam ? { status: statusParam } : {}),
+        },
+      }
+    );
     return response.data;
   } catch (err) {
     const error = err as AxiosError<AppError>;
@@ -224,12 +251,15 @@ const adminOrderSlice = createSlice({
       })
       .addCase(
         fetchAllOrders.fulfilled,
-        (state, action: PayloadAction<Order[]>) => {
-          state.orders = action.payload;
-          state.totalOrders = action.payload.length;
+        (state, action: PayloadAction<FetchOrdersResponse>) => {
+          state.orders = action.payload.orders;
+          state.totalOrders = action.payload.total;
+          state.page = action.payload.page;
+          state.limit = action.payload.limit;
+          state.totalPages = action.payload.totalPages;
 
           // calculate total sales
-          const totalSales = action.payload.reduce((acc, order) => {
+          const totalSales = action.payload.orders.reduce((acc, order) => {
             return acc + order.totalPrice;
           }, 0);
           state.totalSales = totalSales;

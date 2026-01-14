@@ -23,7 +23,34 @@ export interface CancelRequest {
   createdAt: string;
 }
 
-export type OrderStatus = | "pending" | "processing" | "shipping" | "cancelling" | "rejected" | "delivered" | "cancelled" | "returned" | "refunded" | "exchanged"
+export type OrderStatus =
+  | "pending"
+  | "processing"
+  | "shipping"
+  | "cancelling"
+  | "rejected"
+  | "delivered"
+  | "cancelled"
+  | "returned"
+  | "refunded"
+  | "exchanged";
+
+export type OrdersCategory = "all" | "pending_action" | "resolved" | "failed";
+
+export type FetchOrdersParams = {
+  category?: OrdersCategory;
+  status?: OrderStatus | OrderStatus[]; // optional for future use
+  page?: number;
+  limit?: number;
+};
+
+export type FetchOrdersResponse = {
+  orders: Order[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
 
 export interface Order {
   _id: string;
@@ -46,7 +73,7 @@ export interface Order {
   trackingLink?: string;
   deliveredAt?: string;
   paymentDetails?: any;
-  status: OrderStatus
+  status: OrderStatus;
   createdAt: string;
   updatedAt: string;
 }
