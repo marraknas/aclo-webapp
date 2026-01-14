@@ -36,7 +36,7 @@ const Cartdrawer = ({ drawerOpen, toggleCartDrawer }: CartDrawerProps) => {
       </div>
       {/* Cart contents with a scrollable area */}
       <div className="grow px-4 overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-4">Your Cart</h2>
+        <h2 className="text-xl font-semibold mb-4 text-acloblue">Your Cart</h2>
         {cart && cart?.products?.length > 0 ? (
           <CartContents cart={cart} userId={userId} guestId={guestId} />
         ) : (
@@ -48,7 +48,7 @@ const Cartdrawer = ({ drawerOpen, toggleCartDrawer }: CartDrawerProps) => {
           <>
             <button
               onClick={handleCheckout}
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition hover:cursor-pointer"
+              className="w-full bg-acloblue text-white py-3 rounded-lg font-semibold hover:opacity-80 transition hover:cursor-pointer"
             >
               Checkout
             </button>

@@ -9,10 +9,33 @@ import type {
   CreateCheckoutPayload,
   ShippingCostRequest,
   ShippingCostResponse,
+  ShippingDetails,
   ShippingOption,
 } from "../../types/checkout";
 import type { AppError } from "../../types/error";
 import { API_URL, getAuthHeader } from "../../constants/api";
+
+// Helper function to load shipping details from localStorage
+const loadShippingDetailsFromStorage = (): ShippingDetails | null => {
+  const storedShippingDetails = localStorage.getItem("shippingDetails");
+  return storedShippingDetails
+    ? (JSON.parse(storedShippingDetails) as ShippingDetails)
+    : null;
+};
+
+const loadSelectedShippingFromStorage = (): ShippingOption | null => {
+  const storedSelectedShipping = localStorage.getItem("selectedShipping");
+  return storedSelectedShipping
+    ? (JSON.parse(storedSelectedShipping) as ShippingOption)
+    : null;
+};
+
+const loadShippingOptionsFromStorage = (): ShippingOption[] => {
+  const storedShippingOptions = localStorage.getItem("shippingOptions");
+  return storedShippingOptions
+    ? (JSON.parse(storedShippingOptions) as ShippingOption[])
+    : [];
+};
 
 interface CheckoutState {
   checkout: Checkout | null;
@@ -22,16 +45,18 @@ interface CheckoutState {
   selectedShipping: ShippingOption | null;
   shippingLoading: boolean;
   shippingError: string | null;
+  shippingDetails: ShippingDetails | null;
 }
 
 const initialState: CheckoutState = {
   checkout: null,
   loading: false,
   error: null,
-  shippingOptions: [],
-  selectedShipping: null,
+  shippingOptions: loadShippingOptionsFromStorage(),
+  selectedShipping: loadSelectedShippingFromStorage(),
   shippingLoading: false,
   shippingError: null,
+  shippingDetails: loadShippingDetailsFromStorage(),
 };
 
 // Async thunk to fetch checkout by Id
@@ -111,11 +136,20 @@ const checkoutSlice = createSlice({
   reducers: {
     setSelectedShipping: (state, action: PayloadAction<ShippingOption>) => {
       state.selectedShipping = action.payload;
+      localStorage.setItem("selectedShipping", JSON.stringify(action.payload));
+    },
+    setShippingDetails: (state, action: PayloadAction<ShippingDetails>) => {
+      state.shippingDetails = action.payload;
+      localStorage.setItem("shippingDetails", JSON.stringify(action.payload));
     },
     clearShipping: (state) => {
       state.shippingOptions = [];
       state.selectedShipping = null;
       state.shippingError = null;
+      state.shippingDetails = null;
+      localStorage.removeItem("shippingOptions");
+      localStorage.removeItem("selectedShipping");
+      localStorage.removeItem("shippingDetails");
     },
   },
   extraReducers: (builder) => {
@@ -160,9 +194,16 @@ const checkoutSlice = createSlice({
         (state, action: PayloadAction<ShippingCostResponse>) => {
           state.shippingLoading = false;
           state.shippingOptions = action.payload.options;
-          // auto-select the first shipping option
-          if (action.payload.options.length > 0) {
-            state.selectedShipping = action.payload.options[0];
+          localStorage.setItem("shippingOptions", JSON.stringify(action.payload.options));
+          
+          const prev = state.selectedShipping;
+          state.selectedShipping = (prev && action.payload.options.find(
+            opt => opt.courierCode === prev.courierCode && 
+                   opt.courierServiceName === prev.courierServiceName
+          )) || action.payload.options[0] || null;
+          
+          if (state.selectedShipping) {
+            localStorage.setItem("selectedShipping", JSON.stringify(state.selectedShipping));
           }
         }
       )
@@ -174,5 +215,5 @@ const checkoutSlice = createSlice({
   },
 });
 
-export const { setSelectedShipping, clearShipping } = checkoutSlice.actions;
+export const { setSelectedShipping, setShippingDetails, clearShipping } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

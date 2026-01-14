@@ -4,7 +4,6 @@ import {
   HiBars3BottomRight,
 } from "react-icons/hi2";
 import { Link } from "react-router-dom";
-import Searchbar from "./Searchbar";
 import Cartdrawer from "../layout/CartDrawer";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
@@ -102,7 +101,6 @@ const Navbar = () => {
             )}
           </button>
           {/* Search */}
-          <Searchbar />
           <button onClick={toggleNavDrawer} className="md:hidden">
             <HiBars3BottomRight className="h-6 w-6 hover:text-gray-600" />
           </button>

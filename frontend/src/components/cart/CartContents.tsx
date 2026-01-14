@@ -72,7 +72,7 @@ const CartContents = ({ cart, userId, guestId }: CartContentsProps) => {
                 </p>
               )}
 
-              <div className="flex items-center mt-2">
+              <div className="flex items-center mt-2 gap-1">
                 <button
                   onClick={() =>
                     handleAddToCart(
@@ -106,13 +106,13 @@ const CartContents = ({ cart, userId, guestId }: CartContentsProps) => {
             </div>
           </div>
           <div>
-            <p>IDR {product.price.toLocaleString()}</p>
+            <p>IDR {Number(product.price).toLocaleString("id-ID")}</p>
             <button
               onClick={() =>
                 handleRemoveFromCart(product.productVariantId, product.options)
               }
             >
-              <RiDeleteBinLine className="h-6 w-6 mt-2 text-red-600" />
+              <RiDeleteBinLine className="h-6 w-6 mt-2 text-red-700 hover:text-red-900" />
             </button>
           </div>
         </div>

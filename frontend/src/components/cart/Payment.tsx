@@ -7,6 +7,7 @@ import LoadingOverlay from "../common/LoadingOverlay";
 import { cloudinaryImageUrl } from "../../constants/cloudinary";
 import { fetchCheckoutById } from "../../redux/slices/checkoutSlice";
 import { clearCart } from "../../redux/slices/cartSlice";
+import Navbar from "../common/Navbar";
 
 const REDIRECT_AFTER_MS = 2000;
 
@@ -135,32 +136,34 @@ const Payment = () => {
 
   if (error) return <p>Error: {error}</p>;
   return (
-    <div className="flex justify-center px-4 py-10">
-      <LoadingOverlay show={checkoutLoading} />
-      <div className="max-w-4xl border-black border-2 rounded-lg mx-auto py-10 px-6 tracking-tighter">
-        <div className="text-3xl uppercase mb-4 text-acloblue">
-          Payment Instructions
-        </div>
-        <div className="text-xl mb-2">
-          Your total purchase cost is{" "}
-          <span className="font-semibold">
-            IDR {(checkout?.totalPrice ?? 0).toLocaleString()}
-          </span>
-          .
-        </div>
-        <div className="text-xl mb-6">
-          Please do a bank transfer to this account xxxxxxxxxxxxx and upload a
-          screenshot of the proof of transaction. If a proof of transaction is
-          not provided or is deemed invalid, we cannot process your order.
-        </div>
-        {uploading && <p>Uploading image...</p>}
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="bg-acloblue/80 text-white py-2 px-4 rounded hover:bg-acloblue cursor-pointer"
-        >
-          Choose file
-        </button>
+    <>
+      <Navbar />
+      <div className="flex justify-center px-4 py-10">
+        <LoadingOverlay show={checkoutLoading} />
+        <div className="max-w-4xl border-black border-2 rounded-lg mx-auto py-10 px-6 tracking-tighter">
+          <div className="text-3xl uppercase mb-4 text-acloblue">
+            Payment Instructions
+          </div>
+          <div className="text-xl mb-2">
+            Your total purchase cost is{" "}
+            <span className="font-semibold">
+              IDR {(checkout?.totalPrice ?? 0).toLocaleString("id-ID")}
+            </span>
+            .
+          </div>
+          <div className="text-xl mb-6">
+            Please do a bank transfer to this account xxxxxxxxxxxxx and upload a
+            screenshot of the proof of transaction. If a proof of transaction is
+            not provided or is deemed invalid, we cannot process your order.
+          </div>
+          {uploading && <p>Uploading image...</p>}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-acloblue/80 text-white py-2 px-4 rounded hover:bg-acloblue cursor-pointer"
+          >
+            Choose file
+          </button>
 
         <span className="ml-3 text-sm text-gray-600">
           {uploadedFileName ? uploadedFileName : "No file selected"}
@@ -252,6 +255,7 @@ const Payment = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 
