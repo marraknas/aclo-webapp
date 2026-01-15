@@ -125,7 +125,7 @@ const Payment = () => {
         { headers: getAuthHeader() }
       );
       dispatch(clearCart());
-      navigate(`/order/${data._id}/confirmation`);
+      navigate(`/order/${data.orderId}/confirmation`);
     } catch (err) {
       console.error(err);
       // optionally show toast / set local error message
