@@ -70,9 +70,25 @@ const OrderConfirmation = () => {
       <Navbar />
       <div className="max-w-4xl mx-auto p-6 bg-white">
         <h1 className="text-3xl sm:text-4xl font-semibold text-center text-acloblue mb-4 uppercase tracking-tight">
-          Thank You for Your Order!
+          Order Received
         </h1>
         <div className="h-[2px] w-16 bg-acloblue/30 rounded-full mx-auto mb-8" />
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <div className="mt-1 h-3 w-3 rounded-full bg-amber-500 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-900 uppercase tracking-wide">
+                Pending Payment Verification
+              </p>
+              <p className="mt-1 text-sm text-amber-800">
+                Your order is{" "}
+                <span className="font-semibold">not confirmed yet</span>. We’ll
+                confirm it only after we verify and approve your payment proof.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
           <div className="flex justify-between mb-10">
             {/* Order Id and Date */}
@@ -94,7 +110,7 @@ const OrderConfirmation = () => {
             </div>
           </div>
           {/* Ordered Items */}
-          <div className="mb-10">
+          <div className="mb-6">
             {orderDetails.orderItems.map((item) => (
               <div
                 key={item.productId}
@@ -130,10 +146,39 @@ const OrderConfirmation = () => {
               </div>
             ))}
           </div>
-          <div className="mb-6 rounded-xl bg-acloblue/5 border border-acloblue/10 p-4 text-gray-700">
-            Your order has been placed and is pending payment verification.
-            We'll notify you once it's approved and when your tracking number is
-            available.
+          <div className="mb-6 rounded-2xl border border-acloblue/10 bg-acloblue/5 p-5">
+            <p className="text-sm font-semibold text-acloblue uppercase tracking-wide">
+              What happens next
+            </p>
+
+            <ol className="mt-3 space-y-3">
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  1
+                </span>
+                <p className="text-sm text-gray-700">
+                  We review your payment proof.
+                </p>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  2
+                </span>
+                <p className="text-sm text-gray-700">
+                  Once approved, your order is confirmed and we’ll notify you.
+                </p>
+              </li>
+
+              <li className="flex items-start gap-3">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white border border-acloblue/20 text-xs font-bold text-acloblue">
+                  3
+                </span>
+                <p className="text-sm text-gray-700">
+                  When your parcel is shipped, we’ll send your tracking number.
+                </p>
+              </li>
+            </ol>
           </div>
           {/* Payment and Delivery Info */}
           <div className="grid grid-cols-2 gap-8">
