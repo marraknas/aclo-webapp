@@ -18,13 +18,13 @@ const router = express.Router();
 // @desc Get all orders (Admin only)
 // @access Private/Admin
 router.get("/", protect, admin, async (req, res) => {
-    try {
-        const orders = await Order.find({}).populate("user", "name email");
-        res.json(orders);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
-    }
+    // try {
+    //     const orders = await Order.find({}).populate("user", "name email");
+    //     res.json(orders);
+    // } catch (error) {
+    //     console.error(error);
+    //     res.status(500).json({ message: "Server Error" });
+    // }
     try {
         const { category = "all", status, page = 1, limit = 25 } = req.query;
         const categoryMap = {

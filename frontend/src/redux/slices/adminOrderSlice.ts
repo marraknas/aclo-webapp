@@ -252,20 +252,22 @@ const adminOrderSlice = createSlice({
       .addCase(
         fetchAllOrders.fulfilled,
         (state, action: PayloadAction<FetchOrdersResponse>) => {
-          state.orders = action.payload.orders;
-          state.totalOrders = action.payload.total;
-          state.page = action.payload.page;
-          state.limit = action.payload.limit;
-          state.totalPages = action.payload.totalPages;
+          const orders = action.payload.orders ?? [];
 
-          // calculate total sales
-          const totalSales = action.payload.orders.reduce((acc, order) => {
-            return acc + order.totalPrice;
+          state.orders = orders;
+          state.totalOrders = action.payload.total ?? orders.length;
+          state.page = action.payload.page ?? 1;
+          state.limit = action.payload.limit ?? 25;
+          state.totalPages = action.payload.totalPages ?? 1;
+
+          state.totalSales = orders.reduce((acc, order) => {
+            return acc + (order.totalPrice ?? 0);
           }, 0);
-          state.totalSales = totalSales;
+
           state.loading = false;
         }
       )
+
       .addCase(fetchAllOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Failed to fetch orders admin";
