@@ -2,6 +2,8 @@ const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { protect } = require("../middleware/authMiddleware");
+const crypto = require("crypto");
+const { sendEmail } = require("../utils/emailService.js");
 
 const router = express.Router();
 
@@ -172,4 +174,58 @@ router.patch("/profile/addresses/:addressId", protect, async (req, res) => {
 	}
 });
 
+// @route POST /api/users/forgot-password
+// @desc Handles the forgot password flow
+// @access Public
+router.post("/forgot-password", async (req, res) => {
+	const { email } = req.body;
+	try {
+		const user = await User.findOne({ email });
+		if (!user) {
+			return res.status(404).json({ message: "User does not exist!" });
+		}
+
+		const resetToken = user.getResetPasswordToken();
+		await user.save({ validateBeforeSave: false });
+		const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
+		const message = `Click the link below to reset your password: \n\n ${resetUrl}`;
+
+		try {
+			await sendEmail(user.email, "Reset your password", message);
+			res.status(200).json({ success: true, data: "Email sent successfully"});
+		} catch (err) {
+			user.resetPasswordToken = undefined;
+			user.resetPasswordExpire = undefined;
+			await user.save({ validateBeforeSave: false });
+			return res.status(500).json({ message: "Email could not be sent"});
+		}
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ message: "Server Error" });
+	}
+})
+
+// @route PUT /api/users/reset-password/:resetToken
+// @desc Reset password
+// @access Public
+router.put("/reset-password/:resetToken", async (req, res) => {
+	const resetPasswordToken = crypto.createHash("sha256").update(req.params.resetToken).digest("hex");
+	try {
+		const user = await User.findOne({
+			resetPasswordToken,
+			resetPasswordExpire: { $gt: Date.now() },
+		});
+		if (!user) {
+			return res.status(400).json({ message: "Invalid or expired Token" });
+		}
+		user.password = req.body.password;
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+		await user.save();
+		res.status(200).json({ success: true, data: "Password reset successfully" });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server Error" });
+	}
+})
 module.exports = router;

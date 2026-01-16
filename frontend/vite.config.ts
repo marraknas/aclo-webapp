@@ -18,5 +18,12 @@ export default defineConfig({
   server: {
     allowedHosts: ["subfossorial-leisa-graceful.ngrok-free.dev"],
     host: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:9000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });
