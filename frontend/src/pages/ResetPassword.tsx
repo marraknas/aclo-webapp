@@ -4,6 +4,7 @@ import Navbar from "../components/common/Navbar";
 import { assets, cloudinaryImageUrl } from "../constants/cloudinary";
 import type { ResetPasswordPayload } from "../types/auth";
 import axios from "axios";
+import { API_URL } from "../constants/api";
 
 const ResetPassword = () => {
   const [formData, setFormData] = useState<ResetPasswordPayload>({
@@ -62,7 +63,7 @@ const ResetPassword = () => {
     }
 
     try {
-      await axios.put(`/api/users/reset-password/${token}`, {
+      await axios.put(`${API_URL}/api/users/reset-password/${token}`, {
         password: formData.password,
       });
 
